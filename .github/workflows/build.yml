@@ -3,6 +3,29 @@ on:
   push:
   workflow_dispatch:
 jobs:
+  remap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Remap original jar to yarn names
+        run: |
+          chmod +x gradlew
+          ./gradlew -p remap dumpRemapped --no-daemon 2>&1 | tee remap.log
+          J=$(grep -h '^REMAPPED_JAR=' remap.log | head -1 | cut -d= -f2-)
+          echo "remapped: $J"
+          mkdir -p out && cp "$J" out/remapped-yarn.jar
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: remapped-yarn-jar
+          path: |
+            out/remapped-yarn.jar
+            remap.log
   build:
     runs-on: ubuntu-latest
     steps:

@@ -1,0 +1,16 @@
+plugins { id 'fabric-loom' version '1.14-SNAPSHOT' }
+repositories { mavenCentral() }
+dependencies {
+    minecraft "com.mojang:minecraft:1.21.11"
+    mappings "net.fabricmc:yarn:1.21.11+build.2:v2"
+    modImplementation "net.fabricmc:fabric-loader:0.18.4"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.140.0+1.21.11"
+    modImplementation files("libs/orig.jar")
+}
+tasks.register('dumpRemapped') {
+    doLast {
+        configurations.compileClasspath.files.each { f ->
+            if (f.name.contains('orig')) println "REMAPPED_JAR=" + f.absolutePath
+        }
+    }
+}
