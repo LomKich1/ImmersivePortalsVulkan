@@ -1,0 +1,78 @@
+---
+# 1.21.5+: vanilla has one terrain shader (terrain.vsh) and one entity shader (entity.vsh, specialized with
+# defines) in place of the rendertype_solid/cutout/... and rendertype_entity_* families of 1.21.1.
+# The names are the shader file names; ShaderCodeTransformation#shaderIdToName maps the ids to them.
+configs:
+  - comment: For vanilla terrain rendering
+    type: vs
+    affectedShaders:
+      - terrain
+    transformations:
+      - pattern: |-
+          void ( )*main( )*\(( )*( )*\)( )*(
+          )*\{
+        # 1.21.5+: the vertex's camera-relative position is Position + (ChunkPosition - CameraBlockPos) + CameraOffset
+        # (1.21.1: Position.xyz + ChunkOffset)
+        replacement: |-
+          uniform vec4 iportal_ClippingEquation;
+          void main() {
+              gl_ClipDistance[0] = dot(Position + (ChunkPosition - CameraBlockPos) + CameraOffset, iportal_ClippingEquation.xyz) +
+                  iportal_ClippingEquation.w;
+    debugOutput: false
+  - comment: For portal area rendering and entity rendering and particle
+    type: vs
+    affectedShaders:
+      - entity
+      - rendertype_item_entity_translucent_cull
+      - rendertype_beacon_beam
+      - portal_area
+      - particle
+    transformations:
+      - pattern: |-
+          void ( )*main( )*\(( )*( )*\)( )*(
+          )*\{
+        replacement: |-
+          uniform vec4 iportal_ClippingEquation;
+          void main() {
+              gl_ClipDistance[0] = dot(Position.xyz, iportal_ClippingEquation.xyz) +
+                  iportal_ClippingEquation.w;
+    debugOutput: false
+  - comment: For iris+sodium
+    type: vs
+    affectedShaders:
+      - iris_gbuffers_terrain
+      - iris_gbuffers_water
+    transformations:
+      - pattern: |-
+          void ( )*main( )*\(( )*( )*\)( )*(
+          )*\{
+        replacement: |-
+          uniform vec4 iportal_ClippingEquation;
+          void main() {
+      - pattern: "\\}(?![\\S\\s]*\\})"
+        # match the last } ([\S\s] matches any character). use the modelview-transformed coordinate
+        replacement: |-
+          gl_ClipDistance[0] = dot(
+              (iris_ModelViewMatrix * getVertexPosition()).xyz, iportal_ClippingEquation.xyz
+          ) + iportal_ClippingEquation.w;
+          }
+    debugOutput: false
+  - comment: For sodium
+    type: vs
+    affectedShaders:
+      - sodium:blocks/block_layer_opaque.vsh
+    transformations:
+      - pattern: |-
+          void ( )*main( )*\(( )*( )*\)( )*(
+          )*\{
+        replacement:
+          uniform vec4 iportal_ClippingEquation;
+          void main() {
+      - pattern: "\\}(?![\\S\\s]*\\})"
+        # match the last } ([\S\s] matches any character). use the modelview-transformed coordinate
+        replacement: |-
+          gl_ClipDistance[0] = dot(
+              (u_ModelViewMatrix * vec4(position, 1.0)).xyz, iportal_ClippingEquation.xyz
+          ) + iportal_ClippingEquation.w;
+          }
+    debugOutput: false

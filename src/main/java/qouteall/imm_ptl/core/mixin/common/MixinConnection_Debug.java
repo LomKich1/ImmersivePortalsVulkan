@@ -1,0 +1,37 @@
+package qouteall.imm_ptl.core.mixin.common;
+
+import io.netty.channel.ChannelHandlerContext;
+import net.minecraft.network.ClientConnection;
+import org.slf4j.Logger;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin({ClientConnection.class})
+public class MixinConnection_Debug {
+   @Shadow
+   @Final
+   private static Logger LOGGER;
+   @Unique
+   private static int immPtlExceptionLogNum = 0;
+   @Unique
+   private static int immPtlExceptionLogLimit = 5;
+
+   @Inject(
+      method = {"exceptionCaught"},
+      at = {@At("HEAD")}
+   )
+   private void onExceptionCaught(ChannelHandlerContext channelHandlerContext, Throwable throwable, CallbackInfo ci) {
+      if (immPtlExceptionLogNum < immPtlExceptionLogLimit) {
+         immPtlExceptionLogNum++;
+         LOGGER.info(
+            "(This is for debugging only. You can ignore that. Logging limit {}/{}) Exception from connection: ",
+            new Object[]{immPtlExceptionLogNum, immPtlExceptionLogLimit, throwable}
+         );
+      }
+   }
+}

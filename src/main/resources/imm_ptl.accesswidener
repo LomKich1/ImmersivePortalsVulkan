@@ -1,0 +1,19 @@
+accessWidener v2 named
+transitive-accessible	field	net/minecraft/server/MinecraftServer	session	Lnet/minecraft/world/level/storage/LevelStorage$Session;
+transitive-accessible	field	net/minecraft/world/biome/source/BiomeAccess	seed	J
+transitive-accessible	field	net/minecraft/util/profiler/ProfilerSystem	TIMEOUT_NANOSECONDS	J
+transitive-mutable	field	net/minecraft/util/profiler/ProfilerSystem	TIMEOUT_NANOSECONDS	J
+transitive-accessible	class	net/minecraft/server/world/ServerChunkLoadingManager$EntityTracker
+transitive-extendable	method	net/minecraft/entity/Entity	getBoundingBox	()Lnet/minecraft/util/math/Box;
+transitive-accessible	class	net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$Task
+transitive-extendable	class	net/minecraft/world/gen/chunk/NoiseChunkGenerator
+transitive-accessible	class	net/minecraft/registry/RegistryLoader$Loader
+transitive-accessible	class	net/minecraft/client/gui/screen/world/CreateWorldScreen$MoreTab
+transitive-accessible	field	net/minecraft/client/world/ClientChunkManager	emptyChunk	Lnet/minecraft/world/chunk/WorldChunk;
+transitive-accessible	field	net/minecraft/client/world/ClientChunkManager	lightingProvider	Lnet/minecraft/world/chunk/light/LightingProvider;
+transitive-accessible	field	net/minecraft/client/world/ClientChunkManager	chunks	Lnet/minecraft/client/world/ClientChunkManager$ClientChunkMap;
+transitive-accessible	field	net/minecraft/client/world/ClientChunkManager	world	Lnet/minecraft/client/world/ClientWorld;
+transitive-accessible	class	net/minecraft/datafixer/fix/ItemStackComponentizationFix$StackData
+transitive-accessible	field	net/minecraft/server/network/ServerPlayerEntity	server	Lnet/minecraft/server/MinecraftServer;
+transitive-accessible	method	net/minecraft/item/ItemUsageContext	<init>	(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/hit/BlockHitResult;)V
+transitive-accessible	method	net/minecraft/client/render/RenderLayer	of	(Ljava/lang/String;Lnet/minecraft/client/render/RenderSetup;)Lnet/minecraft/client/render/RenderLayer;
