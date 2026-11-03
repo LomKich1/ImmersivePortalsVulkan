@@ -1,9 +1,9 @@
 package qouteall.imm_ptl.core.mc_utils;
 
-import net.minecraft.entity.Entity.class_5529;
+import net.minecraft.entity.Entity.RemovalReason;
 
 public interface IPEntityEventListenableEntity {
    void ip_onEntityPositionUpdated();
 
-   void ip_onRemoved(class_5529 var1);
+   void ip_onRemoved(RemovalReason var1);
 }

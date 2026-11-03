@@ -1,7 +1,7 @@
 package qouteall.imm_ptl.core.mixin.client.collisions;
 
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -11,7 +11,7 @@ import qouteall.imm_ptl.core.ducks.IEEntity;
 @Mixin({ClientPlayerEntity.class})
 public class MixinLocalPlayer {
    @Inject(
-      method = {"Lnet/minecraft/ClientPlayerEntity;wouldCollideAt(Lnet/minecraft/BlockPos;)Z"},
+      method = {"Lnet/minecraft/client/network/ClientPlayerEntity;wouldCollideAt(Lnet/minecraft/util/math/BlockPos;)Z"},
       at = {@At("HEAD")},
       cancellable = true
    )

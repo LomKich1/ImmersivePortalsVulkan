@@ -1,11 +1,11 @@
 package qouteall.imm_ptl.core.mixin.common.chunk_sync;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import net.minecraft.server.network.ChunkDataSender;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ChunkDataSender;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
@@ -75,7 +75,7 @@ public class MixinPlayerChunkSender implements IEPlayerChunkSender {
             );
          }
 
-         return ImmPtlChunkTracking.isChunkPendingToPlayer(player, player.getServerWorld().getRegistryKey(), l);
+         return ImmPtlChunkTracking.isChunkPendingToPlayer(player, player.getEntityWorld().getRegistryKey(), l);
       }
    }
 

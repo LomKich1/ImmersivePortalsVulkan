@@ -18,38 +18,38 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.NetherPortalBlock;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.world.World;
-import net.minecraft.world.LightType;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.block.NetherPortalBlock;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtInt;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerLightingProvider;
 import net.minecraft.text.Text;
-import net.minecraft.block.BlockState;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.world.EntityList;
+import net.minecraft.world.LightType;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkNibbleArray;
 import net.minecraft.world.chunk.EmptyChunk;
-import net.minecraft.util.Identifier;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerLightingProvider;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.EntityList;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.math.Direction.class_2351;
-import net.minecraft.server.MinecraftServer;
 import qouteall.imm_ptl.core.CHelper;
 import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.IPCGlobal;
@@ -183,7 +183,7 @@ public class ClientDebugCommand {
                   MinecraftClient client = MinecraftClient.getInstance();
                   client.execute(
                      () -> client.world
-                        .method_2935()
+                        .getChunkManager()
                         .getLightingProvider()
                         .setSectionStatus(ChunkSectionPos.from(BlockPos.ofFloored(client.player.getEntityPos())), false)
                   );
@@ -212,8 +212,8 @@ public class ClientDebugCommand {
                   server.execute(
                      () -> {
                         ServerPlayerEntity player = (ServerPlayerEntity)server.getPlayerManager().getPlayerList().get(0);
-                        BlockPos.stream(player.getBlockPos().method_10069(-2, -2, -2), player.getBlockPos().method_10069(2, 2, 2))
-                           .forEach(blockPos -> player.getServerWorld().getLightingProvider().checkBlock(blockPos));
+                        BlockPos.stream(player.getBlockPos().add(-2, -2, -2), player.getBlockPos().add(2, 2, 2))
+                           .forEach(blockPos -> player.getEntityWorld().getLightingProvider().checkBlock(blockPos));
                      }
                   );
                   return 0;
@@ -224,8 +224,8 @@ public class ClientDebugCommand {
          MinecraftServer server = MiscHelper.getServer();
          server.execute(() -> {
             ServerPlayerEntity player = (ServerPlayerEntity)server.getPlayerManager().getPlayerList().get(0);
-            ServerLightingProvider lightingProvider = (ServerLightingProvider)player.getServerWorld().getLightingProvider();
-            lightingProvider.light(player.getServerWorld().getChunk(player.getBlockPos()), false);
+            ServerLightingProvider lightingProvider = (ServerLightingProvider)player.getEntityWorld().getLightingProvider();
+            lightingProvider.light(player.getEntityWorld().getChunk(player.getBlockPos()), false);
          });
          return 0;
       }));
@@ -258,7 +258,7 @@ public class ClientDebugCommand {
                            ClientPlayerEntity player = MinecraftClient.getInstance().player;
                            ChunkNibbleArray lightSection = player.getEntityWorld()
                               .getLightingProvider()
-                              .get(LightType.field_9282)
+                              .get(LightType.BLOCK)
                               .getLightSection(ChunkSectionPos.from(player.getBlockPos()));
                            if (lightSection != null) {
                               boolean uninitialized = lightSection.isUninitialized();
@@ -274,9 +274,7 @@ public class ClientDebugCommand {
 
                               support.sendFeedback(
                                  (S)context.getSource(),
-                                 Text.literal(
-                                    "has light section " + (allZero ? "all zero" : "not all zero") + (uninitialized ? " uninitialized" : " fine")
-                                 )
+                                 Text.literal("has light section " + (allZero ? "all zero" : "not all zero") + (uninitialized ? " uninitialized" : " fine"))
                               );
                            } else {
                               support.sendFeedback((S)context.getSource(), Text.literal("does not have light section"));
@@ -470,9 +468,9 @@ public class ClientDebugCommand {
                McRemoteProcedureCall.tellServerToInvoke(
                   "qouteall.imm_ptl.core.commands.ClientDebugCommand.TestRemoteCallable.clientToServer",
                   new UUID(3L, 3L),
-                  Blocks.field_10218,
-                  Blocks.field_10316.getDefaultState().with(NetherPortalBlock.AXIS, class_2351.field_11051),
-                  Items.field_8251,
+                  Blocks.ACACIA_PLANKS,
+                  Blocks.NETHER_PORTAL.getDefaultState().with(NetherPortalBlock.AXIS, Axis.Z),
+                  Items.COMPASS,
                   new ItemStack(Items.ACACIA_LOG, 2),
                   compoundTag,
                   Text.literal("test"),
@@ -490,7 +488,7 @@ public class ClientDebugCommand {
                3.5,
                McHelper.newResourceLocation("imm_ptl:oops"),
                World.NETHER,
-               BiomeKeys.field_9417,
+               BiomeKeys.JUNGLE,
                new BlockPos(3, 5, 4),
                new Vec3d(7.0, 4.0, 1.0)
             )
@@ -518,7 +516,7 @@ public class ClientDebugCommand {
    public static class RemoteCallables {
       public static void reportClientChunkLoadStatus(RegistryKey<World> dimension, int chunkX, int chunkZ) {
          ClientWorld world = ClientWorldLoader.getWorld(dimension);
-         Chunk chunk = world.method_8497(chunkX, chunkZ);
+         Chunk chunk = world.getChunk(chunkX, chunkZ);
          CHelper.printChat(chunk != null && !(chunk instanceof EmptyChunk) ? "client loaded" : "client not loaded");
       }
 
@@ -556,7 +554,7 @@ public class ClientDebugCommand {
          StringBuilder str = new StringBuilder();
          str.append("Client Chunk:\n");
          ClientWorldLoader.getClientWorlds()
-            .forEach(world -> str.append(String.format("%s %s\n", world.getRegistryKey().getValue(), world.method_2935().getLoadedChunkCount())));
+            .forEach(world -> str.append(String.format("%s %s\n", world.getRegistryKey().getValue(), world.getChunkManager().getLoadedChunkCount())));
          str.append("Chunk Mesh Sections:\n");
          ClientWorldLoader.WORLD_RENDERER_MAP
             .forEach(
@@ -600,9 +598,7 @@ public class ClientDebugCommand {
          Text text,
          int[] intArray
       ) {
-         Helper.log(
-            player.getName().getString() + uuid + block + blockState + item + itemStack + compoundTag + text.getString() + Arrays.toString(intArray)
-         );
+         Helper.log(player.getName().getString() + uuid + block + blockState + item + itemStack + compoundTag + text.getString() + Arrays.toString(intArray));
       }
    }
 }

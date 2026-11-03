@@ -6,16 +6,16 @@ import java.util.Random;
 import java.util.UUID;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.world.World;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -52,7 +52,7 @@ public class WandUtil {
          return vec3;
       } else {
          BlockPos blockPos = BlockPos.ofFloored(vec3);
-         return new IntBox(blockPos.method_10069(-1, -1, -1), blockPos.method_10069(1, 1, 1)).stream().flatMap(pos -> {
+         return new IntBox(blockPos.add(-1, -1, -1), blockPos.add(1, 1, 1)).stream().flatMap(pos -> {
             BlockState blockState = world.getBlockState(pos);
             VoxelShape collisionShape = blockState.getCollisionShape(world, pos).offset(pos.getX(), pos.getY(), pos.getZ());
             List<Box> aabbs = collisionShape.getBoundingBoxes();
@@ -77,9 +77,7 @@ public class WandUtil {
       Vec3d yAxis = leftTop.subtract(leftBottom);
       Vec3d normal = xAxis.crossProduct(yAxis).normalize();
       matrixStack.push();
-      matrixStack.translate(
-         leftBottom.x - cameraPos.x, leftBottom.y - cameraPos.y, leftBottom.z - cameraPos.z
-      );
+      matrixStack.translate(leftBottom.x - cameraPos.x, leftBottom.y - cameraPos.y, leftBottom.z - cameraPos.z);
       Matrix4f matrix = matrixStack.peek().getPositionMatrix();
       Matrix3f normalMatrix = matrixStack.peek().getNormalMatrix();
       WireRenderingHelper.putLine(vertexConsumer, color1, matrix, normalMatrix, Vec3d.ZERO, xAxis);
@@ -149,9 +147,7 @@ public class WandUtil {
       Vec3d yAxis = leftTop.subtract(leftBottom);
       Vec3d normal = xAxis.crossProduct(yAxis).normalize();
       matrixStack.push();
-      matrixStack.translate(
-         leftBottom.x - cameraPos.x, leftBottom.y - cameraPos.y, leftBottom.z - cameraPos.z
-      );
+      matrixStack.translate(leftBottom.x - cameraPos.x, leftBottom.y - cameraPos.y, leftBottom.z - cameraPos.z);
       Matrix4f matrix = matrixStack.peek().getPositionMatrix();
       Matrix3f normalMatrix = matrixStack.peek().getNormalMatrix();
 

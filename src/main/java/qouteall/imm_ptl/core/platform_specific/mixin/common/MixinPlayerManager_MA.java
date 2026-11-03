@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.core.platform_specific.mixin.common;
 
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.entity.Entity.RemovalReason;
 import net.minecraft.server.PlayerManager;
-import net.minecraft.entity.Entity.class_5529;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,7 +16,7 @@ public class MixinPlayerManager_MA {
       method = {"respawnPlayer"},
       at = {@At("HEAD")}
    )
-   private void onPlayerRespawn(ServerPlayerEntity oldPlayer, boolean bl, class_5529 removalReason, CallbackInfoReturnable<ServerPlayerEntity> cir) {
+   private void onPlayerRespawn(ServerPlayerEntity oldPlayer, boolean bl, RemovalReason removalReason, CallbackInfoReturnable<ServerPlayerEntity> cir) {
       ImmPtlChunkTracking.removePlayerFromChunkTrackersAndEntityTrackers(oldPlayer);
    }
 

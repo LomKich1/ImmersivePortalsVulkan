@@ -2,13 +2,13 @@ package qouteall.dimlib.mixin.client;
 
 import eu.midnightdust.lib.config.MidnightConfig;
 import java.util.Objects;
-import net.minecraft.text.Text;
+import net.minecraft.client.font.MultilineText;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.BackupPromptScreen;
+import net.minecraft.client.gui.screen.world.BackupPromptScreen.Callback;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CheckboxWidget;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.font.MultilineText;
-import net.minecraft.client.gui.screen.world.BackupPromptScreen.class_406;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,7 +22,7 @@ import qouteall.dimlib.config.DimLibConfig;
 public class MixinBackupConfirmScreen extends Screen {
    @Shadow
    @Final
-   protected class_406 callback;
+   protected Callback callback;
    @Shadow
    private CheckboxWidget eraseCacheCheckbox;
    @Shadow
@@ -36,12 +36,10 @@ public class MixinBackupConfirmScreen extends Screen {
    }
 
    @Inject(
-      method = {"<init>(Ljava/lang/Runnable;Lnet/minecraft/BackupPromptScreen.Callback;Lnet/minecraft/Text;Lnet/minecraft/Text;Lnet/minecraft/Text;Z)V"},
+      method = {"<init>(Ljava/lang/Runnable;Lnet/minecraft/client/gui/screen/world/BackupPromptScreen$Callback;Lnet/minecraft/text/Text;Lnet/minecraft/text/Text;Lnet/minecraft/text/Text;Z)V"},
       at = {@At("RETURN")}
    )
-   private void onInitEnd(
-      Runnable runnable, class_406 listener, Text component, Text component2, Text confirmation, boolean bl, CallbackInfo ci
-   ) {
+   private void onInitEnd(Runnable runnable, Callback listener, Text component, Text component2, Text confirmation, boolean bl, CallbackInfo ci) {
       this.dimlib_isExperimentalWarning = Objects.equals(component, Text.translatable("selectWorld.backupQuestion.experimental"));
    }
 

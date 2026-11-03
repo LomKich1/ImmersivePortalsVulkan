@@ -3,12 +3,12 @@ package qouteall.imm_ptl.peripheral.dim_stack;
 import java.util.function.Consumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,13 +43,11 @@ public class DimStackScreen extends Screen {
       this.finishButton = ButtonWidget.builder(Text.translatable("imm_ptl.finish"), buttonWidget -> controller.onFinish()).build();
       this.controller = controller;
       this.addDimensionButton = ButtonWidget.builder(Text.translatable("imm_ptl.dim_stack_add"), buttonWidget -> this.onAddEntry()).build();
-      this.removeDimensionButton = ButtonWidget.builder(Text.translatable("imm_ptl.dim_stack_remove"), buttonWidget -> this.onRemoveEntry())
-         .build();
+      this.removeDimensionButton = ButtonWidget.builder(Text.translatable("imm_ptl.dim_stack_remove"), buttonWidget -> this.onRemoveEntry()).build();
       this.editButton = ButtonWidget.builder(Text.translatable("imm_ptl.dim_stack_edit"), buttonWidget -> this.onEditEntry()).build();
       this.dimListWidget = new DimListWidget(this.width, this.height, 100, 50, this, DimListWidget.Type.mainDimensionList, controller::onDragged);
       this.helpButton = createHelpButton(this);
-      this.setAsPresetButton = ButtonWidget.builder(Text.translatable("imm_ptl.set_as_dim_stack_default"), button -> this.controller.setAsDefault())
-         .build();
+      this.setAsPresetButton = ButtonWidget.builder(Text.translatable("imm_ptl.set_as_dim_stack_default"), button -> this.controller.setAsDefault()).build();
    }
 
    public void setLoopEnabled(boolean loopEnabled) {
@@ -64,9 +62,7 @@ public class DimStackScreen extends Screen {
    }
 
    public static ButtonWidget createHelpButton(Screen parent) {
-      return ButtonWidget.builder(
-            Text.literal("?"), button -> CHelper.openLinkConfirmScreen(parent, "https://qouteall.fun/immptl/wiki/Dimension-Stack")
-         )
+      return ButtonWidget.builder(Text.literal("?"), button -> CHelper.openLinkConfirmScreen(parent, "https://qouteall.fun/immptl/wiki/Dimension-Stack"))
          .build();
    }
 
@@ -158,14 +154,14 @@ public class DimStackScreen extends Screen {
       return w -> this.dimListWidget.setSelected(w);
    }
 
-   public void render(DrawContext guiGraphics, int mouseX, int mouseY, float partialTick) {
-      super.render(guiGraphics, mouseX, mouseY, partialTick);
+   public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+      super.render(context, mouseX, mouseY, deltaTicks);
       if (this.isEnabled) {
-         this.dimListWidget.render(guiGraphics, mouseX, mouseY, partialTick);
+         this.dimListWidget.render(context, mouseX, mouseY, deltaTicks);
       }
 
       TextRenderer font = MinecraftClient.getInstance().textRenderer;
-      guiGraphics.drawTextWithShadow(font, this.title, 20, 10, -1);
+      context.drawTextWithShadow(font, this.title, 20, 10, -1);
    }
 
    public void setEnabled(boolean cond) {

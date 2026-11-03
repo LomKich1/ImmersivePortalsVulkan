@@ -1,22 +1,22 @@
 package qouteall.imm_ptl.peripheral;
 
 import java.util.function.Consumer;
+import net.minecraft.block.Block;
 import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.ActionResult;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.block.Block;
+import net.minecraft.item.Item.Settings;
+import net.minecraft.item.Item.TooltipContext;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
-import net.minecraft.item.Item.class_1793;
-import net.minecraft.item.Item.class_9635;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 
 public class PortalHelperItem extends BlockItem {
    private static boolean deprecationInformed = false;
 
-   public PortalHelperItem(Block block, class_1793 settings) {
+   public PortalHelperItem(Block block, Settings settings) {
       super(block, settings);
    }
 
@@ -25,18 +25,15 @@ public class PortalHelperItem extends BlockItem {
          deprecationInformed = true;
          context.getPlayer()
             .sendMessage(
-               Text.translatable(
-                  "imm_ptl.portal_helper_deprecated", new Object[]{Text.literal("/portal shape sculpt").formatted(Formatting.field_1065)}
-               ),
-               false
+               Text.translatable("imm_ptl.portal_helper_deprecated", new Object[]{Text.literal("/portal shape sculpt").formatted(Formatting.GOLD)}), false
             );
       }
 
       return super.useOnBlock(context);
    }
 
-   public void appendTooltip(ItemStack itemStack, class_9635 tooltipContext, TooltipDisplayComponent tooltipDisplay, Consumer<Text> list, TooltipType tooltipFlag) {
-      super.appendTooltip(itemStack, tooltipContext, tooltipDisplay, list, tooltipFlag);
-      list.accept(Text.translatable("imm_ptl.portal_helper_tooltip"));
+   public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
+      super.appendTooltip(stack, context, displayComponent, textConsumer, type);
+      textConsumer.accept(Text.translatable("imm_ptl.portal_helper_tooltip"));
    }
 }

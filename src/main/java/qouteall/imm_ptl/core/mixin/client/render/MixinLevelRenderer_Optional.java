@@ -1,10 +1,10 @@
 package qouteall.imm_ptl.core.mixin.client.render;
 
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.BuiltChunkStorage;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.chunk.ChunkBuilder;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -42,7 +42,7 @@ public class MixinLevelRenderer_Optional {
       method = {"updateCamera"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ChunkBuilder;setCameraPosition(Lnet/minecraft/Vec3d;)V"
+         target = "Lnet/minecraft/client/render/chunk/ChunkBuilder;setCameraPosition(Lnet/minecraft/util/math/Vec3d;)V"
       )},
       require = 0
    )

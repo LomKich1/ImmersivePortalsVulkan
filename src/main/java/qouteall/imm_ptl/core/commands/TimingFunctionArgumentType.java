@@ -20,9 +20,7 @@ import qouteall.q_misc_util.platform.Platform;
 
 public class TimingFunctionArgumentType implements ArgumentType<TimingFunction> {
    public static final TimingFunctionArgumentType instance = new TimingFunctionArgumentType();
-   public static final DynamicCommandExceptionType exceptionType = new DynamicCommandExceptionType(
-      object -> Text.literal("Invalid Timing Function " + object)
-   );
+   public static final DynamicCommandExceptionType exceptionType = new DynamicCommandExceptionType(object -> Text.literal("Invalid Timing Function " + object));
 
    public static TimingFunction get(CommandContext<?> context, String argName) {
       return (TimingFunction)context.getArgument(argName, TimingFunction.class);
@@ -44,7 +42,9 @@ public class TimingFunctionArgumentType implements ArgumentType<TimingFunction> 
    public static void init() {
       Platform.get()
          .registerArgumentType(
-            McHelper.newResourceLocation("imm_ptl:timing_function_argument_type"), TimingFunctionArgumentType.class, ConstantArgumentSerializer.of(() -> instance)
+            McHelper.newResourceLocation("imm_ptl:timing_function_argument_type"),
+            TimingFunctionArgumentType.class,
+            ConstantArgumentSerializer.of(() -> instance)
          );
    }
 }

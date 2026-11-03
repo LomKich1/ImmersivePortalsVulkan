@@ -6,16 +6,16 @@ import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.brigadier.CommandDispatcher;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
-import net.minecraft.world.World;
-import net.minecraft.text.Text;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.SimpleFramebuffer;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.text.Text;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
 
 public interface ClientPlatform {
    static ClientPlatform get() {

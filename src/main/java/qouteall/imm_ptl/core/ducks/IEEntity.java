@@ -1,9 +1,9 @@
 package qouteall.imm_ptl.core.ducks;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.collision.PortalCollisionHandler;
 import qouteall.imm_ptl.core.portal.Portal;

@@ -2,10 +2,10 @@ package qouteall.imm_ptl.core.mixin.common.mc_util;
 
 import java.util.Collection;
 import java.util.function.Function;
+import net.minecraft.util.TypeFilter;
 import net.minecraft.util.collection.TypeFilterableList;
 import net.minecraft.world.entity.EntityLike;
 import net.minecraft.world.entity.EntityTrackingSection;
-import net.minecraft.util.TypeFilter;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

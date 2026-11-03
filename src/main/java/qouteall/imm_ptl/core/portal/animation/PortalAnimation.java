@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.Formatting;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.text.Text;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -453,18 +453,14 @@ public class PortalAnimation {
 
       for (int i = 0; i < l1.size(); i++) {
          PortalAnimationDriver animation = l1.get(i);
-         component.append(
-            Text.literal("[%d]: ".formatted(i)).formatted(Formatting.field_1065).append(animation.getInfo()).append("\n")
-         );
+         component.append(Text.literal("[%d]: ".formatted(i)).formatted(Formatting.GOLD).append(animation.getInfo()).append("\n"));
       }
 
       component.append(Text.literal("Other Side:\n"));
 
       for (int i = 0; i < l2.size(); i++) {
          PortalAnimationDriver animation = l2.get(i);
-         component.append(
-            Text.literal("[%d]: ".formatted(i)).formatted(Formatting.field_1065).append(animation.getInfo()).append("\n")
-         );
+         component.append(Text.literal("[%d]: ".formatted(i)).formatted(Formatting.GOLD).append(animation.getInfo()).append("\n"));
       }
 
       return component;

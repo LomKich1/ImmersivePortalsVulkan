@@ -3,31 +3,31 @@ package qouteall.imm_ptl.core.portal;
 import java.util.Objects;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.Entity.RemovalReason;
+import net.minecraft.entity.boss.dragon.EnderDragonFight;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.Items;
-import net.minecraft.world.GameMode;
-import net.minecraft.world.World;
-import net.minecraft.block.Blocks;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.boss.dragon.EnderDragonFight;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.world.GameMode;
+import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.EndPlatformFeature;
-import net.minecraft.entity.Entity.class_5529;
-import net.minecraft.util.math.Direction.class_2351;
-import net.minecraft.server.MinecraftServer;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,7 +81,7 @@ public class EndPortalEntity extends Portal {
    }
 
    private static void doCreateEndPlatform(ServerWorld world) {
-      EndPlatformFeature.generate(world, BlockPos.ofFloored(ServerWorld.END_SPAWN_POS.toBottomCenterPos()).method_10074(), true);
+      EndPlatformFeature.generate(world, BlockPos.ofFloored(ServerWorld.END_SPAWN_POS.toBottomCenterPos()).down(), true);
    }
 
    private static void generateClassicalEndPortal(ServerWorld world, Vec3d destination, Vec3d portalCenter) {
@@ -107,7 +107,7 @@ public class EndPortalEntity extends Portal {
       Box thisSideBox = Helper.getBoxByBottomPosAndSize(frameCenter.add(0.0, 0.2, 0.0), viewBoxSize);
       Box otherSideBox = Helper.getBoxByBottomPosAndSize(new Vec3d(0.0, 0.0, 0.0), viewBoxSize.multiply(scale));
       Vec3d portalCenter = thisSideBox.getCenter();
-      EndPortalEntity portal = (EndPortalEntity)ENTITY_TYPE.create(world, SpawnReason.field_16461);
+      EndPortalEntity portal = (EndPortalEntity)ENTITY_TYPE.create(world, SpawnReason.TRIGGERED);
 
       assert portal != null;
 
@@ -159,11 +159,11 @@ public class EndPortalEntity extends Portal {
          BlockPos interiorCorner = this.findFrameInterior(world);
          if (interiorCorner != null) {
             LOGGER.info("End portal at {} made in mode {} follows the End portal mode {}", interiorCorner, madeInMode, currentMode);
-            this.remove(class_5529.KILLED);
+            this.remove(RemovalReason.KILLED);
             if (currentMode == IPGlobal.EndPortalMode.vanilla) {
                for (int dx = 0; dx < 3; dx++) {
                   for (int dz = 0; dz < 3; dz++) {
-                     world.setBlockState(interiorCorner.method_10069(dx, 0, dz), Blocks.field_10027.getDefaultState(), 2);
+                     world.setBlockState(interiorCorner.add(dx, 0, dz), Blocks.END_PORTAL.getDefaultState(), 2);
                   }
                }
             } else {
@@ -197,9 +197,9 @@ public class EndPortalEntity extends Portal {
       int maxZ = Integer.MIN_VALUE;
       int count = 0;
 
-      for (BlockPos pos : BlockPos.iterate(near.method_10069(-2, -3, -2), near.method_10069(2, 1, 2))) {
+      for (BlockPos pos : BlockPos.iterate(near.add(-2, -3, -2), near.add(2, 1, 2))) {
          BlockState state = world.getBlockState(pos);
-         if (state.getBlock() == PortalPlaceholderBlock.instance && state.get(PortalPlaceholderBlock.AXIS) == class_2351.field_11052) {
+         if (state.getBlock() == PortalPlaceholderBlock.instance && state.get(PortalPlaceholderBlock.AXIS) == Axis.Y) {
             count++;
             minX = Math.min(minX, pos.getX());
             minY = Math.min(minY, pos.getY());
@@ -255,7 +255,7 @@ public class EndPortalEntity extends Portal {
          }
 
          LivingEntity livingEntity = (LivingEntity)entity;
-         livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.field_5906, duration, 1));
+         livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, duration, 1));
       }
 
       MinecraftServer server = this.getEntityWorld().getServer();
@@ -300,11 +300,11 @@ public class EndPortalEntity extends Portal {
    private boolean shouldAddSlowFalling(Entity entity) {
       if (entity instanceof LivingEntity) {
          if (entity instanceof ServerPlayerEntity player) {
-            if (player.interactionManager.getGameMode() == GameMode.field_9220) {
+            if (player.interactionManager.getGameMode() == GameMode.CREATIVE) {
                return false;
             }
 
-            if (player.getEquippedStack(EquipmentSlot.field_6174).getItem() == Items.field_8833) {
+            if (player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA) {
                return false;
             }
          }

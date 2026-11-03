@@ -2,10 +2,10 @@ package qouteall.imm_ptl.peripheral.mixin.client;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.text.Text;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.profiler.Profiler;
 import net.minecraft.client.resource.SplashTextResourceSupplier;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.text.Text;
+import net.minecraft.util.profiler.Profiler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,7 +18,7 @@ public class MixinSplashManager_CVB {
    private List<Text> splashTexts;
 
    @Inject(
-      method = {"method_18175(Ljava/util/List;Lnet/minecraft/ResourceManager;Lnet/minecraft/Profiler;)V"},
+      method = {"apply(Ljava/util/List;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V"},
       at = {@At("RETURN")}
    )
    private void onApply(List<Text> list, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci) {

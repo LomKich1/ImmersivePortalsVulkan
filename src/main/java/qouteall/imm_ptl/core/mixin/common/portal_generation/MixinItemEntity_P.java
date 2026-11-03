@@ -1,10 +1,10 @@
 package qouteall.imm_ptl.core.mixin.common.portal_generation;
 
-import net.minecraft.util.profiler.Profilers;
-import net.minecraft.entity.LazyEntityReference;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LazyEntityReference;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.profiler.Profilers;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -24,7 +24,7 @@ public abstract class MixinItemEntity_P {
    public abstract ItemStack getStack();
 
    @Inject(
-      method = {"Lnet/minecraft/ItemEntity;tick()V"},
+      method = {"Lnet/minecraft/entity/ItemEntity;tick()V"},
       at = {@At("TAIL")}
    )
    private void onItemTickEnded(CallbackInfo ci) {

@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.peripheral.platform_specific;
 
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.registry.Registry;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import qouteall.imm_ptl.peripheral.PeripheralModMain;
 
 public class PeripheralModEntry implements ModInitializer {

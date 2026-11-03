@@ -1,17 +1,17 @@
 package qouteall.imm_ptl.peripheral.alternate_dimension;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry.Reference;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry.class_6883;
 
 public class ErrorTerrainComposition {
-   public static final BlockState air = Blocks.field_10124.getDefaultState();
-   public static final BlockState stone = Blocks.field_10340.getDefaultState();
-   public static final BlockState water = Blocks.field_10382.getDefaultState();
+   public static final BlockState air = Blocks.AIR.getDefaultState();
+   public static final BlockState stone = Blocks.STONE.getDefaultState();
+   public static final BlockState water = Blocks.WATER.getDefaultState();
    public static final RegionErrorTerrainGenerator.Composition mountain = (worldY, funcValue, middle, upMiddle, downMiddle, worldX, worldZ) -> {
       if (funcValue > middle) {
          return funcValue > middle * middle ? air : stone;
@@ -60,9 +60,9 @@ public class ErrorTerrainComposition {
          double upPoint = Math.max(middle, Math.max(upMiddle, downMiddle));
          double splitPoint = MathHelper.lerp(Math.abs(worldY - 32) / 32.0, middle, worldY > 32 ? upMiddle : downMiddle);
          if (funcValue > splitPoint && (int)funcValue % 37 == 0) {
-            Block randomBlock = (Block)((class_6883)Registries.BLOCK.getRandom(Random.create()).get()).comp_349();
-            if (randomBlock == Blocks.field_10327) {
-               randomBlock = Blocks.field_10124;
+            Block randomBlock = (Block)((Reference)Registries.BLOCK.getRandom(Random.create()).get()).value();
+            if (randomBlock == Blocks.BEACON) {
+               randomBlock = Blocks.AIR;
             }
 
             return randomBlock.getDefaultState();

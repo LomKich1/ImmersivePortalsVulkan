@@ -4,13 +4,13 @@ import java.util.Random;
 import java.util.function.IntSupplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack.class_4665;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.MatrixStack.Entry;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -36,9 +36,7 @@ public class WireRenderingHelper {
       Random random = new Random(color);
       double boxSize = Math.pow(boxCenter.distanceTo(cameraPos), 0.3) * 0.09;
       matrixStack.push();
-      matrixStack.translate(
-         boxCenter.x - cameraPos.x, boxCenter.y - cameraPos.y, boxCenter.z - cameraPos.z
-      );
+      matrixStack.translate(boxCenter.x - cameraPos.x, boxCenter.y - cameraPos.y, boxCenter.z - cameraPos.z);
       matrixStack.scale((float)scale, (float)scale, (float)scale);
       DQuaternion rotation = getRandomSmoothRotation(random);
       double periodLen = 100.0;
@@ -68,7 +66,7 @@ public class WireRenderingHelper {
       float blue,
       float alpha
    ) {
-      class_4665 pose = poseStack.peek();
+      Entry pose = poseStack.peek();
       float lineWidth = getLineWidth();
       float x0 = (float)minX;
       float y0 = (float)minY;
@@ -148,9 +146,7 @@ public class WireRenderingHelper {
          Vec3d planeX = normal.crossProduct(anyVecNonNormal).normalize();
          Vec3d planeY = normal.crossProduct(planeX).normalize();
          matrixStack.push();
-         matrixStack.translate(
-            planeCenter.x - cameraPos.x, planeCenter.y - cameraPos.y, planeCenter.z - cameraPos.z
-         );
+         matrixStack.translate(planeCenter.x - cameraPos.x, planeCenter.y - cameraPos.y, planeCenter.z - cameraPos.z);
          matrixStack.multiply(DQuaternion.rotationByDegrees(normal, CHelper.getSmoothCycles(211L) * 360.0).toMcQuaternion());
          Matrix4f matrix = matrixStack.peek().getPositionMatrix();
          double cameraDistanceToCenter = player.getCameraPosVec(RenderStates.getPartialTick()).distanceTo(planeCenter);
@@ -197,9 +193,7 @@ public class WireRenderingHelper {
          Vec3d circleCenter = circle.circleCenter();
          double circleRadius = circle.radius();
          matrixStack.push();
-         matrixStack.translate(
-            circleCenter.x - cameraPos.x, circleCenter.y - cameraPos.y, circleCenter.z - cameraPos.z
-         );
+         matrixStack.translate(circleCenter.x - cameraPos.x, circleCenter.y - cameraPos.y, circleCenter.z - cameraPos.z);
          Matrix4f matrix = matrixStack.peek().getPositionMatrix();
          int vertexNum = MathHelper.clamp((int)Math.round(circleRadius * 40.0), 40, 400);
 
@@ -298,9 +292,7 @@ public class WireRenderingHelper {
       putLine(vertexConsumer, color, lineEnd.subtract(lineStart), matrix, normalMatrix, lineStart, lineEnd);
    }
 
-   public static void putLine(
-      VertexConsumer vertexConsumer, int color, Vec3d normal, Matrix4f matrix, Matrix3f normalMatrix, Vec3d lineStart, Vec3d lineEnd
-   ) {
+   public static void putLine(VertexConsumer vertexConsumer, int color, Vec3d normal, Matrix4f matrix, Matrix3f normalMatrix, Vec3d lineStart, Vec3d lineEnd) {
       Vector3f normalTemp = new Vector3f();
       normalTemp.set(normal.getX(), normal.getY(), normal.getZ());
       normalMatrix.transform(normalTemp);
@@ -344,11 +336,7 @@ public class WireRenderingHelper {
       MatrixStack matrixStack
    ) {
       matrixStack.push();
-      matrixStack.translate(
-         rect.position().x - cameraPos.x,
-         rect.position().y - cameraPos.y,
-         rect.position().z - cameraPos.z
-      );
+      matrixStack.translate(rect.position().x - cameraPos.x, rect.position().y - cameraPos.y, rect.position().z - cameraPos.z);
       Vec3d[] vertices = getRectVertices(rect, shrinkFactor);
       Random random = new Random(color);
       renderFlowLines(vertexConsumer, vertices, flowCount, color, flowDirection, matrixStack, () -> random.nextInt(30, 300));
@@ -376,15 +364,9 @@ public class WireRenderingHelper {
       Vec3d facingOffset = normal.multiply(0.01);
       return new Vec3d[]{
          axisW.multiply(shrinkFactor * rect.width() / 2.0).add(axisH.multiply(shrinkFactor * rect.height() / 2.0)).add(facingOffset),
-         axisW.multiply(shrinkFactor * rect.width() / 2.0)
-            .add(axisH.multiply(-1.0 * shrinkFactor * rect.height() / 2.0))
-            .add(facingOffset),
-         axisW.multiply(-1.0 * shrinkFactor * rect.width() / 2.0)
-            .add(axisH.multiply(-1.0 * shrinkFactor * rect.height() / 2.0))
-            .add(facingOffset),
-         axisW.multiply(-1.0 * shrinkFactor * rect.width() / 2.0)
-            .add(axisH.multiply(shrinkFactor * rect.height() / 2.0))
-            .add(facingOffset),
+         axisW.multiply(shrinkFactor * rect.width() / 2.0).add(axisH.multiply(-1.0 * shrinkFactor * rect.height() / 2.0)).add(facingOffset),
+         axisW.multiply(-1.0 * shrinkFactor * rect.width() / 2.0).add(axisH.multiply(-1.0 * shrinkFactor * rect.height() / 2.0)).add(facingOffset),
+         axisW.multiply(-1.0 * shrinkFactor * rect.width() / 2.0).add(axisH.multiply(shrinkFactor * rect.height() / 2.0)).add(facingOffset),
          axisW.multiply(shrinkFactor * rect.width() / 2.0).add(axisH.multiply(shrinkFactor * rect.height() / 2.0)).add(facingOffset)
       };
    }
@@ -436,11 +418,7 @@ public class WireRenderingHelper {
       double rotationProgress
    ) {
       matrixStack.push();
-      matrixStack.translate(
-         sphere.center().x - cameraPos.x,
-         sphere.center().y - cameraPos.y,
-         sphere.center().z - cameraPos.z
-      );
+      matrixStack.translate(sphere.center().x - cameraPos.x, sphere.center().y - cameraPos.y, sphere.center().z - cameraPos.z);
       matrixStack.multiply(sphereOrientation.toMcQuaternion());
       matrixStack.scale((float)sphere.radius(), (float)sphere.radius(), (float)sphere.radius());
       Matrix4f matrix = matrixStack.peek().getPositionMatrix();
@@ -461,19 +439,13 @@ public class WireRenderingHelper {
             double z = Math.cos(latitude) * Math.sin(longitude);
             boolean isFirst = j == 0;
             if (isFirst) {
-               vertexConsumer.vertex(matrix, (float)x, (float)y, (float)z)
-                  .color(transparentColor)
-                  .normal(0.0F, 1.0F, 0.0F)
-                  .lineWidth(getLineWidth());
+               vertexConsumer.vertex(matrix, (float)x, (float)y, (float)z).color(transparentColor).normal(0.0F, 1.0F, 0.0F).lineWidth(getLineWidth());
             }
 
             vertexConsumer.vertex(matrix, (float)x, (float)y, (float)z).color(color).normal(0.0F, 1.0F, 0.0F).lineWidth(getLineWidth());
             boolean isLast = j == vertexNum - 1;
             if (isLast) {
-               vertexConsumer.vertex(matrix, (float)x, (float)y, (float)z)
-                  .color(transparentColor)
-                  .normal(0.0F, 1.0F, 0.0F)
-                  .lineWidth(getLineWidth());
+               vertexConsumer.vertex(matrix, (float)x, (float)y, (float)z).color(transparentColor).normal(0.0F, 1.0F, 0.0F).lineWidth(getLineWidth());
             }
          }
       }
@@ -492,22 +464,13 @@ public class WireRenderingHelper {
             double zx = Math.cos(latitudex) * Math.sin(longitude);
             boolean isFirstx = j == 0;
             if (isFirstx) {
-               vertexConsumer.vertex(matrix, (float)xx, (float)yx, (float)zx)
-                  .color(transparentColor)
-                  .normal(0.0F, 1.0F, 0.0F)
-                  .lineWidth(getLineWidth());
+               vertexConsumer.vertex(matrix, (float)xx, (float)yx, (float)zx).color(transparentColor).normal(0.0F, 1.0F, 0.0F).lineWidth(getLineWidth());
             }
 
-            vertexConsumer.vertex(matrix, (float)xx, (float)yx, (float)zx)
-               .color(color)
-               .normal(0.0F, 1.0F, 0.0F)
-               .lineWidth(getLineWidth());
+            vertexConsumer.vertex(matrix, (float)xx, (float)yx, (float)zx).color(color).normal(0.0F, 1.0F, 0.0F).lineWidth(getLineWidth());
             boolean isLast = j == vertexNum;
             if (isLast) {
-               vertexConsumer.vertex(matrix, (float)xx, (float)yx, (float)zx)
-                  .color(transparentColor)
-                  .normal(0.0F, 1.0F, 0.0F)
-                  .lineWidth(getLineWidth());
+               vertexConsumer.vertex(matrix, (float)xx, (float)yx, (float)zx).color(transparentColor).normal(0.0F, 1.0F, 0.0F).lineWidth(getLineWidth());
             }
          }
       }
@@ -559,30 +522,9 @@ public class WireRenderingHelper {
             double y1 = p1y * (1.0 - shrink) + centerY * shrink;
             double x2 = p2x * (1.0 - shrink) + centerX * shrink;
             double y2 = p2y * (1.0 - shrink) + centerY * shrink;
-            putLine(
-               vertexConsumer,
-               -2130771968,
-               matrix,
-               normalMatrix,
-               X.multiply(x0).add(Y.multiply(y0)),
-               X.multiply(x1).add(Y.multiply(y1))
-            );
-            putLine(
-               vertexConsumer,
-               -2130771968,
-               matrix,
-               normalMatrix,
-               X.multiply(x1).add(Y.multiply(y1)),
-               X.multiply(x2).add(Y.multiply(y2))
-            );
-            putLine(
-               vertexConsumer,
-               -2130771968,
-               matrix,
-               normalMatrix,
-               X.multiply(x2).add(Y.multiply(y2)),
-               X.multiply(x0).add(Y.multiply(y0))
-            );
+            putLine(vertexConsumer, -2130771968, matrix, normalMatrix, X.multiply(x0).add(Y.multiply(y0)), X.multiply(x1).add(Y.multiply(y1)));
+            putLine(vertexConsumer, -2130771968, matrix, normalMatrix, X.multiply(x1).add(Y.multiply(y1)), X.multiply(x2).add(Y.multiply(y2)));
+            putLine(vertexConsumer, -2130771968, matrix, normalMatrix, X.multiply(x2).add(Y.multiply(y2)), X.multiply(x0).add(Y.multiply(y0)));
          }
 
          matrixStack.pop();

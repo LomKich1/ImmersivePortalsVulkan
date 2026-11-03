@@ -1,11 +1,11 @@
 package qouteall.imm_ptl.peripheral.dim_stack;
 
-import net.minecraft.client.gui.Click;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
+import net.minecraft.client.gui.widget.EntryListWidget;
 import org.jetbrains.annotations.Nullable;
 import qouteall.q_misc_util.Helper;
 
@@ -25,9 +25,9 @@ public class DimListWidget extends EntryListWidget<DimEntryWidget> {
       this.draggingCallback = draggingCallback;
    }
 
-   public boolean mouseDragged(Click mouseButtonEvent, double deltaX, double deltaY) {
-      double mouseX = mouseButtonEvent.comp_4798();
-      double mouseY = mouseButtonEvent.comp_4799();
+   public boolean mouseDragged(Click click, double offsetX, double offsetY) {
+      double mouseX = click.x();
+      double mouseY = click.y();
       if (this.type == DimListWidget.Type.mainDimensionList && this.draggingCallback != null) {
          DimEntryWidget selected = (DimEntryWidget)this.getSelectedOrNull();
          if (selected != null) {
@@ -44,10 +44,10 @@ public class DimListWidget extends EntryListWidget<DimEntryWidget> {
          }
       }
 
-      return super.mouseDragged(mouseButtonEvent, deltaX, deltaY);
+      return super.mouseDragged(click, offsetX, offsetY);
    }
 
-   protected void appendClickableNarrations(NarrationMessageBuilder narrationElementOutput) {
+   protected void appendClickableNarrations(NarrationMessageBuilder builder) {
    }
 
    public int getRowWidth() {
@@ -58,7 +58,7 @@ public class DimListWidget extends EntryListWidget<DimEntryWidget> {
       return (this.width - 300) / 2 + 300;
    }
 
-   protected void drawMenuListBackground(DrawContext guiGraphics) {
+   protected void drawMenuListBackground(DrawContext context) {
    }
 
    public interface DraggingCallback {

@@ -4,11 +4,11 @@ import com.mojang.logging.LogUtils;
 import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.WorldAccess;
 import org.slf4j.Logger;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.q_misc_util.Helper;
@@ -36,7 +36,7 @@ public class NetherPortalMatcher {
       if (airCube == null) {
          LOGGER.info("Cannot Find Portal Placement on Solid Surface");
          return null;
-      } else if (world.getBlockState(airCube.l.method_10074()).isSolid()) {
+      } else if (world.getBlockState(airCube.l.down()).isSolid()) {
          LOGGER.info("Generated Portal On Ground");
          return pushDownBox(world, airCube.getSubBoxInCenter(areaSize));
       } else {
@@ -47,9 +47,7 @@ public class NetherPortalMatcher {
 
    private static IntBox expandFromBottomCenter(IntBox box, BlockPos spacing) {
       BlockPos boxSize = box.getSize();
-      return box.getAdjusted(
-         -spacing.getX() / 2, 0, -spacing.getZ() / 2, spacing.getX() / 2, spacing.getY(), spacing.getZ() / 2
-      );
+      return box.getAdjusted(-spacing.getX() / 2, 0, -spacing.getZ() / 2, spacing.getX() / 2, spacing.getY(), spacing.getZ() / 2);
    }
 
    private static IntBox getAirCubeOnGround(
@@ -72,7 +70,7 @@ public class NetherPortalMatcher {
                   return box;
                }
 
-               if (BlockTraverse.boxAllMatch(box.getSurfaceLayer(Direction.field_11033), isAirOnGroundPredicate) && isAirOnGroundPredicate.test(expanded.l)) {
+               if (BlockTraverse.boxAllMatch(box.getSurfaceLayer(Direction.DOWN), isAirOnGroundPredicate) && isAirOnGroundPredicate.test(expanded.l)) {
                   return box;
                }
             }
@@ -112,11 +110,11 @@ public class NetherPortalMatcher {
    }
 
    private static boolean isAirOnSolidGround(WorldAccess world, BlockPos blockPos) {
-      return world.isAir(blockPos) && isSolidGroundBlock(world.getBlockState(blockPos.method_10069(0, -1, 0)));
+      return world.isAir(blockPos) && isSolidGroundBlock(world.getBlockState(blockPos.add(0, -1, 0)));
    }
 
    private static boolean isAirOnGround(WorldAccess world, BlockPos blockPos) {
-      return world.isAir(blockPos) && isGroundBlock(world.getBlockState(blockPos.method_10069(0, -1, 0)));
+      return world.isAir(blockPos) && isGroundBlock(world.getBlockState(blockPos.add(0, -1, 0)));
    }
 
    public static IntBox findCubeAirAreaAtAnywhere(BlockPos areaSize, WorldAccess world, BlockPos searchingCenter, int findingRadius) {

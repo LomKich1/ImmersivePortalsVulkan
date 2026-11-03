@@ -15,43 +15,43 @@ import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents
 import net.fabricmc.fabric.impl.attachment.AttachmentTargetImpl;
 import net.fabricmc.fabric.impl.attachment.sync.AttachmentChange;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.Text;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerConfigurationTask;
-import net.minecraft.server.network.ServerConfigurationNetworkHandler;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.listener.ClientCommonPacketListener;
 import net.minecraft.network.listener.ServerCommonPacketListener;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.server.network.ServerPlayerConfigurationTask.class_8606;
-import net.minecraft.network.packet.CustomPayload.class_9154;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.CustomPayload.Id;
+import net.minecraft.server.network.ServerConfigurationNetworkHandler;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.server.network.ServerPlayerConfigurationTask;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.network.ServerPlayerConfigurationTask.Key;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.world.chunk.WorldChunk;
 import qouteall.imm_ptl.core.mixin.common.other_sync.IEServerConfigurationPacketListenerImpl;
 import qouteall.q_misc_util.platform.PlatformNetworking;
 
 public class FabricPlatformNetworking implements PlatformNetworking {
    @Override
-   public <T extends CustomPayload> void registerPlayS2C(class_9154<T> type, PacketCodec<? super RegistryByteBuf, T> codec) {
+   public <T extends CustomPayload> void registerPlayS2C(Id<T> type, PacketCodec<? super RegistryByteBuf, T> codec) {
       PayloadTypeRegistry.playS2C().register(type, codec);
    }
 
    @Override
-   public <T extends CustomPayload> void registerPlayC2S(class_9154<T> type, PacketCodec<? super RegistryByteBuf, T> codec) {
+   public <T extends CustomPayload> void registerPlayC2S(Id<T> type, PacketCodec<? super RegistryByteBuf, T> codec) {
       PayloadTypeRegistry.playC2S().register(type, codec);
    }
 
    @Override
-   public <T extends CustomPayload> void registerServerReceiver(class_9154<T> type, PlatformNetworking.ServerPlayReceiver<T> handler) {
+   public <T extends CustomPayload> void registerServerReceiver(Id<T> type, PlatformNetworking.ServerPlayReceiver<T> handler) {
       ServerPlayNetworking.registerGlobalReceiver(type, (payload, context) -> handler.receive((T)payload, context.player()));
    }
 
    @Environment(EnvType.CLIENT)
    @Override
-   public <T extends CustomPayload> void registerClientReceiver(class_9154<T> type, PlatformNetworking.ClientPlayReceiver<T> handler) {
+   public <T extends CustomPayload> void registerClientReceiver(Id<T> type, PlatformNetworking.ClientPlayReceiver<T> handler) {
       ClientPlayNetworking.registerGlobalReceiver(type, (payload, context) -> handler.receive((T)payload, context.client()));
    }
 
@@ -67,17 +67,17 @@ public class FabricPlatformNetworking implements PlatformNetworking {
    }
 
    @Override
-   public <T extends CustomPayload> void registerConfigurationS2C(class_9154<T> type, PacketCodec<? super PacketByteBuf, T> codec) {
+   public <T extends CustomPayload> void registerConfigurationS2C(Id<T> type, PacketCodec<? super PacketByteBuf, T> codec) {
       PayloadTypeRegistry.configurationS2C().register(type, codec);
    }
 
    @Override
-   public <T extends CustomPayload> void registerConfigurationC2S(class_9154<T> type, PacketCodec<? super PacketByteBuf, T> codec) {
+   public <T extends CustomPayload> void registerConfigurationC2S(Id<T> type, PacketCodec<? super PacketByteBuf, T> codec) {
       PayloadTypeRegistry.configurationC2S().register(type, codec);
    }
 
    @Override
-   public <T extends CustomPayload> void registerServerConfigurationReceiver(class_9154<T> type, PlatformNetworking.ServerConfigurationReceiver<T> handler) {
+   public <T extends CustomPayload> void registerServerConfigurationReceiver(Id<T> type, PlatformNetworking.ServerConfigurationReceiver<T> handler) {
       ServerConfigurationNetworking.registerGlobalReceiver(
          type, (payload, context) -> handler.receive((T)payload, new FabricPlatformNetworking.FabricServerConfigurationContext(context.networkHandler()))
       );
@@ -85,7 +85,7 @@ public class FabricPlatformNetworking implements PlatformNetworking {
 
    @Environment(EnvType.CLIENT)
    @Override
-   public <T extends CustomPayload> void registerClientConfigurationReceiver(class_9154<T> type, PlatformNetworking.ClientConfigurationReceiver<T> handler) {
+   public <T extends CustomPayload> void registerClientConfigurationReceiver(Id<T> type, PlatformNetworking.ClientConfigurationReceiver<T> handler) {
       ClientConfigurationNetworking.registerGlobalReceiver(type, (payload, context) -> handler.receive((T)payload, context.responseSender()::sendPacket));
    }
 
@@ -119,7 +119,7 @@ public class FabricPlatformNetworking implements PlatformNetworking {
       }
 
       @Override
-      public void completeTask(class_8606 type) {
+      public void completeTask(Key type) {
          this.networkHandler.completeTask(type);
       }
 
@@ -131,7 +131,7 @@ public class FabricPlatformNetworking implements PlatformNetworking {
 
    private record FabricServerConfigurationControl(ServerConfigurationNetworkHandler handler) implements PlatformNetworking.ServerConfigurationControl {
       @Override
-      public boolean canSend(class_9154<?> type) {
+      public boolean canSend(Id<?> type) {
          return ServerConfigurationNetworking.canSend(this.handler, type);
       }
 

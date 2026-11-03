@@ -5,17 +5,17 @@ import java.util.List;
 import java.util.WeakHashMap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.VertexConsumerProvider.Immediate;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.VertexConsumerProvider.class_4598;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -173,9 +173,8 @@ public class CrossPortalEntityRenderer {
 
       float partialTick = client.getRenderTickCounter().getTickProgress(!client.world.getTickManager().shouldSkipTick(entity));
       Vec3d cameraPos = client.gameRenderer.getCamera().getCameraPos();
-      class_4598 consumers = client.getBufferBuilders().getEntityVertexConsumers();
-      ((IEWorldRenderer)client.worldRenderer)
-         .ip_renderSingleEntity(entity, cameraPos.x, cameraPos.y, cameraPos.z, partialTick, matrixStack, consumers);
+      Immediate consumers = client.getBufferBuilders().getEntityVertexConsumers();
+      ((IEWorldRenderer)client.worldRenderer).ip_renderSingleEntity(entity, cameraPos.x, cameraPos.y, cameraPos.z, partialTick, matrixStack, consumers);
    }
 
    private static void renderEntityProjections(MatrixStack matrixStack) {
@@ -280,11 +279,9 @@ public class CrossPortalEntityRenderer {
          Vec3d newEntityInstantPos = transformingPortal.transformPoint(entityInstantPos);
          Vec3d newCameraPos = entityInstantPos.subtract(newEntityInstantPos).add(cameraPos);
          setupEntityProjectionRenderingTransformation(transformingPortal, matrixStack, entityPos, entityLastTickPos, newCameraPos);
-         class_4598 consumers = client.getBufferBuilders().getEntityVertexConsumers();
+         Immediate consumers = client.getBufferBuilders().getEntityVertexConsumers();
          ((IEWorldRenderer)client.worldRenderer)
-            .ip_renderSingleEntity(
-               entity, newCameraPos.x, newCameraPos.y, newCameraPos.z, RenderStates.getPartialTick(), matrixStack, consumers
-            );
+            .ip_renderSingleEntity(entity, newCameraPos.x, newCameraPos.y, newCameraPos.z, RenderStates.getPartialTick(), matrixStack, consumers);
          consumers.draw();
       } finally {
          matrixStack.pop();

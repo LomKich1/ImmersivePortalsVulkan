@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.core.mixin.client.render;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -14,7 +14,7 @@ public class MixinEntityRenderer {
       method = {"updateRenderState"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/MinecraftClient;hasOutline(Lnet/minecraft/Entity;)Z"
+         target = "Lnet/minecraft/client/MinecraftClient;hasOutline(Lnet/minecraft/entity/Entity;)Z"
       )}
    )
    private boolean redirectGlowing(MinecraftClient client, Entity entity) {

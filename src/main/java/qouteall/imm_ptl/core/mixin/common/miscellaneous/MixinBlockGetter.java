@@ -2,9 +2,9 @@ package qouteall.imm_ptl.core.mixin.common.miscellaneous;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import net.minecraft.world.BlockView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -14,7 +14,7 @@ import qouteall.q_misc_util.Helper;
 @Mixin({BlockView.class})
 public interface MixinBlockGetter {
    @ModifyVariable(
-      method = {"raycast"},
+      method = {"raycast(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;Ljava/lang/Object;Ljava/util/function/BiFunction;Ljava/util/function/Function;)Ljava/lang/Object;"},
       at = {@At("HEAD")},
       argsOnly = true,
       index = 1

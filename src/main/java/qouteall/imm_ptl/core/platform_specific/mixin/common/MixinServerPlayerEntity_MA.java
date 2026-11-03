@@ -2,8 +2,8 @@ package qouteall.imm_ptl.core.platform_specific.mixin.common;
 
 import java.util.Set;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.TeleportTarget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,18 +17,18 @@ import qouteall.imm_ptl.core.portal.custom_portal_gen.CustomPortalGenManager;
 @Mixin({ServerPlayerEntity.class})
 public class MixinServerPlayerEntity_MA {
    @Inject(
-      method = {"method_61275(Lnet/minecraft/TeleportTarget;)Lnet/minecraft/ServerPlayerEntity;"},
+      method = {"teleportTo(Lnet/minecraft/world/TeleportTarget;)Lnet/minecraft/server/network/ServerPlayerEntity;"},
       at = {@At("HEAD")}
    )
    private void onChangeDimensionByVanilla(TeleportTarget dimensionTransition, CallbackInfoReturnable<ServerPlayerEntity> cir) {
       ServerPlayerEntity this_ = (ServerPlayerEntity)this;
-      if (dimensionTransition.comp_2820() != this_.getServerWorld()) {
+      if (dimensionTransition.world() != this_.getEntityWorld()) {
          onBeforeDimensionTravel(this_);
       }
    }
 
    @Inject(
-      method = {"teleport(Lnet/minecraft/ServerWorld;DDDLjava/util/Set;FFZ)Z"},
+      method = {"teleport(Lnet/minecraft/server/world/ServerWorld;DDDLjava/util/Set;FFZ)Z"},
       at = {@At("HEAD")}
    )
    private void onTeleported(
@@ -43,7 +43,7 @@ public class MixinServerPlayerEntity_MA {
       CallbackInfoReturnable<Boolean> cir
    ) {
       ServerPlayerEntity this_ = (ServerPlayerEntity)this;
-      if (this_.getServerWorld() != targetWorld) {
+      if (this_.getEntityWorld() != targetWorld) {
          onBeforeDimensionTravel(this_);
       }
    }

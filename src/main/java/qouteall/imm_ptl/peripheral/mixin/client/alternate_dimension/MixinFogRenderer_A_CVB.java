@@ -1,10 +1,10 @@
 package qouteall.imm_ptl.peripheral.mixin.client.alternate_dimension;
 
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.client.render.fog.FogRenderer;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -16,7 +16,7 @@ public class MixinFogRenderer_A_CVB {
       method = {"getFogColor"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/Camera;getCameraPos()Lnet/minecraft/Vec3d;"
+         target = "Lnet/minecraft/client/render/Camera;getCameraPos()Lnet/minecraft/util/math/Vec3d;"
       )}
    )
    private Vec3d redirectCameraGetPos(Camera camera) {

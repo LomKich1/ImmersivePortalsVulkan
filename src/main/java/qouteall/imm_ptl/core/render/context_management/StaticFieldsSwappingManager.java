@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import net.minecraft.world.World;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 

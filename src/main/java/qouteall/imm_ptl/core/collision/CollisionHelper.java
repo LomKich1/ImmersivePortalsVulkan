@@ -7,22 +7,22 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.profiler.Profilers;
-import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.function.BooleanBiFunction;
-import net.minecraft.text.Text;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.border.WorldBorder;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.Direction.class_2351;
+import net.minecraft.entity.Entity;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.function.BooleanBiFunction;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.util.profiler.Profilers;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.World;
+import net.minecraft.world.border.WorldBorder;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.CHelper;
 import qouteall.imm_ptl.core.ClientWorldLoader;
@@ -49,12 +49,8 @@ public class CollisionHelper {
       boolean xForward = planeNormal.x > 0.0;
       boolean yForward = planeNormal.y > 0.0;
       boolean zForward = planeNormal.z > 0.0;
-      Vec3d pushedPos = new Vec3d(
-         xForward ? box.minX : box.maxX, yForward ? box.minY : box.maxY, zForward ? box.minZ : box.maxZ
-      );
-      Vec3d staticPos = new Vec3d(
-         xForward ? box.maxX : box.minX, yForward ? box.maxY : box.minY, zForward ? box.maxZ : box.minZ
-      );
+      Vec3d pushedPos = new Vec3d(xForward ? box.minX : box.maxX, yForward ? box.minY : box.maxY, zForward ? box.minZ : box.maxZ);
+      Vec3d staticPos = new Vec3d(xForward ? box.maxX : box.minX, yForward ? box.maxY : box.minY, zForward ? box.maxZ : box.minZ);
       double tOfPushedPos = Helper.getCollidingT(planePos, planeNormal, pushedPos, planeNormal);
       boolean isPushedPosInFrontOfPlane = tOfPushedPos < 0.0;
       if (isPushedPosInFrontOfPlane) {
@@ -74,9 +70,7 @@ public class CollisionHelper {
       boolean xForward = planeNormal.x > 0.0;
       boolean yForward = planeNormal.y > 0.0;
       boolean zForward = planeNormal.z > 0.0;
-      Vec3d testingPos = new Vec3d(
-         xForward ? box.maxX : box.minX, yForward ? box.maxY : box.minY, zForward ? box.maxZ : box.minZ
-      );
+      Vec3d testingPos = new Vec3d(xForward ? box.maxX : box.minX, yForward ? box.maxY : box.minY, zForward ? box.maxZ : box.minZ);
       return testingPos.subtract(planePos).dotProduct(planeNormal) < 0.0;
    }
 
@@ -126,9 +120,7 @@ public class CollisionHelper {
    private static Vec3d refHandleCollisionWithShapeProcessor(Entity entity, Vec3d attemptedMove, Function<VoxelShape, VoxelShape> filter) {
       Box boundingBox = entity.getBoundingBox();
       List<VoxelShape> entityCollisions = entity.getEntityWorld().getEntityCollisions(entity, boundingBox.stretch(attemptedMove));
-      BiFunction<Vec3d, Box, Vec3d> collisionFunc = (attempt, bb) -> collideBoundingBox(
-         entity, attempt, bb, entity.getEntityWorld(), entityCollisions, filter
-      );
+      BiFunction<Vec3d, Box, Vec3d> collisionFunc = (attempt, bb) -> collideBoundingBox(entity, attempt, bb, entity.getEntityWorld(), entityCollisions, filter);
       Vec3d collidedMovement = attemptedMove.lengthSquared() == 0.0 ? attemptedMove : collisionFunc.apply(attemptedMove, boundingBox);
       boolean collideX = attemptedMove.x != collidedMovement.x;
       boolean collideY = attemptedMove.y != collidedMovement.y;
@@ -139,13 +131,9 @@ public class CollisionHelper {
       float maxUpStep = entity.getStepHeight();
       if (maxUpStep > 0.0F && touchGround && collidesHorizontally) {
          Vec3d stepping = collisionFunc.apply(new Vec3d(attemptedMove.x, maxUpStep, attemptedMove.z), boundingBox);
-         Vec3d verticalStep = collisionFunc.apply(
-            new Vec3d(0.0, maxUpStep, 0.0), boundingBox.stretch(attemptedMove.x, 0.0, attemptedMove.z)
-         );
+         Vec3d verticalStep = collisionFunc.apply(new Vec3d(0.0, maxUpStep, 0.0), boundingBox.stretch(attemptedMove.x, 0.0, attemptedMove.z));
          if (verticalStep.y < maxUpStep) {
-            Vec3d horizontalMoveAfterVerticalStepping = collisionFunc.apply(
-                  new Vec3d(attemptedMove.x, 0.0, attemptedMove.z), boundingBox.offset(verticalStep)
-               )
+            Vec3d horizontalMoveAfterVerticalStepping = collisionFunc.apply(new Vec3d(attemptedMove.x, 0.0, attemptedMove.z), boundingBox.offset(verticalStep))
                .add(verticalStep);
             if (horizontalMoveAfterVerticalStepping.horizontalLengthSquared() > stepping.horizontalLengthSquared()) {
                stepping = horizontalMoveAfterVerticalStepping;
@@ -153,9 +141,7 @@ public class CollisionHelper {
          }
 
          if (stepping.horizontalLengthSquared() > collidedMovement.horizontalLengthSquared()) {
-            Vec3d movingDown = collisionFunc.apply(
-               new Vec3d(0.0, -stepping.y + attemptedMove.y, 0.0), boundingBox.offset(stepping)
-            );
+            Vec3d movingDown = collisionFunc.apply(new Vec3d(0.0, -stepping.y + attemptedMove.y, 0.0), boundingBox.offset(stepping));
             return stepping.add(movingDown);
          }
       }
@@ -165,16 +151,10 @@ public class CollisionHelper {
 
    @IPVanillaCopy
    public static Vec3d handleCollisionWithShapeProcessor(
-      Entity entity,
-      Box boundingBox,
-      World world,
-      Vec3d attemptedMove,
-      Function<VoxelShape, VoxelShape> filter,
-      Direction gravity,
-      double steppingScale
+      Entity entity, Box boundingBox, World world, Vec3d attemptedMove, Function<VoxelShape, VoxelShape> filter, Direction gravity, double steppingScale
    ) {
       Direction jumpDirection = gravity.getOpposite();
-      class_2351 gravityAxis = gravity.getAxis();
+      Axis gravityAxis = gravity.getAxis();
       List<VoxelShape> entityCollisions = world.getEntityCollisions(entity, boundingBox.stretch(attemptedMove));
       BiFunction<Vec3d, Box, Vec3d> collisionFunc = (attempt, bb) -> collideBoundingBox(entity, attempt, bb, world, entityCollisions, filter);
       Vec3d collidedMovement = attemptedMove.lengthSquared() == 0.0 ? attemptedMove : collisionFunc.apply(attemptedMove, boundingBox);
@@ -192,9 +172,7 @@ public class CollisionHelper {
       if (maxUpStep > 0.0 && touchGround && collidesHorizontally) {
          Vec3d stepping = collisionFunc.apply(Helper.putSignedCoordinate(attemptedMove, jumpDirection, maxUpStep), boundingBox);
          Vec3d expandVec = Helper.putSignedCoordinate(attemptedMove, gravity, 0.0);
-         Vec3d verticalStep = collisionFunc.apply(
-            Helper.putSignedCoordinate(Vec3d.ZERO, jumpDirection, maxUpStep), boundingBox.stretch(expandVec)
-         );
+         Vec3d verticalStep = collisionFunc.apply(Helper.putSignedCoordinate(Vec3d.ZERO, jumpDirection, maxUpStep), boundingBox.stretch(expandVec));
          if (Helper.getSignedCoordinate(verticalStep, jumpDirection) < maxUpStep + 0.001) {
             Vec3d horizontalMoveAfterVerticalStepping = collisionFunc.apply(expandVec, boundingBox.offset(verticalStep)).add(verticalStep);
             if (Helper.getDistanceSqrOnAxisPlane(horizontalMoveAfterVerticalStepping, gravityAxis) > Helper.getDistanceSqrOnAxisPlane(stepping, gravityAxis)) {
@@ -215,11 +193,11 @@ public class CollisionHelper {
       return collidedMovement;
    }
 
-   public static boolean movesOnNonGravityAxis(Vec3d vec, class_2351 gravityAxis) {
+   public static boolean movesOnNonGravityAxis(Vec3d vec, Axis gravityAxis) {
       return switch (gravityAxis) {
-         case field_11048 -> vec.y != 0.0 || vec.z != 0.0;
-         case field_11052 -> vec.x != 0.0 || vec.z != 0.0;
-         case field_11051 -> vec.x != 0.0 || vec.y != 0.0;
+         case X -> vec.y != 0.0 || vec.z != 0.0;
+         case Y -> vec.x != 0.0 || vec.z != 0.0;
+         case Z -> vec.x != 0.0 || vec.y != 0.0;
          default -> throw new MatchException(null, null);
       };
    }

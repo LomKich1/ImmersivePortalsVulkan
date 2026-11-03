@@ -10,32 +10,32 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.command.permission.LeveledPermissionPredicate;
 import net.minecraft.command.DefaultPermissions;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ActionResult;
+import net.minecraft.command.permission.LeveledPermissionPredicate;
+import net.minecraft.component.ComponentType;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Item.Settings;
+import net.minecraft.item.Item.TooltipContext;
+import net.minecraft.item.ItemGroup.Entries;
 import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.world.World;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.command.CommandManager;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.text.Text;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemGroup.class_7704;
-import net.minecraft.item.Item.class_1793;
-import net.minecraft.item.Item.class_9635;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import qouteall.imm_ptl.core.IPGlobal;
@@ -56,14 +56,14 @@ public class CommandStickItem extends Item {
    public static final ComponentType<CommandStickItem.Data> COMPONENT_TYPE = ComponentType.builder().codec(DATA_CODEC).build();
    public static final LinkedHashMap<String, CommandStickItem.Data> BUILT_IN_COMMAND_STICK_TYPES = new LinkedHashMap<>();
    public static final CommandStickItem instance = new CommandStickItem(
-      new class_1793().registryKey(RegistryKey.of(RegistryKeys.field_41197, McHelper.newResourceLocation("immersive_portals:command_stick")))
+      new Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, McHelper.newResourceLocation("immersive_portals:command_stick")))
    );
 
    public static void registerBuiltInCommandStick(CommandStickItem.Data data) {
       BUILT_IN_COMMAND_STICK_TYPES.put(data.command, data);
    }
 
-   public CommandStickItem(class_1793 settings) {
+   public CommandStickItem(Settings settings) {
       super(settings);
    }
 
@@ -71,9 +71,9 @@ public class CommandStickItem extends Item {
       return true;
    }
 
-   public ActionResult use(World world, PlayerEntity player, Hand hand) {
-      this.doUse(player, player.getStackInHand(hand));
-      return super.use(world, player, hand);
+   public ActionResult use(World world, PlayerEntity user, Hand hand) {
+      this.doUse(user, user.getStackInHand(hand));
+      return super.use(world, user, hand);
    }
 
    private void doUse(PlayerEntity player, ItemStack stack) {
@@ -107,19 +107,19 @@ public class CommandStickItem extends Item {
       return IPGlobal.easeCommandStickPermission ? true : player.getPermissions().hasPermission(DefaultPermissions.GAMEMASTERS) || player.isCreative();
    }
 
-   public void appendTooltip(ItemStack stack, class_9635 tooltipContext, TooltipDisplayComponent tooltipDisplay, Consumer<Text> tooltip, TooltipType tooltipFlag) {
-      super.appendTooltip(stack, tooltipContext, tooltipDisplay, tooltip, tooltipFlag);
+   public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
+      super.appendTooltip(stack, context, displayComponent, textConsumer, type);
       CommandStickItem.Data data = (CommandStickItem.Data)stack.get(COMPONENT_TYPE);
       if (data != null) {
          for (String commandPortion : Splitter.fixedLength(40).split(data.command)) {
-            tooltip.accept(Text.literal(commandPortion).formatted(Formatting.field_1065));
+            textConsumer.accept(Text.literal(commandPortion).formatted(Formatting.GOLD));
          }
 
          for (String descriptionTranslationKey : data.descriptionTranslationKeys) {
-            tooltip.accept(Text.translatable(descriptionTranslationKey).formatted(Formatting.field_1075));
+            textConsumer.accept(Text.translatable(descriptionTranslationKey).formatted(Formatting.AQUA));
          }
 
-         tooltip.accept(Text.translatable("imm_ptl.command_stick").formatted(Formatting.field_1080));
+         textConsumer.accept(Text.translatable("imm_ptl.command_stick").formatted(Formatting.GRAY));
       }
    }
 
@@ -144,7 +144,7 @@ public class CommandStickItem extends Item {
       });
    }
 
-   public static void addIntoCreativeTag(class_7704 entries) {
+   public static void addIntoCreativeTag(Entries entries) {
       for (CommandStickItem.Data data : BUILT_IN_COMMAND_STICK_TYPES.values()) {
          ItemStack stack = new ItemStack(instance);
          stack.set(COMPONENT_TYPE, data);
@@ -250,7 +250,7 @@ public class CommandStickItem extends Item {
          return new CommandStickItem.Data(
             tag.getString("command", ""),
             tag.getString("nameTranslationKey", ""),
-            tag.getListOrEmpty("descriptionTranslationKeys").stream().map(tag1 -> ((NbtString)tag1).comp_3831()).collect(Collectors.toList())
+            tag.getListOrEmpty("descriptionTranslationKeys").stream().map(tag1 -> ((NbtString)tag1).value()).collect(Collectors.toList())
          );
       }
    }

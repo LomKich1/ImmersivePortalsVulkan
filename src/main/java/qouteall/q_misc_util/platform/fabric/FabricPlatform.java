@@ -15,21 +15,19 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.EndDataP
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityType.Builder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.SemanticVersion;
 import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.VersionParsingException;
-import net.minecraft.entity.Entity;
 import net.minecraft.command.argument.serialize.ArgumentSerializer;
+import net.minecraft.command.argument.serialize.ArgumentSerializer.ArgumentTypeProperties;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType.Builder;
 import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.entity.EntityType.class_1300;
-import net.minecraft.item.ItemGroup.class_7913;
-import net.minecraft.command.argument.serialize.ArgumentSerializer.class_7217;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Identifier;
 import qouteall.q_misc_util.platform.ModInfo;
 import qouteall.q_misc_util.platform.Platform;
 
@@ -110,7 +108,9 @@ public class FabricPlatform implements Platform {
    }
 
    @Override
-   public <A extends ArgumentType<?>, T extends class_7217<A>, I extends ArgumentSerializer<A, T>> void registerArgumentType(Identifier id, Class<A> clazz, I info) {
+   public <A extends ArgumentType<?>, T extends ArgumentTypeProperties<A>, I extends ArgumentSerializer<A, T>> void registerArgumentType(
+      Identifier id, Class<A> clazz, I info
+   ) {
       ArgumentTypeRegistry.registerArgumentType(id, clazz, info);
    }
 
@@ -120,13 +120,13 @@ public class FabricPlatform implements Platform {
    }
 
    @Override
-   public class_7913 createCreativeTabBuilder() {
+   public net.minecraft.item.ItemGroup.Builder createCreativeTabBuilder() {
       return FabricItemGroup.builder();
    }
 
    @Override
-   public <T extends Entity> class_1300<T> forceTrackedVelocityUpdates(class_1300<T> builder, boolean value) {
-      return ((Builder)builder).alwaysUpdateVelocity(value);
+   public <T extends Entity> Builder<T> forceTrackedVelocityUpdates(Builder<T> builder, boolean value) {
+      return ((net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityType.Builder)builder).alwaysUpdateVelocity(value);
    }
 
    @Override

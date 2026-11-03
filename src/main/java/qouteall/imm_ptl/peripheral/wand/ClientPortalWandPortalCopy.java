@@ -6,19 +6,19 @@ import java.util.Comparator;
 import java.util.UUID;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.world.World;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.hit.HitResult.class_240;
-import net.minecraft.client.render.VertexConsumerProvider.class_4598;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider.Immediate;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.text.Text;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.hit.HitResult.Type;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -90,7 +90,10 @@ public class ClientPortalWandPortalCopy {
                CustomTextOverlay.putText(
                   Text.translatable(
                      "imm_ptl.wand.copy.prompt.copy_or_cut",
-                     new Object[]{MinecraftClient.getInstance().options.useKey.getBoundKeyLocalizedText(), MinecraftClient.getInstance().options.attackKey.getBoundKeyLocalizedText()}
+                     new Object[]{
+                        MinecraftClient.getInstance().options.useKey.getBoundKeyLocalizedText(),
+                        MinecraftClient.getInstance().options.attackKey.getBoundKeyLocalizedText()
+                     }
                   )
                );
             } else {
@@ -107,7 +110,7 @@ public class ClientPortalWandPortalCopy {
             HitResult hitResult = player.raycast(64.0, RenderStates.getPartialTick(), false);
             int alignment = IPConfig.getConfig().portalWandCursorAlignment;
             Vec3d preCursorPos;
-            if (hitResult.getType() == class_240.field_1332 && hitResult instanceof BlockHitResult blockHitResult) {
+            if (hitResult.getType() == Type.BLOCK && hitResult instanceof BlockHitResult blockHitResult) {
                preCursorPos = blockHitResult.getPos();
             } else {
                preCursorPos = eyePos.add(viewVec.multiply(5.0));
@@ -134,7 +137,10 @@ public class ClientPortalWandPortalCopy {
             CustomTextOverlay.putText(
                Text.translatable(
                   "imm_ptl.wand.copy.prompt.place_portal",
-                  new Object[]{MinecraftClient.getInstance().options.useKey.getBoundKeyLocalizedText(), MinecraftClient.getInstance().options.attackKey.getBoundKeyLocalizedText()}
+                  new Object[]{
+                     MinecraftClient.getInstance().options.useKey.getBoundKeyLocalizedText(),
+                     MinecraftClient.getInstance().options.attackKey.getBoundKeyLocalizedText()
+                  }
                )
             );
          }
@@ -183,7 +189,7 @@ public class ClientPortalWandPortalCopy {
       }
    }
 
-   public static void render(MatrixStack matrixStack, class_4598 bufferSource, double camX, double camY, double camZ) {
+   public static void render(MatrixStack matrixStack, Immediate bufferSource, double camX, double camY, double camZ) {
       ClientPlayerEntity player = MinecraftClient.getInstance().player;
       if (player != null) {
          if (!PortalRendering.isRendering()) {

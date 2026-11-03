@@ -8,19 +8,19 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.Map.Entry;
-import net.minecraft.client.gui.screen.world.CreateWorldCallback;
-import net.minecraft.world.World;
-import net.minecraft.text.Text;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.world.CreateWorldCallback;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.dimension.DimensionOptions;
-import net.minecraft.world.gen.WorldPreset;
-import net.minecraft.client.world.GeneratorOptionsHolder;
-import net.minecraft.world.dimension.DimensionOptionsRegistryHolder;
 import net.minecraft.client.gui.screen.world.WorldCreator;
-import net.minecraft.registry.DynamicRegistryManager.class_6890;
+import net.minecraft.client.world.GeneratorOptionsHolder;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.DynamicRegistryManager.Immutable;
+import net.minecraft.text.Text;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionOptions;
+import net.minecraft.world.dimension.DimensionOptionsRegistryHolder;
+import net.minecraft.world.gen.WorldPreset;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
@@ -90,20 +90,20 @@ public abstract class MixinCreateWorldScreen_CVB extends Screen implements IECre
 
       try {
          GeneratorOptionsHolder settings = this.worldCreator.getGeneratorOptionsHolder();
-         class_6890 registryAccess = settings.getCombinedRegistryManager();
-         DimensionOptionsRegistryHolder selectedDimensions = settings.comp_1028();
+         Immutable registryAccess = settings.getCombinedRegistryManager();
+         DimensionOptionsRegistryHolder selectedDimensions = settings.selectedDimensions();
 
-         for (Entry<RegistryKey<DimensionOptions>, DimensionOptions> entry : selectedDimensions.comp_1014().entrySet()) {
+         for (Entry<RegistryKey<DimensionOptions>, DimensionOptions> entry : selectedDimensions.dimensions().entrySet()) {
             result.add(Helper.dimIdToKey(entry.getKey().getValue()));
          }
 
-         for (Entry<RegistryKey<DimensionOptions>, DimensionOptions> entry : settings.comp_1027().getEntrySet()) {
+         for (Entry<RegistryKey<DimensionOptions>, DimensionOptions> entry : settings.dimensionOptionsRegistry().getEntrySet()) {
             result.add(Helper.dimIdToKey(entry.getKey().getValue()));
          }
 
          Collection<RegistryKey<World>> other = DimensionStackAPI.DIMENSION_STACK_CANDIDATE_COLLECTION_EVENT
             .invoker()
-            .getExtraDimensionKeys(registryAccess, settings.comp_616());
+            .getExtraDimensionKeys(registryAccess, settings.generatorOptions());
          result.addAll(other);
       } catch (Exception var7) {
          LOGGER.error("ImmPtl getting dimension list", var7);

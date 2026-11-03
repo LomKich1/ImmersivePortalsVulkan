@@ -13,10 +13,10 @@ import qouteall.imm_ptl.core.render.MyRenderHelper;
 @Mixin({FogRenderer.class})
 public class MixinFogRenderer_Distance {
    @Inject(
-      method = {"applyFog"},
+      method = {"applyFog(Lnet/minecraft/client/render/Camera;ILnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/FogRenderer;applyFog(Ljava/nio/ByteBuffer;ILorg/joml/Vector4f;FFFFFF)V"
+         target = "Lnet/minecraft/client/render/fog/FogRenderer;applyFog(Ljava/nio/ByteBuffer;ILorg/joml/Vector4f;FFFFFF)V"
       )}
    )
    private void onBeforeWritingFogBuffer(CallbackInfoReturnable<Vector4f> cir, @Local FogData fogData) {

@@ -2,13 +2,13 @@ package qouteall.imm_ptl.core.mixin.client.render.optimization;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import net.minecraft.client.gl.MappableRingBuffer;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.gl.MappableRingBuffer;
 import net.minecraft.client.option.CloudRenderMode;
 import net.minecraft.client.render.CloudRenderer;
-import net.minecraft.client.render.CloudRenderer.class_9957;
+import net.minecraft.client.render.CloudRenderer.CloudCells;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,7 +35,7 @@ public abstract class MixinCloudRenderer {
    private CloudRenderMode renderMode;
    @Shadow
    @Nullable
-   private class_9957 cells;
+   private CloudCells cells;
    @Shadow
    private int instanceCount;
    @Shadow
@@ -141,11 +141,11 @@ public abstract class MixinCloudRenderer {
             relativeCameraPos = 1;
          }
 
-         float f2 = (float)(gameTime % (this.cells.comp_3007() * 400L)) + partialTick;
+         float f2 = (float)(gameTime % (this.cells.width() * 400L)) + partialTick;
          double d0 = cameraPos.x + f2 * 0.030000001F;
          double d1 = cameraPos.z + 3.96F;
-         double d2 = this.cells.comp_3007() * 12.0;
-         double d3 = this.cells.comp_3008() * 12.0;
+         double d2 = this.cells.width() * 12.0;
+         double d3 = this.cells.height() * 12.0;
          d0 -= MathHelper.floor(d0 / d2) * d2;
          d1 -= MathHelper.floor(d1 / d3) * d3;
          int cellX = MathHelper.floor(d0 / 12.0);

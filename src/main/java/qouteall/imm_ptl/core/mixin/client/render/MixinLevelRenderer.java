@@ -7,61 +7,61 @@ import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.systems.RenderPass.class_10884;
+import com.mojang.blaze3d.systems.RenderPass.RenderObject;
 import com.mojang.blaze3d.textures.GpuTextureView;
-import com.mojang.blaze3d.vertex.VertexFormat.class_5595;
+import com.mojang.blaze3d.vertex.VertexFormat.IndexType;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.util.profiler.Profilers;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.render.chunk.Buffers;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.GpuSampler;
+import net.minecraft.client.gl.DynamicUniforms.ChunkSectionsValue;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.render.chunk.ChunkRenderData;
-import net.minecraft.client.render.chunk.AbstractChunkRenderData;
 import net.minecraft.client.render.BlockRenderLayerGroup;
+import net.minecraft.client.render.BufferBuilderStorage;
+import net.minecraft.client.render.BuiltChunkStorage;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.DefaultFramebufferSet;
+import net.minecraft.client.render.FramePass;
+import net.minecraft.client.render.Frustum;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.render.SectionRenderState;
-import net.minecraft.client.render.state.WorldRenderState;
+import net.minecraft.client.render.SubmittableBatch;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.WeatherRendering;
+import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.render.DiffuseLighting.Type;
+import net.minecraft.client.render.VertexConsumerProvider.Immediate;
+import net.minecraft.client.render.chunk.AbstractChunkRenderData;
+import net.minecraft.client.render.chunk.Buffers;
+import net.minecraft.client.render.chunk.ChunkBuilder;
+import net.minecraft.client.render.chunk.ChunkRenderData;
+import net.minecraft.client.render.chunk.ChunkBuilder.BuiltChunk;
 import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
 import net.minecraft.client.render.command.RenderDispatcher;
-import net.minecraft.client.render.SubmittableBatch;
+import net.minecraft.client.render.debug.DebugRenderer;
+import net.minecraft.client.render.debug.GameTestDebugRenderer;
+import net.minecraft.client.render.entity.EntityRenderManager;
+import net.minecraft.client.render.entity.state.EntityRenderState;
+import net.minecraft.client.render.gizmo.GizmoDrawerImpl;
 import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.render.state.WeatherRenderState;
-import net.minecraft.client.gl.GpuSampler;
-import net.minecraft.client.render.gizmo.GizmoDrawerImpl;
+import net.minecraft.client.render.state.WorldRenderState;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.ObjectAllocator;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Util;
-import net.minecraft.world.World;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.debug.GameTestDebugRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.BufferBuilderStorage;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.BuiltChunkStorage;
-import net.minecraft.client.render.chunk.ChunkBuilder;
-import net.minecraft.client.render.debug.DebugRenderer;
-import net.minecraft.client.render.entity.EntityRenderManager;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.render.FramePass;
-import net.minecraft.client.util.memory.ObjectAllocator;
-import net.minecraft.client.render.DefaultFramebufferSet;
-import net.minecraft.client.render.WeatherRendering;
-import net.minecraft.client.gl.DynamicUniforms.class_12294;
-import net.minecraft.client.render.DiffuseLighting.class_11274;
-import net.minecraft.client.render.VertexConsumerProvider.class_4598;
-import net.minecraft.client.render.chunk.ChunkBuilder.class_851;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.profiler.Profilers;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -122,7 +122,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
    @Shadow
    @Final
    @Mutable
-   private ObjectArrayList<class_851> builtChunks;
+   private ObjectArrayList<BuiltChunk> builtChunks;
    @Shadow
    @Final
    @Mutable
@@ -159,21 +159,21 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
    @Unique
    @IPVanillaCopy
    private SectionRenderState ip_prepareChunkRenders(Matrix4fc modelView, double camX, double camY, double camZ) {
-      ObjectListIterator<class_851> iterator = this.builtChunks.listIterator(0);
-      EnumMap<BlockRenderLayer, List<class_10884<GpuBufferSlice[]>>> drawsPerLayer = new EnumMap<>(BlockRenderLayer.class);
+      ObjectListIterator<BuiltChunk> iterator = this.builtChunks.listIterator(0);
+      EnumMap<BlockRenderLayer, List<RenderObject<GpuBufferSlice[]>>> drawsPerLayer = new EnumMap<>(BlockRenderLayer.class);
       int maxIndicesRequired = 0;
 
       for (BlockRenderLayer layer : BlockRenderLayer.values()) {
          drawsPerLayer.put(layer, new ArrayList<>());
       }
 
-      List<class_12294> sectionInfos = new ArrayList<>();
+      List<ChunkSectionsValue> sectionInfos = new ArrayList<>();
       GpuTextureView atlasView = this.client.getTextureManager().getTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE).getGlTextureView();
       int atlasWidth = atlasView.getWidth(0);
       int atlasHeight = atlasView.getHeight(0);
 
       while (iterator.hasNext()) {
-         class_851 section = (class_851)iterator.next();
+         BuiltChunk section = (BuiltChunk)iterator.next();
          AbstractChunkRenderData sectionMesh = section.getCurrentRenderData();
          BlockPos origin = section.getOrigin();
          long now = Util.getMeasuringTimeMs();
@@ -185,20 +185,14 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
                if (infoIndex == -1) {
                   infoIndex = sectionInfos.size();
                   sectionInfos.add(
-                     new class_12294(
-                        new Matrix4f(modelView),
-                        origin.getX(),
-                        origin.getY(),
-                        origin.getZ(),
-                        section.method_76298(now),
-                        atlasWidth,
-                        atlasHeight
+                     new ChunkSectionsValue(
+                        new Matrix4f(modelView), origin.getX(), origin.getY(), origin.getZ(), section.method_76298(now), atlasWidth, atlasHeight
                      )
                   );
                }
 
                GpuBuffer indexBuffer;
-               class_5595 indexType;
+               IndexType indexType;
                if (buffers.getIndexBuffer() == null) {
                   if (buffers.getIndexCount() > maxIndicesRequired) {
                      maxIndicesRequired = buffers.getIndexCount();
@@ -214,7 +208,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
                int sliceIndex = infoIndex;
                drawsPerLayer.get(layer)
                   .add(
-                     new class_10884(
+                     new RenderObject(
                         0,
                         buffers.getVertexBuffer(),
                         indexBuffer,
@@ -228,7 +222,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
          }
       }
 
-      GpuBufferSlice[] slices = RenderSystem.getDynamicUniforms().writeChunkSections(sectionInfos.toArray(new class_12294[0]));
+      GpuBufferSlice[] slices = RenderSystem.getDynamicUniforms().writeChunkSections(sectionInfos.toArray(new ChunkSectionsValue[0]));
       return new SectionRenderState(atlasView, drawsPerLayer, maxIndicesRequired, slices);
    }
 
@@ -236,7 +230,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
       method = {"lambda$addMainPass$1", "method_62214"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/SectionRenderState;renderSection(Lnet/minecraft/BlockRenderLayerGroup;Lnet/minecraft/GpuSampler;)V"
+         target = "Lnet/minecraft/client/render/SectionRenderState;renderSection(Lnet/minecraft/client/render/BlockRenderLayerGroup;Lnet/minecraft/client/gl/GpuSampler;)V"
       )},
       require = 1
    )
@@ -265,7 +259,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
       }
 
       this.onAfterRenderingLayer();
-      if (group == BlockRenderLayerGroup.field_61022) {
+      if (group == BlockRenderLayerGroup.OPAQUE) {
          this.onAfterCutoutRendering(modelView);
       }
    }
@@ -301,7 +295,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
       method = {"lambda$addMainPass$1", "method_62214"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/TexturedRenderLayers;getItemTranslucentCull()Lnet/minecraft/RenderLayer;"
+         target = "Lnet/minecraft/client/render/TexturedRenderLayers;getItemTranslucentCull()Lnet/minecraft/client/render/RenderLayer;"
       )},
       require = 1
    )
@@ -317,7 +311,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
       method = {"lambda$addMainPass$1", "method_62214"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/VertexConsumerProvider.Immediate;drawCurrentLayer()V",
+         target = "Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;drawCurrentLayer()V",
          ordinal = 0,
          shift = Shift.AFTER
       )},
@@ -332,7 +326,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
       method = {"lambda$addMainPass$1", "method_62214"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/WorldRenderer;collectGizmos()V"
+         target = "Lnet/minecraft/client/render/WorldRenderer;collectGizmos()V"
       )},
       require = 1
    )
@@ -346,12 +340,17 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
       method = {"lambda$addMainPass$1", "method_62214"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/GizmoDrawerImpl;draw(Lnet/minecraft/MatrixStack;Lnet/minecraft/VertexConsumerProvider;Lnet/minecraft/CameraRenderState;Lorg/joml/Matrix4f;)V"
+         target = "Lnet/minecraft/client/render/gizmo/GizmoDrawerImpl;draw(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/render/state/CameraRenderState;Lorg/joml/Matrix4f;)V"
       )},
       require = 1
    )
    private void wrapRenderGizmos(
-      GizmoDrawerImpl instance, MatrixStack poseStack, VertexConsumerProvider bufferSource, CameraRenderState cameraRenderState, Matrix4f projection, Operation<Void> original
+      GizmoDrawerImpl instance,
+      MatrixStack poseStack,
+      VertexConsumerProvider bufferSource,
+      CameraRenderState cameraRenderState,
+      Matrix4f projection,
+      Operation<Void> original
    ) {
       if (!WorldRenderInfo.isRendering()) {
          original.call(new Object[]{instance, poseStack, bufferSource, cameraRenderState, projection});
@@ -362,7 +361,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
       method = {"render"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/DebugRenderer;render(Lnet/minecraft/Frustum;DDDF)V"
+         target = "Lnet/minecraft/client/render/debug/DebugRenderer;render(Lnet/minecraft/client/render/Frustum;DDDF)V"
       )}
    )
    private void wrapEmitDebugGizmos(DebugRenderer instance, Frustum frustum, double x, double y, double z, float partialTick, Operation<Void> original) {
@@ -375,7 +374,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
       method = {"render"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/GameTestDebugRenderer;render()V"
+         target = "Lnet/minecraft/client/render/debug/GameTestDebugRenderer;render()V"
       )}
    )
    private void wrapEmitGameTestGizmos(GameTestDebugRenderer instance, Operation<Void> original) {
@@ -413,14 +412,14 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
       CallbackInfo ci
    ) {
       IPCGlobal.renderer.onAfterTranslucentRendering(modelView);
-      this.client.gameRenderer.getDiffuseLighting().setShaderLights(class_11274.field_60025);
+      this.client.gameRenderer.getDiffuseLighting().setShaderLights(Type.LEVEL);
    }
 
    @WrapOperation(
       method = {"render"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/FramePass;setRenderer(Ljava/lang/Runnable;)V",
+         target = "Lnet/minecraft/client/render/FramePass;setRenderer(Ljava/lang/Runnable;)V",
          ordinal = 0
       )}
    )
@@ -436,7 +435,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
       method = {"render"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ClientWorld;runQueuedChunkUpdates()V"
+         target = "Lnet/minecraft/client/world/ClientWorld;runQueuedChunkUpdates()V"
       )}
    )
    private void redirectRunQueuedChunkUpdates(ClientWorld world) {
@@ -444,7 +443,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
    }
 
    @Inject(
-      method = {"renderSky(Lnet/minecraft/FrameGraphBuilder;Lnet/minecraft/Camera;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", "addSkyPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/client/Camera;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Matrix4f;)V"},
+      method = {"renderSky(Lnet/minecraft/client/render/FrameGraphBuilder;Lnet/minecraft/client/render/Camera;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", "addSkyPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/client/Camera;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Matrix4f;)V"},
       at = {@At("HEAD")},
       cancellable = true,
       require = 1
@@ -456,10 +455,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
    }
 
    @WrapOperation(
-      method = {"renderSky(Lnet/minecraft/FrameGraphBuilder;Lnet/minecraft/Camera;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", "addSkyPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/client/Camera;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Matrix4f;)V"},
+      method = {"renderSky(Lnet/minecraft/client/render/FrameGraphBuilder;Lnet/minecraft/client/render/Camera;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", "addSkyPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/client/Camera;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Matrix4f;)V"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/FramePass;setRenderer(Ljava/lang/Runnable;)V"
+         target = "Lnet/minecraft/client/render/FramePass;setRenderer(Ljava/lang/Runnable;)V"
       )},
       require = 1
    )
@@ -478,11 +477,13 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
       method = {"lambda$addWeatherPass$4", "method_62216"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/WeatherRendering;renderPrecipitation(Lnet/minecraft/VertexConsumerProvider;Lnet/minecraft/Vec3d;Lnet/minecraft/WeatherRenderState;)V"
+         target = "Lnet/minecraft/client/render/WeatherRendering;renderPrecipitation(Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/client/render/state/WeatherRenderState;)V"
       )},
       require = 1
    )
-   private void wrapRenderWeather(WeatherRendering instance, VertexConsumerProvider bufferSource, Vec3d cameraPos, WeatherRenderState weatherRenderState, Operation<Void> original) {
+   private void wrapRenderWeather(
+      WeatherRendering instance, VertexConsumerProvider bufferSource, Vec3d cameraPos, WeatherRenderState weatherRenderState, Operation<Void> original
+   ) {
       if (PortalRendering.isRendering()) {
          FrontClipping.setupInnerClipping(PortalRendering.getActiveClippingPlane(), new Matrix4f(RenderSystem.getModelViewMatrix()), 0.0);
          RenderStates.isRenderingPortalWeather = true;
@@ -554,10 +555,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
    }
 
    @Redirect(
-      method = {"reload"},
+      method = {"reload()V"},
       at = {@At(
          value = "NEW",
-         target = "(Lnet/minecraft/ChunkBuilder;Lnet/minecraft/World;ILnet/minecraft/WorldRenderer;)Lnet/minecraft/BuiltChunkStorage;"
+         target = "(Lnet/minecraft/client/render/chunk/ChunkBuilder;Lnet/minecraft/world/World;ILnet/minecraft/client/render/WorldRenderer;)Lnet/minecraft/client/render/BuiltChunkStorage;"
       )}
    )
    private BuiltChunkStorage redirectConstructingBuildChunkStorage(ChunkBuilder chunkBuilder_1, World world_1, int int_1, WorldRenderer worldRenderer_1) {
@@ -578,7 +579,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
       method = {"fillEntityRenderStates"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/EntityRenderManager;shouldRender(Lnet/minecraft/Entity;Lnet/minecraft/Frustum;DDD)Z"
+         target = "Lnet/minecraft/client/render/entity/EntityRenderManager;shouldRender(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/Frustum;DDD)Z"
       )}
    )
    private boolean wrapShouldRenderForDeferring(
@@ -604,7 +605,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
       method = {"fillEntityRenderStates"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/Entity;hasPassengerDeep(Lnet/minecraft/Entity;)Z"
+         target = "Lnet/minecraft/entity/Entity;hasPassengerDeep(Lnet/minecraft/entity/Entity;)Z"
       )}
    )
    private boolean wrapHasIndirectPassengerForDeferring(Entity entity, Entity passenger, Operation<Boolean> original) {
@@ -615,12 +616,16 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
    private boolean ip_vanillaWouldExtract(Entity entity, Camera camera) {
       BlockPos blockPos = entity.getBlockPos();
       return (this.world.isOutOfHeightLimit(blockPos.getY()) || this.isRenderingReady(blockPos))
-         && (entity != camera.getFocusedEntity() || camera.isThirdPerson() || camera.getFocusedEntity() instanceof LivingEntity livingEntity && livingEntity.isSleeping())
+         && (
+            entity != camera.getFocusedEntity()
+               || camera.isThirdPerson()
+               || camera.getFocusedEntity() instanceof LivingEntity livingEntity && livingEntity.isSleeping()
+         )
          && (!(entity instanceof ClientPlayerEntity) || camera.getFocusedEntity() == entity);
    }
 
    @Inject(
-      method = {"reload"},
+      method = {"reload()V"},
       at = {@At("HEAD")},
       cancellable = true
    )
@@ -632,7 +637,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
    }
 
    @Inject(
-      method = {"reload"},
+      method = {"reload()V"},
       at = {@At("TAIL")}
    )
    private void onReloadFinished(CallbackInfo ci) {
@@ -656,7 +661,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    private boolean ip_isChunkCompiled(ImmPtlViewArea immPtlViewArea, BlockPos blockPos) {
       ChunkSectionPos sectionPos = ChunkSectionPos.from(blockPos);
-      class_851 renderChunk = immPtlViewArea.rawGet(sectionPos.getSectionX(), sectionPos.getSectionY(), sectionPos.getSectionZ());
+      BuiltChunk renderChunk = immPtlViewArea.rawGet(sectionPos.getSectionX(), sectionPos.getSectionY(), sectionPos.getSectionZ());
       return renderChunk != null && renderChunk.currentRenderData.get() != ChunkRenderData.HIDDEN;
    }
 
@@ -672,7 +677,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Override
    public void ip_renderSingleEntity(
-      Entity entity, double cameraX, double cameraY, double cameraZ, float partialTick, MatrixStack matrixStack, class_4598 bufferSource
+      Entity entity, double cameraX, double cameraY, double cameraZ, float partialTick, MatrixStack matrixStack, Immediate bufferSource
    ) {
       EntityRenderState renderState = this.entityRenderManager.getAndUpdateRenderState(entity, partialTick);
       this.entityRenderManager
@@ -704,12 +709,12 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
    }
 
    @Override
-   public void portal_setChunkInfoList(ObjectArrayList<class_851> arg) {
+   public void portal_setChunkInfoList(ObjectArrayList<BuiltChunk> arg) {
       this.builtChunks = arg;
    }
 
    @Override
-   public ObjectArrayList<class_851> portal_getChunkInfoList() {
+   public ObjectArrayList<BuiltChunk> portal_getChunkInfoList() {
       return this.builtChunks;
    }
 

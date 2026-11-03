@@ -2,16 +2,16 @@ package qouteall.imm_ptl.core.mixin.common.interaction;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.minecraft.util.Hand;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.class_2847;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -47,7 +47,7 @@ public class MixinServerPlayerGameMode {
       at = {@At(
          value = "FIELD",
          opcode = 180,
-         target = "Lnet/minecraft/ServerPlayerInteractionManager;world:Lnet/minecraft/ServerWorld;"
+         target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;world:Lnet/minecraft/server/world/ServerWorld;"
       )}
    )
    private ServerWorld redirectGetLevel(ServerPlayerInteractionManager serverPlayerGameMode) {
@@ -58,7 +58,7 @@ public class MixinServerPlayerGameMode {
       method = {"continueMining", "processBlockBreakingAction"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ServerPlayerEntity;getServerWorld()Lnet/minecraft/ServerWorld;"
+         target = "Lnet/minecraft/server/network/ServerPlayerEntity;getEntityWorld()Lnet/minecraft/server/world/ServerWorld;"
       )}
    )
    private ServerWorld redirectGetLevel(ServerPlayerEntity instance) {
@@ -69,7 +69,7 @@ public class MixinServerPlayerGameMode {
       method = {"interactBlock"},
       at = {@At(
          value = "NEW",
-         target = "(Lnet/minecraft/PlayerEntity;Lnet/minecraft/Hand;Lnet/minecraft/BlockHitResult;)Lnet/minecraft/ItemUsageContext;"
+         target = "(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/item/ItemUsageContext;"
       )}
    )
    private ItemUsageContext redirectNewUseOnContext(PlayerEntity player, Hand interactionHand, BlockHitResult blockHitResult) {
@@ -80,7 +80,7 @@ public class MixinServerPlayerGameMode {
       method = {"processBlockBreakingAction"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ServerPlayerEntity;canInteractWithBlockAt(Lnet/minecraft/BlockPos;D)Z"
+         target = "Lnet/minecraft/server/network/ServerPlayerEntity;canInteractWithBlockAt(Lnet/minecraft/util/math/BlockPos;D)Z"
       )}
    )
    private boolean wrapDistanceInHandleBlockBreakAction(ServerPlayerEntity instance, BlockPos blockPos, double v, Operation<Boolean> original) {
@@ -93,10 +93,10 @@ public class MixinServerPlayerGameMode {
       at = {@At(
          value = "FIELD",
          opcode = 181,
-         target = "Lnet/minecraft/ServerPlayerInteractionManager;miningPos:Lnet/minecraft/BlockPos;"
+         target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;miningPos:Lnet/minecraft/util/math/BlockPos;"
       )}
    )
-   private void onSetDestroyPos(BlockPos pos, class_2847 action, Direction face, int maxBuildHeight, int sequence, CallbackInfo ci) {
+   private void onSetDestroyPos(BlockPos pos, Action action, Direction face, int maxBuildHeight, int sequence, CallbackInfo ci) {
       this.ip_destroyPosLevel = this.ip_getActualWorld();
    }
 
@@ -105,10 +105,10 @@ public class MixinServerPlayerGameMode {
       at = {@At(
          value = "FIELD",
          opcode = 181,
-         target = "Lnet/minecraft/ServerPlayerInteractionManager;failedMiningPos:Lnet/minecraft/BlockPos;"
+         target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;failedMiningPos:Lnet/minecraft/util/math/BlockPos;"
       )}
    )
-   private void onSetDelayedDestroyPos(BlockPos pos, class_2847 action, Direction face, int maxBuildHeight, int sequence, CallbackInfo ci) {
+   private void onSetDelayedDestroyPos(BlockPos pos, Action action, Direction face, int maxBuildHeight, int sequence, CallbackInfo ci) {
       this.ip_destroyPosLevel = this.ip_getActualWorld();
    }
 
@@ -117,7 +117,7 @@ public class MixinServerPlayerGameMode {
       at = {@At(
          value = "FIELD",
          opcode = 180,
-         target = "Lnet/minecraft/ServerPlayerInteractionManager;world:Lnet/minecraft/ServerWorld;"
+         target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;world:Lnet/minecraft/server/world/ServerWorld;"
       )}
    )
    private ServerWorld redirectLevelOnTicking(ServerPlayerInteractionManager instance) {

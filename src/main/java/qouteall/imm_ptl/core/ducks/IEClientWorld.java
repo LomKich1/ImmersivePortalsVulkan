@@ -2,9 +2,9 @@ package qouteall.imm_ptl.core.ducks;
 
 import java.util.List;
 import java.util.Map;
+import net.minecraft.client.network.PendingUpdateManager;
 import net.minecraft.item.map.MapState;
 import net.minecraft.world.EntityList;
-import net.minecraft.client.network.PendingUpdateManager;
 import net.minecraft.world.tick.TickManager;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.portal.Portal;

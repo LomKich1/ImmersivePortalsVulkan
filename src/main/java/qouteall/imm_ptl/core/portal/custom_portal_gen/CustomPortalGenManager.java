@@ -9,19 +9,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Map.Entry;
-import net.minecraft.util.ActionResult;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Position;
 import net.minecraft.registry.Registry;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Position;
+import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import qouteall.imm_ptl.core.IPGlobal;
@@ -53,8 +53,8 @@ public class CustomPortalGenManager {
       if (IPGlobal.enableDatapackPortalGen) {
          LOGGER.info("Processing custom portal generation");
          CustomPortalGenManager manager = new CustomPortalGenManager();
-         Registry<CustomPortalGeneration> registry = server.getRegistryManager().get(CustomPortalGeneration.REGISTRY_KEY);
-         Registry<CustomPortalGeneration> legacyRegistry = server.getRegistryManager().get(CustomPortalGeneration.LEGACY_REGISTRY_KEY);
+         Registry<CustomPortalGeneration> registry = server.getRegistryManager().getOrThrow(CustomPortalGeneration.REGISTRY_KEY);
+         Registry<CustomPortalGeneration> legacyRegistry = server.getRegistryManager().getOrThrow(CustomPortalGeneration.LEGACY_REGISTRY_KEY);
 
          for (Entry<RegistryKey<CustomPortalGeneration>, CustomPortalGeneration> entry : registry.getEntrySet()) {
             manager.addEntry(server, entry.getKey(), entry.getValue());
@@ -109,24 +109,19 @@ public class CustomPortalGenManager {
          MinecraftServer server = context.getWorld().getServer();
          Item item = context.getStack().getItem();
          if (this.useItemGen.containsKey(item)) {
-            ServerTaskList.of(server)
-               .addTask(
-                  () -> {
-                     for (CustomPortalGeneration gen : this.useItemGen.get(item)) {
-                        boolean result = gen.perform(
-                           (ServerWorld)context.getWorld(), context.getBlockPos().method_10093(context.getSide()), context.getPlayer()
-                        );
-                        if (result) {
-                           if (gen.trigger instanceof PortalGenTrigger.UseItemTrigger trigger && trigger.shouldConsume(context)) {
-                              context.getStack().decrement(1);
-                           }
-                           break;
-                        }
+            ServerTaskList.of(server).addTask(() -> {
+               for (CustomPortalGeneration gen : this.useItemGen.get(item)) {
+                  boolean result = gen.perform((ServerWorld)context.getWorld(), context.getBlockPos().offset(context.getSide()), context.getPlayer());
+                  if (result) {
+                     if (gen.trigger instanceof PortalGenTrigger.UseItemTrigger trigger && trigger.shouldConsume(context)) {
+                        context.getStack().decrement(1);
                      }
-
-                     return true;
+                     break;
                   }
-               );
+               }
+
+               return true;
+            });
          }
       }
    }
@@ -153,7 +148,7 @@ public class CustomPortalGenManager {
    }
 
    public void onBeforeConventionalDimensionChange(ServerPlayerEntity player) {
-      this.playerPosBeforeTravel.put(player.getUuid(), new WithDim<>(player.getServerWorld().getRegistryKey(), player.getEntityPos()));
+      this.playerPosBeforeTravel.put(player.getUuid(), new WithDim<>(player.getEntityWorld().getRegistryKey(), player.getEntityPos()));
    }
 
    public void onAfterConventionalDimensionChange(ServerPlayerEntity player) {

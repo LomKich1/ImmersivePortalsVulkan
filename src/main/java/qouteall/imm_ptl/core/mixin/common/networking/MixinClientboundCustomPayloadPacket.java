@@ -1,9 +1,9 @@
 package qouteall.imm_ptl.core.mixin.common.networking;
 
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.network.listener.ClientCommonPacketListener;
+import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,15 +17,15 @@ import qouteall.imm_ptl.core.network.PacketRedirection;
 public class MixinClientboundCustomPayloadPacket implements IECustomPayloadPacket {
    @Shadow
    @Final
-   private CustomPayload comp_1646;
+   private CustomPayload payload;
 
    @Inject(
-      method = {"method_53024(Lnet/minecraft/ClientCommonPacketListener;)V"},
+      method = {"apply(Lnet/minecraft/network/listener/ClientCommonPacketListener;)V"},
       at = {@At("HEAD")},
       cancellable = true
    )
    private void onHandle(ClientCommonPacketListener clientCommonPacketListener, CallbackInfo ci) {
-      if (this.comp_1646 instanceof PacketRedirection.Payload redirectPayload) {
+      if (this.payload instanceof PacketRedirection.Payload redirectPayload) {
          if (clientCommonPacketListener instanceof ClientPlayPacketListener clientGamePacketListener) {
             redirectPayload.handle(clientGamePacketListener);
          }

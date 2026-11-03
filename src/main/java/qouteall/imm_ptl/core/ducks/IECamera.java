@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.core.ducks;
 
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.client.world.ClientWorld;
 
 public interface IECamera {
    void ip_resetState(Vec3d var1, ClientWorld var2);

@@ -4,12 +4,12 @@ import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
-import net.minecraft.client.MinecraftClient;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.CHelper;
@@ -24,9 +24,7 @@ public class GravityChangerInterface {
    private static void warnGravityChangerNotPresent() {
       if (!warned) {
          warned = true;
-         CHelper.printChat(
-            Text.translatable("imm_ptl.missing_gravity_changer").append(McHelper.getLinkText("https://modrinth.com/mod/gravity-api-fork"))
-         );
+         CHelper.printChat(Text.translatable("imm_ptl.missing_gravity_changer").append(McHelper.getLinkText("https://modrinth.com/mod/gravity-api-fork")));
       }
    }
 
@@ -40,11 +38,11 @@ public class GravityChangerInterface {
       }
 
       public Direction getGravityDirection(Entity entity) {
-         return Direction.field_11033;
+         return Direction.DOWN;
       }
 
       public Direction getBaseGravityDirection(Entity entity) {
-         return Direction.field_11033;
+         return Direction.DOWN;
       }
 
       public void setClientPlayerGravityDirection(PlayerEntity player, Direction direction) {
@@ -124,7 +122,7 @@ public class GravityChangerInterface {
       @Nullable
       @Override
       public DQuaternion getExtraCameraRotation(Direction gravityDirection) {
-         return gravityDirection == Direction.field_11033 ? null : DQuaternion.fromMcQuaternion(RotationUtil.getWorldRotationQuaternion(gravityDirection));
+         return gravityDirection == Direction.DOWN ? null : DQuaternion.fromMcQuaternion(RotationUtil.getWorldRotationQuaternion(gravityDirection));
       }
 
       @Override

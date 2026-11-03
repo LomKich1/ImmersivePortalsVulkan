@@ -2,12 +2,12 @@ package qouteall.imm_ptl.peripheral.wand;
 
 import com.mojang.logging.LogUtils;
 import java.util.Objects;
-import net.minecraft.world.World;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.MutableText;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;

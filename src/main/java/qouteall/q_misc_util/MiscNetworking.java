@@ -5,23 +5,23 @@ import com.google.common.collect.ImmutableMap.Builder;
 import com.mojang.logging.LogUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.world.World;
-import net.minecraft.registry.Registry;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.util.Identifier;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.world.dimension.DimensionTypes;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.listener.ClientCommonPacketListener;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload.class_9154;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.CustomPayload.Id;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.dimension.DimensionTypes;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import qouteall.imm_ptl.core.ClientWorldLoader;
@@ -43,7 +43,7 @@ public class MiscNetworking {
    }
 
    public record DimIdSyncPacket(NbtCompound dimIntIdTag, NbtCompound dimTypeTag) implements CustomPayload {
-      public static final class_9154<MiscNetworking.DimIdSyncPacket> TYPE = new class_9154(McHelper.newResourceLocation("imm_ptl:dim_int_id_sync"));
+      public static final Id<MiscNetworking.DimIdSyncPacket> TYPE = new Id(McHelper.newResourceLocation("imm_ptl:dim_int_id_sync"));
       public static final PacketCodec<PacketByteBuf, MiscNetworking.DimIdSyncPacket> CODEC = PacketCodec.ofStatic(
          (b, p) -> p.write(b), MiscNetworking.DimIdSyncPacket::read
       );
@@ -52,7 +52,7 @@ public class MiscNetworking {
          DimIntIdMap rec = DimensionIntId.getServerMap(server);
          NbtCompound dimIntIdTag = rec.toTag(dim -> true);
          DynamicRegistryManager registryManager = server.getRegistryManager();
-         Registry<DimensionType> dimensionTypes = registryManager.get(RegistryKeys.field_41241);
+         Registry<DimensionType> dimensionTypes = registryManager.getOrThrow(RegistryKeys.DIMENSION_TYPE);
          NbtCompound dimIdToDimTypeIdTag = new NbtCompound();
 
          for (ServerWorld world : server.getWorlds()) {
@@ -62,7 +62,7 @@ public class MiscNetworking {
             if (dimTypeId == null) {
                MiscNetworking.LOGGER.error("Cannot find dimension type for {}", dimId.getValue());
                MiscNetworking.LOGGER.error("Registered dimension types {}", dimensionTypes.getIds());
-               dimTypeId = DimensionTypes.field_37666.getValue();
+               dimTypeId = DimensionTypes.OVERWORLD.getValue();
             }
 
             dimIdToDimTypeIdTag.putString(dimId.getValue().toString(), dimTypeId.toString());
@@ -95,7 +95,7 @@ public class MiscNetworking {
          for (String key : this.dimTypeTag.getKeys()) {
             RegistryKey<World> dimId = RegistryKey.of(RegistryKeys.WORLD, McHelper.newResourceLocation(key));
             String dimTypeId = this.dimTypeTag.getString(key, "");
-            RegistryKey<DimensionType> dimType = RegistryKey.of(RegistryKeys.field_41241, McHelper.newResourceLocation(dimTypeId));
+            RegistryKey<DimensionType> dimType = RegistryKey.of(RegistryKeys.DIMENSION_TYPE, McHelper.newResourceLocation(dimTypeId));
             builder.put(dimId, dimType);
          }
 
@@ -105,7 +105,7 @@ public class MiscNetworking {
       }
 
       @NotNull
-      public class_9154<? extends CustomPayload> getId() {
+      public Id<? extends CustomPayload> getId() {
          return TYPE;
       }
    }

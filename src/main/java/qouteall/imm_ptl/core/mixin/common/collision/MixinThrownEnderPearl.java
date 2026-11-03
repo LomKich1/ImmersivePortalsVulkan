@@ -1,9 +1,9 @@
 package qouteall.imm_ptl.core.mixin.common.collision;
 
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.hit.HitResult;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,14 +17,14 @@ public class MixinThrownEnderPearl {
       method = {"onCollision"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/EnderPearlEntity;discard()V"
+         target = "Lnet/minecraft/entity/projectile/thrown/EnderPearlEntity;discard()V"
       )}
    )
    private void onOnHitDiscard(HitResult result, CallbackInfo ci) {
       EnderPearlEntity this_ = (EnderPearlEntity)this;
       if (this_.getOwner() instanceof ServerPlayerEntity serverPlayer
          && serverPlayer.networkHandler.isConnectionOpen()
-         && serverPlayer.getServerWorld() != this_.getEntityWorld()
+         && serverPlayer.getEntityWorld() != this_.getEntityWorld()
          && !serverPlayer.isSleeping()) {
          Helper.log("Doing cross-dimensional ender pearl teleportation");
          ServerTeleportationManager.teleportEntityGeneral(serverPlayer, this_.getEntityPos(), (ServerWorld)this_.getEntityWorld());

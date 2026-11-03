@@ -2,9 +2,9 @@ package qouteall.imm_ptl.core.portal.animation;
 
 import java.util.Objects;
 import java.util.stream.Stream;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.portal.PortalManipulation;
@@ -21,11 +21,7 @@ public record DeltaUnilateralPortalState(@Nullable Vec3d offset, @Nullable DQuat
          this.rotation == null ? null : this.rotation.getConjugated(),
          this.sizeScaling == null
             ? null
-            : new Vec3d(
-               1.0 / this.sizeScaling.getX(),
-               1.0 / this.sizeScaling.getY(),
-               this.sizeScaling.getZ() == 0.0 ? 1.0 : 1.0 / this.sizeScaling.getZ()
-            )
+            : new Vec3d(1.0 / this.sizeScaling.getX(), 1.0 / this.sizeScaling.getY(), this.sizeScaling.getZ() == 0.0 ? 1.0 : 1.0 / this.sizeScaling.getZ())
       );
    }
 
@@ -33,11 +29,7 @@ public record DeltaUnilateralPortalState(@Nullable Vec3d offset, @Nullable DQuat
       return new DeltaUnilateralPortalState(
          Helper.combineNullable(this.offset, then.offset, Vec3d::add),
          Helper.combineNullable(this.rotation, then.rotation, DQuaternion::hamiltonProduct),
-         Helper.combineNullable(
-            this.sizeScaling,
-            then.sizeScaling,
-            (a, b) -> new Vec3d(a.getX() * b.getX(), a.getY() * b.getY(), a.getZ() * b.getZ())
-         )
+         Helper.combineNullable(this.sizeScaling, then.sizeScaling, (a, b) -> new Vec3d(a.getX() * b.getX(), a.getY() * b.getY(), a.getZ() * b.getZ()))
       );
    }
 
@@ -47,9 +39,7 @@ public record DeltaUnilateralPortalState(@Nullable Vec3d offset, @Nullable DQuat
          tag.contains("rotation") ? DQuaternion.fromTag(tag.getCompoundOrEmpty("rotation")) : null,
          tag.contains("sizeScalingX")
             ? new Vec3d(
-               tag.getDouble("sizeScalingX", 0.0),
-               tag.getDouble("sizeScalingY", 0.0),
-               tag.contains("sizeScalingZ") ? tag.getDouble("sizeScalingZ", 0.0) : 1.0
+               tag.getDouble("sizeScalingX", 0.0), tag.getDouble("sizeScalingY", 0.0), tag.contains("sizeScalingZ") ? tag.getDouble("sizeScalingZ", 0.0) : 1.0
             )
             : null
       );
@@ -142,9 +132,7 @@ public record DeltaUnilateralPortalState(@Nullable Vec3d offset, @Nullable DQuat
    @Override
    public String toString() {
       String str = Stream.of(
-            this.offset == null
-               ? null
-               : "offset=(%.3f,%.3f,%.3f)".formatted(this.offset.getX(), this.offset.getY(), this.offset.getZ()),
+            this.offset == null ? null : "offset=(%.3f,%.3f,%.3f)".formatted(this.offset.getX(), this.offset.getY(), this.offset.getZ()),
             this.rotation == null ? null : "rotation=(%.3f,%.3f,%.3f,%.3f)".formatted(this.rotation.x, this.rotation.y, this.rotation.z, this.rotation.w),
             this.sizeScaling == null ? null : "sizeScaling=(%.3f,%.3f)".formatted(this.sizeScaling.getX(), this.sizeScaling.getY())
          )

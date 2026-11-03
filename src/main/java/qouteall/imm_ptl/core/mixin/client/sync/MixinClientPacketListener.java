@@ -2,26 +2,26 @@ package qouteall.imm_ptl.core.mixin.client.sync;
 
 import java.util.Map;
 import java.util.UUID;
-import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import net.minecraft.network.packet.s2c.play.UnloadChunkS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntityPassengersSetS2CPacket;
-import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
-import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.network.packet.s2c.play.LightData;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientConnectionState;
-import net.minecraft.registry.DynamicRegistryManager.class_6890;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
+import net.minecraft.network.ClientConnection;
+import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntityPassengersSetS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.network.packet.s2c.play.LightData;
+import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.network.packet.s2c.play.UnloadChunkS2CPacket;
+import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.DynamicRegistryManager.Immutable;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -62,7 +62,7 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
    protected abstract void readLightData(int var1, int var2, LightData var3, boolean var4);
 
    @Shadow
-   public abstract class_6890 getRegistryManager();
+   public abstract Immutable getRegistryManager();
 
    @Shadow
    protected abstract void scheduleRenderChunk(WorldChunk var1, int var2, int var3);
@@ -81,10 +81,10 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
    }
 
    @Inject(
-      method = {"Lnet/minecraft/ClientPlayNetworkHandler;onPlayerPositionLook(Lnet/minecraft/PlayerPositionLookS2CPacket;)V"},
+      method = {"Lnet/minecraft/client/network/ClientPlayNetworkHandler;onPlayerPositionLook(Lnet/minecraft/network/packet/s2c/play/PlayerPositionLookS2CPacket;)V"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/NetworkThreadUtils;forceMainThread(Lnet/minecraft/Packet;Lnet/minecraft/PacketListener;Lnet/minecraft/PacketApplyBatcher;)V",
+         target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V",
          shift = Shift.AFTER
       )}
    )
@@ -101,9 +101,9 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
                "[ImmPtl] Client accepted position packet in another dimension. Packet: {} {} {} {}. Player: {} {} {} {}",
                new Object[]{
                   packetDim.getValue(),
-                  packet.comp_3228().comp_3148().x,
-                  packet.comp_3228().comp_3148().y,
-                  packet.comp_3228().comp_3148().z,
+                  packet.change().position().x,
+                  packet.change().position().y,
+                  packet.change().position().z,
                   playerWorld.getRegistryKey().getValue(),
                   player.getX(),
                   player.getY(),
@@ -111,28 +111,22 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
                }
             );
             ClientTeleportationManager.forceTeleportPlayer(
-               packetDim,
-               new Vec3d(packet.comp_3228().comp_3148().x, packet.comp_3228().comp_3148().y, packet.comp_3228().comp_3148().z)
+               packetDim, new Vec3d(packet.change().position().x, packet.change().position().y, packet.change().position().z)
             );
          }
 
          LOGGER.info(
             "[ImmPtl] Client accepted position packet {} {} {} {}",
-            new Object[]{
-               packetDim.getValue(),
-               packet.comp_3228().comp_3148().x,
-               packet.comp_3228().comp_3148().y,
-               packet.comp_3228().comp_3148().z
-            }
+            new Object[]{packetDim.getValue(), packet.change().position().x, packet.change().position().y, packet.change().position().z}
          );
       }
    }
 
    @Inject(
-      method = {"Lnet/minecraft/ClientPlayNetworkHandler;onEntityPassengersSet(Lnet/minecraft/EntityPassengersSetS2CPacket;)V"},
+      method = {"Lnet/minecraft/client/network/ClientPlayNetworkHandler;onEntityPassengersSet(Lnet/minecraft/network/packet/s2c/play/EntityPassengersSetS2CPacket;)V"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/NetworkThreadUtils;forceMainThread(Lnet/minecraft/Packet;Lnet/minecraft/PacketListener;Lnet/minecraft/PacketApplyBatcher;)V",
+         target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V",
          shift = Shift.AFTER
       )},
       cancellable = true
@@ -152,10 +146,10 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
    }
 
    @Redirect(
-      method = {"Lnet/minecraft/ClientPlayNetworkHandler;onEntityTrackerUpdate(Lnet/minecraft/EntityTrackerUpdateS2CPacket;)V"},
+      method = {"Lnet/minecraft/client/network/ClientPlayNetworkHandler;onEntityTrackerUpdate(Lnet/minecraft/network/packet/s2c/play/EntityTrackerUpdateS2CPacket;)V"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ClientWorld;getEntityById(I)Lnet/minecraft/Entity;"
+         target = "Lnet/minecraft/client/world/ClientWorld;getEntityById(I)Lnet/minecraft/entity/Entity;"
       )}
    )
    private Entity redirectGetEntityById(ClientWorld clientWorld, int id) {
@@ -177,7 +171,7 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
 
          for (ClientWorld clientWorld : ClientWorldLoader.getClientWorlds()) {
             if (clientWorld != currentWorld) {
-               clientWorld.method_28104().setTime(packet.comp_3219());
+               clientWorld.getLevelProperties().setTime(packet.time());
             }
          }
       }
@@ -187,7 +181,7 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
       method = {"onPlayerActionResponse"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ClientWorld;handlePlayerActionResponse(I)V"
+         target = "Lnet/minecraft/client/world/ClientWorld;handlePlayerActionResponse(I)V"
       )}
    )
    private void redirectHandleBlockChangedAck(ClientWorld instance, int seqNumber) {
@@ -200,7 +194,7 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
       method = {"onEntitySpawn"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/NetworkThreadUtils;forceMainThread(Lnet/minecraft/Packet;Lnet/minecraft/PacketListener;Lnet/minecraft/PacketApplyBatcher;)V",
+         target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V",
          shift = Shift.AFTER
       )},
       cancellable = true
@@ -218,15 +212,13 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
       method = {"onChunkData"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/NetworkThreadUtils;forceMainThread(Lnet/minecraft/Packet;Lnet/minecraft/PacketListener;Lnet/minecraft/PacketApplyBatcher;)V",
+         target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V",
          shift = Shift.AFTER
       )}
    )
    private void onHandleLevelChunkWithLight(ChunkDataS2CPacket packet, CallbackInfo ci) {
       if (IPGlobal.chunkPacketDebug) {
-         LOGGER.info(
-            "Chunk Load Packet {} {} {}", new Object[]{this.world.getRegistryKey().getValue(), packet.getChunkX(), packet.getChunkZ()}
-         );
+         LOGGER.info("Chunk Load Packet {} {} {}", new Object[]{this.world.getRegistryKey().getValue(), packet.getChunkX(), packet.getChunkZ()});
       }
    }
 
@@ -234,16 +226,13 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
       method = {"onUnloadChunk"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/NetworkThreadUtils;forceMainThread(Lnet/minecraft/Packet;Lnet/minecraft/PacketListener;Lnet/minecraft/PacketApplyBatcher;)V",
+         target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V",
          shift = Shift.AFTER
       )}
    )
    private void onHandleForgetLevelChunk(UnloadChunkS2CPacket packet, CallbackInfo ci) {
       if (IPGlobal.chunkPacketDebug) {
-         LOGGER.info(
-            "Chunk Unload Packet {} {} {}",
-            new Object[]{this.world.getRegistryKey().getValue(), packet.comp_1726().x, packet.comp_1726().z}
-         );
+         LOGGER.info("Chunk Unload Packet {} {} {}", new Object[]{this.world.getRegistryKey().getValue(), packet.pos().x, packet.pos().z});
       }
    }
 }

@@ -8,14 +8,14 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import java.util.Collection;
 import java.util.List;
-import net.minecraft.entity.Entity;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.command.CommandManager;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.Vec3ArgumentType;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
+import net.minecraft.entity.Entity;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.imm_ptl.core.portal.PortalExtension;
 import qouteall.imm_ptl.core.portal.PortalState;
@@ -481,8 +481,7 @@ public class PortalAnimationCommand {
    }
 
    private static void sendAnimationHolderFailure(CommandContext<ServerCommandSource> context, Portal animationHolder) {
-      ((ServerCommandSource)context.getSource())
-         .sendError(Text.literal("This portal entity is not animation holder. Use this command to " + animationHolder));
+      ((ServerCommandSource)context.getSource()).sendError(Text.literal("This portal entity is not animation holder. Use this command to " + animationHolder));
    }
 
    private static void finishBuildingNormalAnimation(CommandContext<ServerCommandSource> context, Portal portal, int loopCount) {

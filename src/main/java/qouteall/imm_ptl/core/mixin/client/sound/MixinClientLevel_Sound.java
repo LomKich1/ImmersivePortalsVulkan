@@ -1,12 +1,12 @@
 package qouteall.imm_ptl.core.mixin.client.sound;
 
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -24,13 +24,22 @@ public class MixinClientLevel_Sound {
    private MinecraftClient client;
 
    @Inject(
-      method = {"playSound"},
+      method = {"playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZJ)V"},
       at = {@At("HEAD")},
       cancellable = true
    )
    @IPVanillaCopy
    private void onPlaySound(
-      double x, double y, double z, SoundEvent soundEvent, SoundCategory soundSource, float volume, float pitch, boolean distanceDelay, long seed, CallbackInfo ci
+      double x,
+      double y,
+      double z,
+      SoundEvent soundEvent,
+      SoundCategory soundSource,
+      float volume,
+      float pitch,
+      boolean distanceDelay,
+      long seed,
+      CallbackInfo ci
    ) {
       if (IPGlobal.enableCrossPortalSound) {
          ClientWorld this_ = (ClientWorld)this;

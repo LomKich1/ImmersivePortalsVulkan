@@ -9,16 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
 import java.util.concurrent.Executor;
-import net.minecraft.server.world.ChunkTicketManager;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ChunkLevelManager;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ChunkTicket;
+import net.minecraft.server.world.ChunkTicketManager;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.OptionalChunk;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.chunk.WorldChunk;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import qouteall.dimlib.api.DimensionAPI;
@@ -141,7 +141,7 @@ public class ImmPtlChunkTickets {
    private static void addTicket(ServerWorld world, long chunkPos) {
       if (IPConfig.getConfig().enableImmPtlChunkLoading) {
          ChunkPos chunkPosObj = new ChunkPos(chunkPos);
-         world.method_14178().addTicket(TICKET_TYPE, chunkPosObj, getLoadingRadius());
+         world.getChunkManager().addTicket(TICKET_TYPE, chunkPosObj, getLoadingRadius());
          if (enableDebugRateStat) {
             debugRateStat.hit();
          }
@@ -158,7 +158,7 @@ public class ImmPtlChunkTickets {
             boolean pendingTicketAdding = this.getQueueByDistance(ticketInfo.distanceToSource).remove(chunkPos);
             if (!pendingTicketAdding) {
                ChunkPos chunkPosObj = new ChunkPos(chunkPos);
-               world.method_14178().removeTicket(TICKET_TYPE, chunkPosObj, getLoadingRadius());
+               world.getChunkManager().removeTicket(TICKET_TYPE, chunkPosObj, getLoadingRadius());
             }
 
             return true;
@@ -196,11 +196,11 @@ public class ImmPtlChunkTickets {
    }
 
    public static ChunkHolder getChunkHolder(ServerWorld world, long chunkPos) {
-      return ((IEChunkMap)world.method_14178().chunkLoadingManager).ip_getChunkHolder(chunkPos);
+      return ((IEChunkMap)world.getChunkManager().chunkLoadingManager).ip_getChunkHolder(chunkPos);
    }
 
    public static ChunkLevelManager getDistanceManager(ServerWorld world) {
-      return ((IEServerChunkCache)world.method_14178()).ip_getDistanceManager();
+      return ((IEServerChunkCache)world.getChunkManager()).ip_getDistanceManager();
    }
 
    private static void cleanup(MinecraftServer server) {

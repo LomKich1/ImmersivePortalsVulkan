@@ -4,12 +4,12 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import java.util.List;
-import net.minecraft.server.world.ChunkTicketManager;
-import net.minecraft.server.world.ChunkLevelManager;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ChunkLevelManager;
 import net.minecraft.server.world.ChunkTicket;
+import net.minecraft.server.world.ChunkTicketManager;
 import net.minecraft.server.world.ServerChunkLoadingManager;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkSectionPos;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,7 +32,7 @@ public abstract class MixinDistanceManager implements qouteall.imm_ptl.core.duck
    private ChunkTicketManager ticketManager;
 
    @Inject(
-      method = {"Lnet/minecraft/ChunkLevelManager;handleChunkLeave(Lnet/minecraft/ChunkSectionPos;Lnet/minecraft/ServerPlayerEntity;)V"},
+      method = {"Lnet/minecraft/server/world/ChunkLevelManager;handleChunkLeave(Lnet/minecraft/util/math/ChunkSectionPos;Lnet/minecraft/server/network/ServerPlayerEntity;)V"},
       at = {@At("HEAD")}
    )
    private void onHandleChunkLeave(ChunkSectionPos sectionPos, ServerPlayerEntity serverPlayer, CallbackInfo ci) {

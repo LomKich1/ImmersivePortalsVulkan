@@ -5,10 +5,10 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.function.Predicate;
 import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import qouteall.imm_ptl.core.portal.nether_portal.BlockPortalShape;
 
 public class DiligentForm extends AbstractDiligentForm {

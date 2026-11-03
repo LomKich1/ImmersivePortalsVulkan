@@ -2,23 +2,23 @@ package qouteall.imm_ptl.core.mixin.client;
 
 import java.util.List;
 import java.util.Map;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.PendingUpdateManager;
+import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.world.ClientChunkManager;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.world.ClientWorld.Properties;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.Entity.RemovalReason;
 import net.minecraft.item.map.MapState;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.world.EntityList;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.EntityList;
-import net.minecraft.client.world.ClientChunkManager;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.client.network.PendingUpdateManager;
-import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.world.tick.TickManager;
-import net.minecraft.entity.Entity.class_5529;
-import net.minecraft.client.world.ClientWorld.class_5271;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -90,7 +90,7 @@ public abstract class MixinClientLevel implements IEClientWorld {
    )
    void onConstructed(
       ClientPlayNetworkHandler clientPacketListener,
-      class_5271 clientLevelData,
+      Properties clientLevelData,
       RegistryKey resourceKey,
       RegistryEntry holder,
       int loadDistance,
@@ -114,20 +114,20 @@ public abstract class MixinClientLevel implements IEClientWorld {
       if (ClientWorldLoader.getIsInitialized()) {
          for (ClientWorld world : ClientWorldLoader.getClientWorlds()) {
             if (world != this) {
-               world.removeEntity(entityIn.getId(), class_5529.DISCARDED);
+               world.removeEntity(entityIn.getId(), RemovalReason.DISCARDED);
             }
          }
       }
    }
 
    @Inject(
-      method = {"Lnet/minecraft/ClientWorld;isChunkLoaded(II)Z"},
+      method = {"Lnet/minecraft/client/world/ClientWorld;isChunkLoaded(II)Z"},
       at = {@At("HEAD")},
       cancellable = true
    )
    private void onHasChunk(int chunkX, int chunkZ, CallbackInfoReturnable<Boolean> cir) {
       if (IPGlobal.tickOnlyIfChunkLoaded) {
-         WorldChunk chunk = this.chunkManager.method_2857(chunkX, chunkZ, ChunkStatus.field_12803, false);
+         WorldChunk chunk = this.chunkManager.getChunk(chunkX, chunkZ, ChunkStatus.FULL, false);
          if (chunk == null || chunk instanceof EmptyChunk) {
             cir.setReturnValue(false);
          }
@@ -135,7 +135,7 @@ public abstract class MixinClientLevel implements IEClientWorld {
    }
 
    @Inject(
-      method = {"Lnet/minecraft/ClientWorld;toString()Ljava/lang/String;"},
+      method = {"Lnet/minecraft/client/world/ClientWorld;toString()Ljava/lang/String;"},
       at = {@At("HEAD")},
       cancellable = true
    )

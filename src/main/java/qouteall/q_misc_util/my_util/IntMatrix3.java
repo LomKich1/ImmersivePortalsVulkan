@@ -3,11 +3,11 @@ package qouteall.q_misc_util.my_util;
 import java.util.Objects;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.DirectionTransformation;
-import net.minecraft.util.math.Direction.class_2351;
-import net.minecraft.util.math.Direction.class_2352;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.util.math.Direction.AxisDirection;
 import org.joml.Matrix3f;
 import qouteall.q_misc_util.Helper;
 
@@ -23,16 +23,16 @@ public class IntMatrix3 {
    }
 
    public IntMatrix3(DirectionTransformation t) {
-      Direction d1 = t.map(Direction.from(class_2351.field_11048, class_2352.field_11056));
-      Direction d2 = t.map(Direction.from(class_2351.field_11052, class_2352.field_11056));
-      Direction d3 = t.map(Direction.from(class_2351.field_11051, class_2352.field_11056));
+      Direction d1 = t.map(Direction.from(Axis.X, AxisDirection.POSITIVE));
+      Direction d2 = t.map(Direction.from(Axis.Y, AxisDirection.POSITIVE));
+      Direction d3 = t.map(Direction.from(Axis.Z, AxisDirection.POSITIVE));
       this.x = d1.getVector();
       this.y = d2.getVector();
       this.z = d3.getVector();
    }
 
    public BlockPos transform(Vec3i p) {
-      return Helper.scale(this.x, p.getX()).method_10081(Helper.scale(this.y, p.getY())).method_10081(Helper.scale(this.z, p.getZ()));
+      return Helper.scale(this.x, p.getX()).add(Helper.scale(this.y, p.getY())).add(Helper.scale(this.z, p.getZ()));
    }
 
    public IntMatrix3 multiply(IntMatrix3 m) {

@@ -6,16 +6,16 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.minecraft.entity.EntityType;
-import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Pair;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.Pair;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.q_misc_util.Helper;
@@ -50,7 +50,7 @@ public class WorldWrappingPortal extends GlobalTrackedPortal {
    }
 
    private static WorldWrappingPortal createWrappingPortal(ServerWorld serverWorld, Box area, Direction direction, int zoneId, boolean isInward) {
-      WorldWrappingPortal portal = (WorldWrappingPortal)ENTITY_TYPE.create(serverWorld, SpawnReason.field_16461);
+      WorldWrappingPortal portal = (WorldWrappingPortal)ENTITY_TYPE.create(serverWorld, SpawnReason.TRIGGERED);
       portal.isInward = isInward;
       portal.zoneId = zoneId;
       initWrappingPortal(serverWorld, area, direction, isInward, portal);
@@ -102,12 +102,11 @@ public class WorldWrappingPortal extends GlobalTrackedPortal {
       }
 
       int availableId = getAvailableId(wrappingZones);
-      Box box = new IntBox(new BlockPos(x1, McHelper.getMinY(world), z1), new BlockPos(x2, McHelper.getMaxYExclusive(world) - 1, z2))
-         .toRealNumberBox();
-      WorldWrappingPortal p1 = createWrappingPortal(world, box, Direction.field_11043, availableId, isInward);
-      WorldWrappingPortal p2 = createWrappingPortal(world, box, Direction.field_11035, availableId, isInward);
-      WorldWrappingPortal p3 = createWrappingPortal(world, box, Direction.field_11039, availableId, isInward);
-      WorldWrappingPortal p4 = createWrappingPortal(world, box, Direction.field_11034, availableId, isInward);
+      Box box = new IntBox(new BlockPos(x1, McHelper.getMinY(world), z1), new BlockPos(x2, McHelper.getMaxYExclusive(world) - 1, z2)).toRealNumberBox();
+      WorldWrappingPortal p1 = createWrappingPortal(world, box, Direction.NORTH, availableId, isInward);
+      WorldWrappingPortal p2 = createWrappingPortal(world, box, Direction.SOUTH, availableId, isInward);
+      WorldWrappingPortal p3 = createWrappingPortal(world, box, Direction.WEST, availableId, isInward);
+      WorldWrappingPortal p4 = createWrappingPortal(world, box, Direction.EAST, availableId, isInward);
       GlobalPortalStorage gps = GlobalPortalStorage.get(world);
       gps.addPortal(p1);
       gps.addPortal(p2);
@@ -195,9 +194,7 @@ public class WorldWrappingPortal extends GlobalTrackedPortal {
       @Override
       public String toString() {
          Box area = this.getArea();
-         return String.format(
-            "[%d] %s %s %s ~ %s %s\n", this.id, this.isInwardZone ? "inward" : "outward", area.minX, area.minZ, area.maxX, area.maxZ
-         );
+         return String.format("[%d] %s %s %s ~ %s %s\n", this.id, this.isInwardZone ? "inward" : "outward", area.minX, area.minZ, area.maxX, area.maxZ);
       }
    }
 }

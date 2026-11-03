@@ -20,32 +20,32 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.Formatting;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.Text;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Identifier;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.listener.ClientCommonPacketListener;
 import net.minecraft.network.listener.ServerCommonPacketListener;
 import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.CustomPayload.Id;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload.class_9154;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,9 +67,9 @@ public class ImplRemoteProcedureCall {
       .put(BlockPos.class, (BiConsumer<RegistryByteBuf, Object>)(buf, o) -> buf.writeBlockPos((BlockPos)o))
       .put(Vec3d.class, (BiConsumer<RegistryByteBuf, Object>)(buf, o) -> {
          Vec3d vec = (Vec3d)o;
-         buf.method_52940(vec.x);
-         buf.method_52940(vec.y);
-         buf.method_52940(vec.z);
+         buf.writeDouble(vec.x);
+         buf.writeDouble(vec.y);
+         buf.writeDouble(vec.z);
       })
       .put(UUID.class, (BiConsumer<RegistryByteBuf, Object>)(buf, o) -> buf.writeUuid((UUID)o))
       .put(Block.class, (BiConsumer<RegistryByteBuf, Object>)(buf, o) -> serializeByCodec(buf, Registries.BLOCK.getCodec(), o))
@@ -80,23 +80,17 @@ public class ImplRemoteProcedureCall {
       .put(Text.class, (BiConsumer<RegistryByteBuf, Object>)(buf, o) -> TextCodecs.UNLIMITED_REGISTRY_PACKET_CODEC.encode(buf, (Text)o))
       .put(DQuaternion.class, (BiConsumer<RegistryByteBuf, Object>)(buf, o) -> {
          DQuaternion dQuaternion = (DQuaternion)o;
-         buf.method_52940(dQuaternion.x);
-         buf.method_52940(dQuaternion.y);
-         buf.method_52940(dQuaternion.z);
-         buf.method_52940(dQuaternion.w);
+         buf.writeDouble(dQuaternion.x);
+         buf.writeDouble(dQuaternion.y);
+         buf.writeDouble(dQuaternion.z);
+         buf.writeDouble(dQuaternion.w);
       })
       .put(byte[].class, (BiConsumer<RegistryByteBuf, Object>)(buf, o) -> buf.writeByteArray((byte[])o))
       .build();
    private static final ImmutableMap<Type, Function<RegistryByteBuf, Object>> deserializerMap = ImmutableMap.builder()
       .put(Identifier.class, PacketByteBuf::readIdentifier)
-      .put(
-         (new TypeToken<RegistryKey<World>>() {}).getType(),
-         (Function<RegistryByteBuf, >)buf -> RegistryKey.of(RegistryKeys.WORLD, buf.readIdentifier())
-      )
-      .put(
-         (new TypeToken<RegistryKey<Biome>>() {}).getType(),
-         (Function<RegistryByteBuf, >)buf -> RegistryKey.of(RegistryKeys.BIOME, buf.readIdentifier())
-      )
+      .put((new TypeToken<RegistryKey<World>>() {}).getType(), (Function<RegistryByteBuf, >)buf -> RegistryKey.of(RegistryKeys.WORLD, buf.readIdentifier()))
+      .put((new TypeToken<RegistryKey<Biome>>() {}).getType(), (Function<RegistryByteBuf, >)buf -> RegistryKey.of(RegistryKeys.BIOME, buf.readIdentifier()))
       .put(BlockPos.class, (Function<RegistryByteBuf, >)buf -> buf.readBlockPos())
       .put(Vec3d.class, (Function<RegistryByteBuf, >)buf -> new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble()))
       .put(UUID.class, (Function<RegistryByteBuf, >)buf -> buf.readUuid())
@@ -176,11 +170,11 @@ public class ImplRemoteProcedureCall {
       MinecraftClient.getInstance()
          .inGameHud
          .getChatHud()
-         .addMessage(Text.literal("The client failed to process a packet from server. See the log for details.").formatted(Formatting.field_1061));
+         .addMessage(Text.literal("The client failed to process a packet from server. See the log for details.").formatted(Formatting.RED));
    }
 
    private static void serverTellFailure(ServerPlayerEntity player) {
-      player.sendMessage(Text.literal("The server failed to process a packet sent from client.").formatted(Formatting.field_1061));
+      player.sendMessage(Text.literal("The server failed to process a packet sent from client.").formatted(Formatting.RED));
    }
 
    private static Method getMethodByPath(String methodPath) {
@@ -230,7 +224,7 @@ public class ImplRemoteProcedureCall {
 
    public record C2SRPCPayload(boolean deserializeSuccess, @Nullable String methodPath, @Nullable Method method, @Nullable List<Object> args)
       implements CustomPayload {
-      public static final class_9154<ImplRemoteProcedureCall.C2SRPCPayload> TYPE = new class_9154(McHelper.newResourceLocation("iportal:remote_c2s"));
+      public static final Id<ImplRemoteProcedureCall.C2SRPCPayload> TYPE = new Id(McHelper.newResourceLocation("iportal:remote_c2s"));
       public static final PacketCodec<RegistryByteBuf, ImplRemoteProcedureCall.C2SRPCPayload> CODEC = PacketCodec.ofStatic(
          (b, p) -> p.write(b), ImplRemoteProcedureCall.C2SRPCPayload::read
       );
@@ -298,14 +292,14 @@ public class ImplRemoteProcedureCall {
       }
 
       @NotNull
-      public class_9154<? extends CustomPayload> getId() {
+      public Id<? extends CustomPayload> getId() {
          return TYPE;
       }
    }
 
    public record S2CRPCPayload(boolean deserializeSuccess, @Nullable String methodPath, @Nullable Method method, @Nullable List<Object> args)
       implements CustomPayload {
-      public static final class_9154<ImplRemoteProcedureCall.S2CRPCPayload> TYPE = new class_9154(McHelper.newResourceLocation("iportal:remote_s2c"));
+      public static final Id<ImplRemoteProcedureCall.S2CRPCPayload> TYPE = new Id(McHelper.newResourceLocation("iportal:remote_s2c"));
       public static final PacketCodec<RegistryByteBuf, ImplRemoteProcedureCall.S2CRPCPayload> CODEC = PacketCodec.ofStatic(
          (b, p) -> p.write(b), ImplRemoteProcedureCall.S2CRPCPayload::read
       );
@@ -367,7 +361,7 @@ public class ImplRemoteProcedureCall {
       }
 
       @NotNull
-      public class_9154<? extends CustomPayload> getId() {
+      public Id<? extends CustomPayload> getId() {
          return TYPE;
       }
    }

@@ -6,12 +6,12 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult.class_240;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.hit.HitResult.Type;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.CHelper;
@@ -138,7 +138,7 @@ public class PortalRendering {
             return false;
          }
 
-         if (hitResult instanceof BlockHitResult blockHitResult && hitResult.getType() == class_240.field_1332) {
+         if (hitResult instanceof BlockHitResult blockHitResult && hitResult.getType() == Type.BLOCK) {
             BlockPos blockPos = blockHitResult.getBlockPos();
             Plane innerClipping = renderingPortal.getInnerClipping();
             if (innerClipping != null) {

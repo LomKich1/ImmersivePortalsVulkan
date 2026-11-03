@@ -1,10 +1,10 @@
 package qouteall.imm_ptl.core.portal;
 
-import net.minecraft.world.World;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.core.portal.animation.UnilateralPortalState;
@@ -171,9 +171,7 @@ public class PortalState {
       Vec3d axisW = McHelper.getAxisWFromOrientation(this.orientation);
       Vec3d axisH = McHelper.getAxisHFromOrientation(this.orientation);
       Vec3d origin = this.fromPos;
-      return origin.add(axisW.multiply(portalLocalPos.x))
-         .add(axisH.multiply(portalLocalPos.y))
-         .add(axisW.crossProduct(axisH).multiply(portalLocalPos.z));
+      return origin.add(axisW.multiply(portalLocalPos.x)).add(axisH.multiply(portalLocalPos.y)).add(axisW.crossProduct(axisH).multiply(portalLocalPos.z));
    }
 
    public Vec3d getLocalPosTransformed(double collisionLocalX, double collisionLocalY) {

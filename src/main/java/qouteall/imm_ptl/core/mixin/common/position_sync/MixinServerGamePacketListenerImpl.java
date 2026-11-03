@@ -1,25 +1,25 @@
 package qouteall.imm_ptl.core.mixin.common.position_sync;
 
 import java.util.Set;
-import net.minecraft.entity.EntityPosition;
 import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.function.BooleanBiFunction;
-import net.minecraft.text.Text;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.entity.EntityPosition;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
-import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.world.WorldView;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.function.BooleanBiFunction;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
@@ -91,11 +91,11 @@ public abstract class MixinServerGamePacketListenerImpl implements IEServerPlayN
    public abstract ServerPlayerEntity getPlayer();
 
    @Inject(
-      method = {"Lnet/minecraft/ServerPlayNetworkHandler;onPlayerMove(Lnet/minecraft/PlayerMoveC2SPacket;)V"},
+      method = {"Lnet/minecraft/server/network/ServerPlayNetworkHandler;onPlayerMove(Lnet/minecraft/network/packet/c2s/play/PlayerMoveC2SPacket;)V"},
       at = {@At(
          value = "INVOKE",
          shift = Shift.AFTER,
-         target = "Lnet/minecraft/NetworkThreadUtils;forceMainThread(Lnet/minecraft/Packet;Lnet/minecraft/PacketListener;Lnet/minecraft/ServerWorld;)V"
+         target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/server/world/ServerWorld;)V"
       )},
       cancellable = true
    )
@@ -108,16 +108,12 @@ public abstract class MixinServerGamePacketListenerImpl implements IEServerPlayN
             return true;
          });
       } else {
-         if (this.player.getServerWorld().getRegistryKey() != packetDimension) {
+         if (this.player.getEntityWorld().getRegistryKey() != packetDimension) {
             if (LOG_LIMIT.tryDecrement()) {
                LOGGER.info(
                   "[ImmPtl] Ignoring player move packet. Player: {} Packet: {} {} {} {}",
                   new Object[]{
-                     this.player,
-                     packetDimension.getValue(),
-                     packet.getX(this.player.getX()),
-                     packet.getY(this.player.getY()),
-                     packet.getZ(this.player.getZ())
+                     this.player, packetDimension.getValue(), packet.getX(this.player.getX()), packet.getY(this.player.getY()), packet.getZ(this.player.getZ())
                   }
                );
             }
@@ -126,10 +122,10 @@ public abstract class MixinServerGamePacketListenerImpl implements IEServerPlayN
             if (this.ip_wrongMovePacketCount > 10) {
                LOGGER.info(
                   "[ImmPtl] Force move player {} {} {}",
-                  new Object[]{this.player, this.player.getServerWorld().getRegistryKey().getValue(), this.player.getEntityPos()}
+                  new Object[]{this.player, this.player.getEntityWorld().getRegistryKey().getValue(), this.player.getEntityPos()}
                );
                ServerTeleportationManager.of(this.player.server)
-                  .forceTeleportPlayer(this.player, this.player.getServerWorld().getRegistryKey(), this.player.getEntityPos());
+                  .forceTeleportPlayer(this.player, this.player.getEntityWorld().getRegistryKey(), this.player.getEntityPos());
                this.ip_wrongMovePacketCount = 0;
             }
 
@@ -151,10 +147,10 @@ public abstract class MixinServerGamePacketListenerImpl implements IEServerPlayN
                "Teleporting player {} to {} {} {} {}",
                new Object[]{
                   this.player,
-                  this.player.getServerWorld().getRegistryKey().getValue(),
-                  posMoveRot.comp_3148().x,
-                  posMoveRot.comp_3148().y,
-                  posMoveRot.comp_3148().z
+                  this.player.getEntityWorld().getRegistryKey().getValue(),
+                  posMoveRot.position().x,
+                  posMoveRot.position().y,
+                  posMoveRot.position().z
                }
             );
          }
@@ -166,9 +162,9 @@ public abstract class MixinServerGamePacketListenerImpl implements IEServerPlayN
 
          this.player.setPosition(posMoveRot, relativeAttrs);
          this.requestedTeleportPos = this.player.getEntityPos();
-         this.ip_dimOfAwaitingPosition = this.player.getServerWorld().getRegistryKey();
+         this.ip_dimOfAwaitingPosition = this.player.getEntityWorld().getRegistryKey();
          PlayerPositionLookS2CPacket lookPacket = PlayerPositionLookS2CPacket.of(this.requestedTeleportId, posMoveRot, relativeAttrs);
-         ((IEPlayerPositionLookS2CPacket)lookPacket).ip_setPlayerDimension(this.player.getServerWorld().getRegistryKey());
+         ((IEPlayerPositionLookS2CPacket)lookPacket).ip_setPlayerDimension(this.player.getEntityWorld().getRegistryKey());
          this.player.networkHandler.sendPacket(lookPacket);
       }
    }
@@ -222,14 +218,14 @@ public abstract class MixinServerGamePacketListenerImpl implements IEServerPlayN
       method = {"onTeleportConfirm"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ServerPlayerEntity;updatePositionAndAngles(DDDFF)V"
+         target = "Lnet/minecraft/server/network/ServerPlayerEntity;updatePositionAndAngles(DDDFF)V"
       )}
    )
    private void onHandleAcceptTeleportPacket(TeleportConfirmC2SPacket packet, CallbackInfo ci) {
       if (this.ip_dimOfAwaitingPosition == null) {
          LOGGER.error("[ImmPtl] ip_dimOfAwaitingPosition is null {}", this.player);
       } else {
-         if (this.ip_dimOfAwaitingPosition != this.player.getServerWorld().getRegistryKey()) {
+         if (this.ip_dimOfAwaitingPosition != this.player.getEntityWorld().getRegistryKey()) {
             LOGGER.info("Accepted teleport to another dimension {} {}", this.ip_dimOfAwaitingPosition, this.requestedTeleportPos);
             ServerWorld destWorld = this.player.server.getWorld(this.ip_dimOfAwaitingPosition);
             if (destWorld == null) {
@@ -237,8 +233,7 @@ public abstract class MixinServerGamePacketListenerImpl implements IEServerPlayN
                return;
             }
 
-            ServerTeleportationManager.of(this.player.server)
-               .forceTeleportPlayer(this.player, this.ip_dimOfAwaitingPosition, this.requestedTeleportPos, false);
+            ServerTeleportationManager.of(this.player.server).forceTeleportPlayer(this.player, this.ip_dimOfAwaitingPosition, this.requestedTeleportPos, false);
             this.ip_dimOfAwaitingPosition = null;
          }
       }
@@ -248,12 +243,12 @@ public abstract class MixinServerGamePacketListenerImpl implements IEServerPlayN
       method = {"onClientCommand"},
       at = {@At(
          value = "FIELD",
-         target = "Lnet/minecraft/ServerPlayNetworkHandler;requestedTeleportPos:Lnet/minecraft/Vec3d;",
+         target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;requestedTeleportPos:Lnet/minecraft/util/math/Vec3d;",
          opcode = 181
       )}
    )
    private void onTeleportPlayerCancelSleeping(ClientCommandC2SPacket packet, CallbackInfo ci) {
-      this.ip_dimOfAwaitingPosition = this.player.getServerWorld().getRegistryKey();
+      this.ip_dimOfAwaitingPosition = this.player.getEntityWorld().getRegistryKey();
    }
 
    @Override

@@ -2,25 +2,25 @@ package qouteall.imm_ptl.peripheral.alternate_dimension;
 
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.block.Blocks;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryEntryList;
+import net.minecraft.registry.entry.RegistryEntry.Reference;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.Registry;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.gen.chunk.FlatChunkGenerator;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
-import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.dimension.DimensionOptions;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry.class_6883;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.chunk.FlatChunkGenerator;
+import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
+import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 import org.jetbrains.annotations.Nullable;
 import qouteall.dimlib.DimensionTemplate;
 import qouteall.dimlib.api.DimensionAPI;
@@ -32,22 +32,16 @@ import qouteall.q_misc_util.platform.Platform;
 
 public class AlternateDimensions {
    public static final RegistryKey<DimensionType> SURFACE_TYPE = RegistryKey.of(
-      RegistryKeys.field_41241, McHelper.newResourceLocation("immersive_portals:surface_type")
+      RegistryKeys.DIMENSION_TYPE, McHelper.newResourceLocation("immersive_portals:surface_type")
    );
    public static final RegistryKey<DimensionType> SURFACE_TYPE_BRIGHT = RegistryKey.of(
-      RegistryKeys.field_41241, McHelper.newResourceLocation("immersive_portals:surface_type_bright")
+      RegistryKeys.DIMENSION_TYPE, McHelper.newResourceLocation("immersive_portals:surface_type_bright")
    );
-   public static final RegistryKey<World> SKYLAND = RegistryKey.of(
-      RegistryKeys.WORLD, McHelper.newResourceLocation("immersive_portals:skyland")
-   );
-   public static final RegistryKey<World> BRIGHT_SKYLAND = RegistryKey.of(
-      RegistryKeys.WORLD, McHelper.newResourceLocation("immersive_portals:bright_skyland")
-   );
+   public static final RegistryKey<World> SKYLAND = RegistryKey.of(RegistryKeys.WORLD, McHelper.newResourceLocation("immersive_portals:skyland"));
+   public static final RegistryKey<World> BRIGHT_SKYLAND = RegistryKey.of(RegistryKeys.WORLD, McHelper.newResourceLocation("immersive_portals:bright_skyland"));
    public static final RegistryKey<World> CHAOS = RegistryKey.of(RegistryKeys.WORLD, McHelper.newResourceLocation("immersive_portals:chaos"));
    public static final RegistryKey<World> VOID = RegistryKey.of(RegistryKeys.WORLD, McHelper.newResourceLocation("immersive_portals:void"));
-   public static final RegistryKey<World> BRIGHT_VOID = RegistryKey.of(
-      RegistryKeys.WORLD, McHelper.newResourceLocation("immersive_portals:bright_void")
-   );
+   public static final RegistryKey<World> BRIGHT_VOID = RegistryKey.of(RegistryKeys.WORLD, McHelper.newResourceLocation("immersive_portals:bright_void"));
    public static final DimensionTemplate SKYLAND_TEMPLATE = new DimensionTemplate(
       SURFACE_TYPE,
       (server, dimensionTypeHolder) -> new DimensionOptions(
@@ -111,24 +105,26 @@ public class AlternateDimensions {
 
    public static ChunkGenerator createSkylandGenerator(DynamicRegistryManager rm, long seed) {
       return NormalSkylandGenerator.create(
-         rm.get(RegistryKeys.BIOME),
-         rm.get(RegistryKeys.DENSITY_FUNCTION),
-         rm.get(RegistryKeys.NOISE_PARAMETERS),
-         rm.get(RegistryKeys.CHUNK_GENERATOR_SETTINGS),
-         rm.get(RegistryKeys.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST),
+         rm.getOrThrow(RegistryKeys.BIOME),
+         rm.getOrThrow(RegistryKeys.DENSITY_FUNCTION),
+         rm.getOrThrow(RegistryKeys.NOISE_PARAMETERS),
+         rm.getOrThrow(RegistryKeys.CHUNK_GENERATOR_SETTINGS),
+         rm.getOrThrow(RegistryKeys.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST),
          seed
       );
    }
 
    public static ChunkGenerator createErrorTerrainGenerator(long seed, DynamicRegistryManager rm) {
-      return ErrorTerrainGenerator.create(rm.get(RegistryKeys.BIOME), rm.get(RegistryKeys.CHUNK_GENERATOR_SETTINGS));
+      return ErrorTerrainGenerator.create(rm.getOrThrow(RegistryKeys.BIOME), rm.getOrThrow(RegistryKeys.CHUNK_GENERATOR_SETTINGS));
    }
 
    public static ChunkGenerator createVoidGenerator(DynamicRegistryManager rm) {
-      Registry<Biome> biomeRegistry = rm.get(RegistryKeys.BIOME);
-      class_6883<Biome> plainsHolder = biomeRegistry.getOrThrow(BiomeKeys.field_9451);
-      FlatChunkGeneratorConfig flatChunkGeneratorConfig = new FlatChunkGeneratorConfig(Optional.of(RegistryEntryList.of(new RegistryEntry[0])), plainsHolder, List.of());
-      flatChunkGeneratorConfig.getLayers().add(new FlatChunkGeneratorLayer(1, Blocks.field_10124));
+      Registry<Biome> biomeRegistry = rm.getOrThrow(RegistryKeys.BIOME);
+      Reference<Biome> plainsHolder = biomeRegistry.getOrThrow(BiomeKeys.PLAINS);
+      FlatChunkGeneratorConfig flatChunkGeneratorConfig = new FlatChunkGeneratorConfig(
+         Optional.of(RegistryEntryList.of(new RegistryEntry[0])), plainsHolder, List.of()
+      );
+      flatChunkGeneratorConfig.getLayers().add(new FlatChunkGeneratorLayer(1, Blocks.AIR));
       flatChunkGeneratorConfig.updateLayerBlocks();
       return new FlatChunkGenerator(flatChunkGeneratorConfig);
    }
@@ -142,6 +138,9 @@ public class AlternateDimensions {
    }
 
    private static void syncWeatherFromOverworld(ServerWorld world, ServerWorld overworld) {
-      ((IEWorld)world).portal_setWeather(overworld.getRainGradient(1.0F), overworld.getRainGradient(1.0F), overworld.getThunderGradient(1.0F), overworld.getThunderGradient(1.0F));
+      ((IEWorld)world)
+         .portal_setWeather(
+            overworld.getRainGradient(1.0F), overworld.getRainGradient(1.0F), overworld.getThunderGradient(1.0F), overworld.getThunderGradient(1.0F)
+         );
    }
 }

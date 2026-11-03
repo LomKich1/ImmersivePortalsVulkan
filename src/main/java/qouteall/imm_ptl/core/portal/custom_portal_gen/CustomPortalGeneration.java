@@ -11,18 +11,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import net.minecraft.util.profiler.Profilers;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.Util;
-import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.registry.SimpleRegistry;
 import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.SimpleRegistry;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.profiler.Profilers;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.core.portal.Portal;
@@ -31,12 +31,8 @@ import qouteall.q_misc_util.Helper;
 import qouteall.q_misc_util.MiscHelper;
 
 public class CustomPortalGeneration {
-   public static final RegistryKey<World> THE_SAME_DIMENSION = RegistryKey.of(
-      RegistryKeys.WORLD, McHelper.newResourceLocation("imm_ptl:the_same_dimension")
-   );
-   public static final RegistryKey<World> ANY_DIMENSION = RegistryKey.of(
-      RegistryKeys.WORLD, McHelper.newResourceLocation("imm_ptl:any_dimension")
-   );
+   public static final RegistryKey<World> THE_SAME_DIMENSION = RegistryKey.of(RegistryKeys.WORLD, McHelper.newResourceLocation("imm_ptl:the_same_dimension"));
+   public static final RegistryKey<World> ANY_DIMENSION = RegistryKey.of(RegistryKeys.WORLD, McHelper.newResourceLocation("imm_ptl:any_dimension"));
    public static final Codec<List<RegistryKey<World>>> DIMENSION_LIST_CODEC = World.CODEC.listOf();
    public static final Codec<List<String>> STRING_LIST_CODEC = Codec.STRING.listOf();
    public static final Codec<List<List<String>>> STRING_LIST_LIST_CODEC = STRING_LIST_CODEC.listOf();
@@ -63,15 +59,12 @@ public class CustomPortalGeneration {
          )
          .apply(instance, instance.stable(CustomPortalGeneration::new))
    );
-   private static final SimpleRegistry<MapCodec<CustomPortalGeneration>> SCHEMA_REGISTRY = (SimpleRegistry<MapCodec<CustomPortalGeneration>>)Util.make(
-      () -> {
-         SimpleRegistry<MapCodec<CustomPortalGeneration>> registry = new SimpleRegistry(SCHEMA_KEY, Lifecycle.stable());
-         Registry.register(registry, McHelper.newResourceLocation("imm_ptl:v1"), codecV1);
-         return registry;
-      }
-   );
-   public static final MapCodec<CustomPortalGeneration> MAP_CODEC = SCHEMA_REGISTRY.getCodec()
-      .dispatchMap("schema_version", e -> codecV1, Function.identity());
+   private static final SimpleRegistry<MapCodec<CustomPortalGeneration>> SCHEMA_REGISTRY = (SimpleRegistry<MapCodec<CustomPortalGeneration>>)Util.make(() -> {
+      SimpleRegistry<MapCodec<CustomPortalGeneration>> registry = new SimpleRegistry(SCHEMA_KEY, Lifecycle.stable());
+      Registry.register(registry, McHelper.newResourceLocation("imm_ptl:v1"), codecV1);
+      return registry;
+   });
+   public static final MapCodec<CustomPortalGeneration> MAP_CODEC = SCHEMA_REGISTRY.getCodec().dispatchMap("schema_version", e -> codecV1, Function.identity());
    public static final Codec<CustomPortalGeneration> CODEC = MAP_CODEC.codec();
    public final List<RegistryKey<World>> fromDimensions;
    public final RegistryKey<World> toDimension;

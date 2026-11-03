@@ -3,18 +3,18 @@ package qouteall.imm_ptl.core.mixin.common.collision;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import it.unimi.dsi.fastutil.longs.LongSet;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCollisionHandler.Impl;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.entity.EntityCollisionHandler.class_10775;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
@@ -80,10 +80,10 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
    protected abstract void unsetRemoved();
 
    @Redirect(
-      method = {"Lnet/minecraft/Entity;move(Lnet/minecraft/MovementType;Lnet/minecraft/Vec3d;)V"},
+      method = {"Lnet/minecraft/entity/Entity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/Entity;adjustMovementForCollisions(Lnet/minecraft/Vec3d;)Lnet/minecraft/Vec3d;"
+         target = "Lnet/minecraft/entity/Entity;adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;"
       )}
    )
    private Vec3d redirectHandleCollisions(Entity entity, Vec3d attemptedMove) {
@@ -117,7 +117,7 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
    }
 
    @Inject(
-      method = {"Lnet/minecraft/Entity;isFireImmune()Z"},
+      method = {"Lnet/minecraft/entity/Entity;isFireImmune()Z"},
       at = {@At("HEAD")},
       cancellable = true
    )
@@ -132,10 +132,10 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
    protected abstract Box calculateDefaultBoundingBox(Vec3d var1);
 
    @WrapOperation(
-      method = {"checkBlockCollision(Lnet/minecraft/Vec3d;Lnet/minecraft/Vec3d;Lnet/minecraft/EntityCollisionHandler.Impl;Lit/unimi/dsi/fastutil/longs/LongSet;I)I"},
+      method = {"checkBlockCollision(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/entity/EntityCollisionHandler$Impl;Lit/unimi/dsi/fastutil/longs/LongSet;I)I"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/Entity;calculateDefaultBoundingBox(Lnet/minecraft/Vec3d;)Lnet/minecraft/Box;"
+         target = "Lnet/minecraft/entity/Entity;calculateDefaultBoundingBox(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Box;"
       )}
    )
    private Box redirectBoundingBoxInCheckingBlockCollision(Entity entity, Vec3d pos, Operation<Box> original) {
@@ -143,18 +143,18 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
    }
 
    @Inject(
-      method = {"checkBlockCollision(Lnet/minecraft/Vec3d;Lnet/minecraft/Vec3d;Lnet/minecraft/EntityCollisionHandler.Impl;Lit/unimi/dsi/fastutil/longs/LongSet;I)I"},
+      method = {"checkBlockCollision(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/entity/EntityCollisionHandler$Impl;Lit/unimi/dsi/fastutil/longs/LongSet;I)I"},
       at = {@At("HEAD")},
       cancellable = true
    )
-   private void onCheckInsideBlocks(Vec3d from, Vec3d to, class_10775 collector, LongSet visited, int steps, CallbackInfoReturnable<Integer> cir) {
+   private void onCheckInsideBlocks(Vec3d from, Vec3d to, Impl collector, LongSet visited, int steps, CallbackInfoReturnable<Integer> cir) {
       if (this.ip_getActiveCollisionBox(this.calculateDefaultBoundingBox(to)) == null) {
          cir.setReturnValue(0);
       }
    }
 
    @Inject(
-      method = {"Lnet/minecraft/Entity;isInsideWall()Z"},
+      method = {"Lnet/minecraft/entity/Entity;isInsideWall()Z"},
       at = {@At("HEAD")},
       cancellable = true
    )
@@ -165,7 +165,7 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
    }
 
    @Inject(
-      method = {"Lnet/minecraft/Entity;setPos(DDD)V"},
+      method = {"Lnet/minecraft/entity/Entity;setPos(DDD)V"},
       at = {@At("HEAD")}
    )
    private void onSetPos(double nx, double ny, double nz, CallbackInfo ci) {

@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.core.mixin.client.particle;
 
-import net.minecraft.client.particle.ParticleRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

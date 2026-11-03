@@ -15,9 +15,7 @@ public record Plane(Vec3d pos, Vec3d normal) {
    }
 
    public double getDistanceTo(double x, double y, double z) {
-      return this.normal.getX() * (x - this.pos.getX())
-         + this.normal.getY() * (y - this.pos.getY())
-         + this.normal.getZ() * (z - this.pos.getZ());
+      return this.normal.getX() * (x - this.pos.getX()) + this.normal.getY() * (y - this.pos.getY()) + this.normal.getZ() * (z - this.pos.getZ());
    }
 
    @NotNull

@@ -3,11 +3,11 @@ package qouteall.imm_ptl.peripheral.dim_stack;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.DynamicRegistryManager.Immutable;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.GeneratorOptions;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.DynamicRegistryManager.class_6890;
-import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
 import qouteall.q_misc_util.platform.event.Event;
 import qouteall.q_misc_util.platform.event.EventFactory;
@@ -33,7 +33,7 @@ public class DimensionStackAPI {
    );
 
    public interface DimensionCollectionCallback {
-      Collection<RegistryKey<World>> getExtraDimensionKeys(class_6890 var1, GeneratorOptions var2);
+      Collection<RegistryKey<World>> getExtraDimensionKeys(Immutable var1, GeneratorOptions var2);
    }
 
    public interface DimensionStackPreUpdateCallback {

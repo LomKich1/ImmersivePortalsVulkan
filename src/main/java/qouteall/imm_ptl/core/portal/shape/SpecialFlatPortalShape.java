@@ -3,9 +3,9 @@ package qouteall.imm_ptl.core.portal.shape;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.shape.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -122,9 +122,7 @@ public final class SpecialFlatPortalShape implements PortalShape {
 
    @Environment(EnvType.CLIENT)
    @Override
-   public void renderViewAreaMesh(
-      Vec3d portalOriginRelativeToCamera, UnilateralPortalState portalState, TriangleConsumer vertexOutput, boolean isGlobalPortal
-   ) {
+   public void renderViewAreaMesh(Vec3d portalOriginRelativeToCamera, UnilateralPortalState portalState, TriangleConsumer vertexOutput, boolean isGlobalPortal) {
       double halfWidth = portalState.width() / 2.0;
       double halfHeight = portalState.height() / 2.0;
       Vec3d localXAxis = portalState.getAxisW().multiply(halfWidth);

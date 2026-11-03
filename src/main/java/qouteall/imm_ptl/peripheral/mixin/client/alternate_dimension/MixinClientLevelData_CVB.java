@@ -2,17 +2,17 @@ package qouteall.imm_ptl.peripheral.mixin.client.alternate_dimension;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.world.ClientWorld.class_5271;
+import net.minecraft.client.world.ClientWorld.Properties;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import qouteall.imm_ptl.peripheral.alternate_dimension.AlternateDimensions;
 
-@Mixin({class_5271.class})
+@Mixin({Properties.class})
 public class MixinClientLevelData_CVB {
    @Inject(
-      method = {"Lnet/minecraft/ClientWorld.Properties;getSkyDarknessHeight(Lnet/minecraft/HeightLimitView;)D"},
+      method = {"Lnet/minecraft/client/world/ClientWorld$Properties;getSkyDarknessHeight(Lnet/minecraft/world/HeightLimitView;)D"},
       at = {@At("HEAD")},
       cancellable = true
    )

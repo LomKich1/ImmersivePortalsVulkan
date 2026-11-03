@@ -1,9 +1,9 @@
 package qouteall.imm_ptl.core.chunk_loading;
 
 import java.util.Objects;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.registry.RegistryKey;
 
 public class DimensionalChunkPos {
    public final RegistryKey<World> dimension;

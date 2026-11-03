@@ -1,7 +1,7 @@
 package qouteall.q_misc_util.ducks;
 
-import net.minecraft.world.level.storage.LevelStorage.class_5143;
+import net.minecraft.world.level.storage.LevelStorage.Session;
 
 public interface IEMinecraftServer_Misc {
-   class_5143 ip_getStorageSource();
+   Session ip_getStorageSource();
 }

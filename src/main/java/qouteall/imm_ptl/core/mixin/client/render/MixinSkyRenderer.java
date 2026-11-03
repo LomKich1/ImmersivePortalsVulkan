@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.core.mixin.client.render;
 
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.SkyRendering;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -14,7 +14,7 @@ public class MixinSkyRenderer {
       method = {"isSkyDark"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ClientPlayerEntity;getCameraPosVec(F)Lnet/minecraft/Vec3d;"
+         target = "Lnet/minecraft/client/network/ClientPlayerEntity;getCameraPosVec(F)Lnet/minecraft/util/math/Vec3d;"
       )}
    )
    private Vec3d redirectGetEyePositionInSkyRendering(ClientPlayerEntity player, float partialTicks) {

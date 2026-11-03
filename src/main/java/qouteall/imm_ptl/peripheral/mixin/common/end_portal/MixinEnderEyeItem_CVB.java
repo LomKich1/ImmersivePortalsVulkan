@@ -1,18 +1,18 @@
 package qouteall.imm_ptl.peripheral.mixin.common.end_portal;
 
-import net.minecraft.util.ActionResult;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.EndPortalFrameBlock;
+import net.minecraft.block.pattern.BlockPattern.Result;
 import net.minecraft.item.EnderEyeItem;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.world.World;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.Block;
-import net.minecraft.block.EndPortalFrameBlock;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.Direction.class_2351;
-import net.minecraft.block.pattern.BlockPattern.class_2702;
+import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,7 +25,7 @@ import qouteall.imm_ptl.core.portal.PortalPlaceholderBlock;
 @Mixin({EnderEyeItem.class})
 public class MixinEnderEyeItem_CVB {
    @Inject(
-      method = {"Lnet/minecraft/EnderEyeItem;useOnBlock(Lnet/minecraft/ItemUsageContext;)Lnet/minecraft/ActionResult;"},
+      method = {"Lnet/minecraft/item/EnderEyeItem;useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;"},
       at = {@At("HEAD")},
       cancellable = true
    )
@@ -41,7 +41,7 @@ public class MixinEnderEyeItem_CVB {
       World world = itemUsageContext.getWorld();
       BlockPos blockPos = itemUsageContext.getBlockPos();
       BlockState blockState = world.getBlockState(blockPos);
-      if (blockState.getBlock() != Blocks.field_10398 || (Boolean)blockState.get(EndPortalFrameBlock.EYE)) {
+      if (blockState.getBlock() != Blocks.END_PORTAL_FRAME || (Boolean)blockState.get(EndPortalFrameBlock.EYE)) {
          return ActionResult.PASS;
       } else if (world.isClient()) {
          return ActionResult.SUCCESS;
@@ -49,24 +49,22 @@ public class MixinEnderEyeItem_CVB {
          BlockState blockState_2 = (BlockState)blockState.with(EndPortalFrameBlock.EYE, true);
          Block.pushEntitiesUpBeforeBlockChange(blockState, blockState_2, world, blockPos);
          world.setBlockState(blockPos, blockState_2, 2);
-         world.updateComparators(blockPos, Blocks.field_10398);
+         world.updateComparators(blockPos, Blocks.END_PORTAL_FRAME);
          itemUsageContext.getStack().decrement(1);
          world.syncWorldEvent(1503, blockPos, 0);
-         class_2702 pattern = EndPortalFrameBlock.getCompletedFramePattern().searchAround(world, blockPos);
+         Result pattern = EndPortalFrameBlock.getCompletedFramePattern().searchAround(world, blockPos);
          if (pattern != null) {
-            BlockPos blockPos_2 = pattern.getFrontTopLeft().method_10069(-3, 0, -3);
+            BlockPos blockPos_2 = pattern.getFrontTopLeft().add(-3, 0, -3);
 
             for (int dx = 0; dx < 3; dx++) {
                for (int dz = 0; dz < 3; dz++) {
                   world.setBlockState(
-                     blockPos_2.method_10069(dx, 0, dz),
-                     (BlockState)PortalPlaceholderBlock.instance.getDefaultState().with(PortalPlaceholderBlock.AXIS, class_2351.field_11052),
-                     2
+                     blockPos_2.add(dx, 0, dz), (BlockState)PortalPlaceholderBlock.instance.getDefaultState().with(PortalPlaceholderBlock.AXIS, Axis.Y), 2
                   );
                }
             }
 
-            world.syncGlobalEvent(1038, blockPos_2.method_10069(1, 0, 1), 0);
+            world.syncGlobalEvent(1038, blockPos_2.add(1, 0, 1), 0);
             EndPortalEntity.onEndPortalComplete((ServerWorld)world, Vec3d.of(pattern.getFrontTopLeft()).add(-1.5, 0.5, -1.5));
          }
 

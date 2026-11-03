@@ -8,10 +8,10 @@ import java.util.function.Function;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.registry.SimpleRegistry;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.Registries;
+import net.minecraft.registry.SimpleRegistry;
 import qouteall.imm_ptl.core.McHelper;
 
 public abstract class PortalGenTrigger {
@@ -23,8 +23,7 @@ public abstract class PortalGenTrigger {
    );
    public static final MapCodec<PortalGenTrigger.UseItemTrigger> useItemTriggerCodec = RecordCodecBuilder.mapCodec(
       instance -> instance.group(
-            Registries.ITEM.getCodec().fieldOf("item").forGetter(o -> o.item),
-            Codec.BOOL.optionalFieldOf("consume", false).forGetter(o -> o.consume)
+            Registries.ITEM.getCodec().fieldOf("item").forGetter(o -> o.item), Codec.BOOL.optionalFieldOf("consume", false).forGetter(o -> o.consume)
          )
          .apply(instance, instance.stable(PortalGenTrigger.UseItemTrigger::new))
    );

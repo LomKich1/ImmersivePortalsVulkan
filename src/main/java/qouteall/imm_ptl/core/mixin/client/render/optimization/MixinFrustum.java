@@ -1,7 +1,7 @@
 package qouteall.imm_ptl.core.mixin.client.render.optimization;
 
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.render.Frustum;
+import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,7 +30,7 @@ public class MixinFrustum implements IEFrustum {
    private FrustumCuller portal_frustumCuller;
 
    @Inject(
-      method = {"<init>(Lnet/minecraft/Frustum;)V"},
+      method = {"<init>(Lnet/minecraft/client/render/Frustum;)V"},
       at = {@At("RETURN")}
    )
    private void onFrustumCopy(Frustum other, CallbackInfo ci) {
@@ -44,7 +44,7 @@ public class MixinFrustum implements IEFrustum {
    }
 
    @Inject(
-      method = {"Lnet/minecraft/Frustum;setPosition(DDD)V"},
+      method = {"Lnet/minecraft/client/render/Frustum;setPosition(DDD)V"},
       at = {@At("TAIL")}
    )
    private void onSetOrigin(double double_1, double double_2, double double_3, CallbackInfo ci) {

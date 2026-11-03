@@ -1,11 +1,11 @@
 package qouteall.imm_ptl.core.mixin.common;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.world.PersistentStateManager;
 import net.minecraft.server.world.ServerChunkManager;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.level.ServerWorldProperties;
 import net.minecraft.server.world.ServerEntityManager;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.PersistentStateManager;
+import net.minecraft.world.level.ServerWorldProperties;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -31,13 +31,13 @@ public abstract class MixinServerLevel implements IEServerWorld {
    public abstract PersistentStateManager getPersistentStateManager();
 
    @Shadow
-   public abstract ServerChunkManager method_14178();
+   public abstract ServerChunkManager getChunkManager();
 
    @Redirect(
-      method = {"Lnet/minecraft/ServerWorld;tick(Ljava/util/function/BooleanSupplier;)V"},
+      method = {"Lnet/minecraft/server/world/ServerWorld;tick(Ljava/util/function/BooleanSupplier;)V"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ServerChunkManager;shouldResetIdleTimeout()Z"
+         target = "Lnet/minecraft/server/world/ServerChunkManager;shouldResetIdleTimeout()Z"
       )}
    )
    private boolean redirectHasActiveTickets(ServerChunkManager chunkSource) {
@@ -46,7 +46,7 @@ public abstract class MixinServerLevel implements IEServerWorld {
    }
 
    @Inject(
-      method = {"Lnet/minecraft/ServerWorld;toString()Ljava/lang/String;"},
+      method = {"Lnet/minecraft/server/world/ServerWorld;toString()Ljava/lang/String;"},
       at = {@At("HEAD")},
       cancellable = true
    )

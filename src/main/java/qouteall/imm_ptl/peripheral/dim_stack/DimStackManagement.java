@@ -10,19 +10,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.command.DefaultPermissions;
-import net.minecraft.world.World;
-import net.minecraft.block.Blocks;
-import net.minecraft.text.Text;
 import net.minecraft.block.BlockState;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.command.DefaultPermissions;
 import net.minecraft.registry.Registries;
-import net.minecraft.util.math.BlockPos.class_2339;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos.Mutable;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import qouteall.dimlib.api.DimensionAPI;
@@ -101,9 +101,7 @@ public class DimStackManagement {
          BlockState replacement = GlobalPortalStorage.get(world).bedrockReplacement;
          newMap.put(world.getRegistryKey(), replacement);
          LOGGER.info(
-            "Bedrock Replacement {} {}",
-            world.getRegistryKey().getValue(),
-            replacement != null ? Registries.BLOCK.getId(replacement.getBlock()) : "null"
+            "Bedrock Replacement {} {}", world.getRegistryKey().getValue(), replacement != null ? Registries.BLOCK.getId(replacement.getBlock()) : "null"
          );
       }
 
@@ -117,14 +115,14 @@ public class DimStackManagement {
          } else {
             BlockState replacement = bedrockReplacementMap.get(world.getRegistryKey());
             if (replacement != null) {
-               class_2339 mutable = new class_2339();
+               Mutable mutable = new Mutable();
 
                for (int x = 0; x < 16; x++) {
                   for (int z = 0; z < 16; z++) {
                      for (int y = chunk.getBottomY(); y < chunk.getTopYInclusive() + 1; y++) {
                         mutable.set(x, y, z);
                         BlockState blockState = chunk.getBlockState(mutable);
-                        if (blockState.getBlock() == Blocks.field_9987) {
+                        if (blockState.getBlock() == Blocks.BEDROCK) {
                            chunk.setBlockState(mutable, replacement, 1);
                         }
                      }
@@ -235,7 +233,7 @@ public class DimStackManagement {
          } else if (!DimStackManagement.isDimStackEnabled()) {
             player.sendMessage(Text.literal("Dimension stack feature is not enabled"));
          } else {
-            MinecraftServer server = player.getServerWorld().getServer();
+            MinecraftServer server = player.getEntityWorld().getServer();
             DimStackManagement.updateDimStack(server, dimStackInfo);
             player.sendMessage(Text.translatable("imm_ptl.dim_stack_established"), false);
          }
@@ -245,7 +243,7 @@ public class DimStackManagement {
          if (!player.getPermissions().hasPermission(DefaultPermissions.GAMEMASTERS)) {
             Helper.err("one player without permission tries to change dimension stack");
          } else {
-            MinecraftServer server = player.getServerWorld().getServer();
+            MinecraftServer server = player.getEntityWorld().getServer();
             DimStackManagement.clearDimStackPortals(server);
             player.sendMessage(Text.translatable("imm_ptl.dim_stack_removed"), false);
             if (O_O.isDedicatedServer()) {

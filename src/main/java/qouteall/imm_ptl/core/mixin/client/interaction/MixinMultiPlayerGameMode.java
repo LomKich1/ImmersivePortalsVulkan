@@ -1,20 +1,20 @@
 package qouteall.imm_ptl.core.mixin.client.interaction;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.util.Hand;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.world.World;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,11 +37,11 @@ public abstract class MixinMultiPlayerGameMode implements IEClientPlayerInteract
    private MinecraftClient client;
 
    @Redirect(
-      method = {"lambda$startDestroyBlock$1", "(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;I)Lnet/minecraft/network/packet/Packet;"},
+      method = {"lambda$startDestroyBlock$1", "method_41930"},
       require = 1,
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ClientPlayerEntity;getEntityWorld()Lnet/minecraft/World;"
+         target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEntityWorld()Lnet/minecraft/world/World;"
       )}
    )
    private World redirectPlayerLevel1(ClientPlayerEntity instance) {
@@ -52,7 +52,7 @@ public abstract class MixinMultiPlayerGameMode implements IEClientPlayerInteract
       method = {"updateBlockBreakingProgress"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ClientPlayerEntity;getEntityWorld()Lnet/minecraft/World;"
+         target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEntityWorld()Lnet/minecraft/world/World;"
       )}
    )
    private World redirectPlayerLevel2(ClientPlayerEntity instance) {
@@ -63,7 +63,7 @@ public abstract class MixinMultiPlayerGameMode implements IEClientPlayerInteract
       method = {"interactBlockInternal"},
       at = {@At(
          value = "NEW",
-         target = "(Lnet/minecraft/PlayerEntity;Lnet/minecraft/Hand;Lnet/minecraft/BlockHitResult;)Lnet/minecraft/ItemUsageContext;"
+         target = "(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/item/ItemUsageContext;"
       )}
    )
    private ItemUsageContext redirectNewUseOnContext(PlayerEntity player, Hand interactionHand, BlockHitResult blockHitResult) {
@@ -74,7 +74,7 @@ public abstract class MixinMultiPlayerGameMode implements IEClientPlayerInteract
       method = {"sendSequencedPacket"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ClientPlayNetworkHandler;sendPacket(Lnet/minecraft/Packet;)V"
+         target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"
       )}
    )
    private Packet<?> modifyPacketInStartPrediction(Packet<?> packet) {
@@ -85,7 +85,7 @@ public abstract class MixinMultiPlayerGameMode implements IEClientPlayerInteract
       method = {"attackBlock"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ClientPlayNetworkHandler;sendPacket(Lnet/minecraft/Packet;)V"
+         target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"
       )}
    )
    private Packet redirectSendInStartDestroyBlock(Packet packet) {
@@ -96,7 +96,7 @@ public abstract class MixinMultiPlayerGameMode implements IEClientPlayerInteract
       method = {"cancelBlockBreaking"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ClientPlayNetworkHandler;sendPacket(Lnet/minecraft/Packet;)V"
+         target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"
       )}
    )
    private Packet redirectSendInStopDestroyBlock(Packet packet) {

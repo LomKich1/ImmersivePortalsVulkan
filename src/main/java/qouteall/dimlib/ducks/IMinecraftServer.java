@@ -1,13 +1,13 @@
 package qouteall.dimlib.ducks;
 
 import java.util.concurrent.Executor;
-import net.minecraft.world.World;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.level.storage.LevelStorage.class_5143;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.World;
+import net.minecraft.world.level.storage.LevelStorage.Session;
 
 public interface IMinecraftServer {
-   class_5143 dimlib_getStorageSource();
+   Session dimlib_getStorageSource();
 
    Executor dimlib_getExecutor();
 

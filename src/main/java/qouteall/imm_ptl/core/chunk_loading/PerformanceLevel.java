@@ -1,7 +1,7 @@
 package qouteall.imm_ptl.core.chunk_loading;
 
-import net.minecraft.server.ServerTickManager;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ServerTickManager;
 
 public enum PerformanceLevel {
    good,

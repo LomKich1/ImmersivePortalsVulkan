@@ -11,20 +11,20 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider.Immediate;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.text.MutableText;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.VertexConsumerProvider.class_4598;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -130,26 +130,21 @@ public class ClientPortalWandPortalDrag {
             if (selectionStatus.selectsHorizontalEdge) {
                lockWidth = !lockWidth;
                CustomTextOverlay.putText(
-                  Text.translatable(lockWidth ? "imm_ptl.wand.width_locked" : "imm_ptl.wand.width_unlocked").formatted(Formatting.field_1065),
-                  3.0,
-                  "0_alert"
+                  Text.translatable(lockWidth ? "imm_ptl.wand.width_locked" : "imm_ptl.wand.width_unlocked").formatted(Formatting.GOLD), 3.0, "0_alert"
                );
             } else if (selectionStatus.selectsVerticalEdge) {
                lockHeight = !lockHeight;
                CustomTextOverlay.putText(
-                  Text.translatable(lockHeight ? "imm_ptl.wand.height_locked" : "imm_ptl.wand.height_unlocked").formatted(Formatting.field_1065),
-                  3.0,
-                  "0_alert"
+                  Text.translatable(lockHeight ? "imm_ptl.wand.height_locked" : "imm_ptl.wand.height_unlocked").formatted(Formatting.GOLD), 3.0, "0_alert"
                );
             } else {
                PortalLocalXYNormalized selectedAnchor = selectionStatus.selectedAnchor;
                if (lockedAnchor != null && lockedAnchor.isCloseTo(selectedAnchor, 0.01)) {
                   lockedAnchor = null;
-                  CustomTextOverlay.putText(Text.translatable("imm_ptl.wand.anchor_unlocked").formatted(Formatting.field_1065), 3.0, "0_alert");
+                  CustomTextOverlay.putText(Text.translatable("imm_ptl.wand.anchor_unlocked").formatted(Formatting.GOLD), 3.0, "0_alert");
                } else {
                   CustomTextOverlay.putText(
-                     Text.translatable(lockedAnchor != null ? "imm_ptl.wand.anchor_lock_moved" : "imm_ptl.wand.anchor_locked")
-                        .formatted(Formatting.field_1065),
+                     Text.translatable(lockedAnchor != null ? "imm_ptl.wand.anchor_lock_moved" : "imm_ptl.wand.anchor_locked").formatted(Formatting.GOLD),
                      3.0,
                      "0_alert"
                   );
@@ -176,8 +171,8 @@ public class ClientPortalWandPortalDrag {
       ClientPlayerEntity player = minecraft.player;
       if (player != null) {
          if (isDragging()
-            && player.getStackInHand(Hand.field_5808).getItem() != PortalWandItem.instance
-            && player.getStackInHand(Hand.field_5810).getItem() != PortalWandItem.instance) {
+            && player.getStackInHand(Hand.MAIN_HAND).getItem() != PortalWandItem.instance
+            && player.getStackInHand(Hand.OFF_HAND).getItem() != PortalWandItem.instance) {
             LOGGER.info("Undo dragging because the player is not holding the wand");
             undoDragging();
          }
@@ -231,7 +226,7 @@ public class ClientPortalWandPortalDrag {
                      if (originalSelectedPortal == null || !Portal.isFlippedPortal(originalSelectedPortal, portal)) {
                         selectionStatus = null;
                         if (hasLock()) {
-                           CustomTextOverlay.putText(Text.translatable("imm_ptl.wand.lock_cleared").formatted(Formatting.field_1065), 5.0, "1_alert");
+                           CustomTextOverlay.putText(Text.translatable("imm_ptl.wand.lock_cleared").formatted(Formatting.GOLD), 5.0, "1_alert");
                            clearLock();
                         }
                      } else if (lockedAnchor != null) {
@@ -269,7 +264,9 @@ public class ClientPortalWandPortalDrag {
                   renderedRect.setTarget(newRenderedRect, Helper.secondToNano(1.0));
                   Pair<Plane, MutableText> planeInfo = getPlayerFacingPlaneAligned(player, cursorPos, portal);
                   if (selectsHorizontalEdge) {
-                     CustomTextOverlay.putText(Text.translatable("imm_ptl.wand.lock_width", new Object[]{minecraft.options.attackKey.getBoundKeyLocalizedText()}));
+                     CustomTextOverlay.putText(
+                        Text.translatable("imm_ptl.wand.lock_width", new Object[]{minecraft.options.attackKey.getBoundKeyLocalizedText()})
+                     );
                      renderedPrePlane.clearTarget();
                   } else if (selectsVerticalEdge) {
                      CustomTextOverlay.putText(
@@ -277,9 +274,7 @@ public class ClientPortalWandPortalDrag {
                      );
                      renderedPrePlane.clearTarget();
                   } else {
-                     Text planeText = Text.translatable(
-                        "imm_ptl.wand.on_plane", new Object[]{((MutableText)planeInfo.getSecond()).formatted(Formatting.field_1065)}
-                     );
+                     Text planeText = Text.translatable("imm_ptl.wand.on_plane", new Object[]{((MutableText)planeInfo.getSecond()).formatted(Formatting.GOLD)});
                      CustomTextOverlay.putText(
                         Text.translatable(
                            "imm_ptl.wand.pre_drag",
@@ -363,8 +358,7 @@ public class ClientPortalWandPortalDrag {
                : Text.literal("\n")
                   .append(
                      Text.translatable(
-                        "imm_ptl.wand.cursor_pos",
-                        new Object[]{"%.3f".formatted(cursorPos.x), "%.3f".formatted(cursorPos.y), "%.3f".formatted(cursorPos.z)}
+                        "imm_ptl.wand.cursor_pos", new Object[]{"%.3f".formatted(cursorPos.x), "%.3f".formatted(cursorPos.y), "%.3f".formatted(cursorPos.z)}
                      )
                   );
             Portal portal = WandUtil.getClientPortalByUUID(draggingContext.portalId());
@@ -435,7 +429,7 @@ public class ClientPortalWandPortalDrag {
                                  plane,
                                  null,
                                  draggingInfo,
-                                 ((MutableText)info.getSecond()).formatted(Formatting.field_1065),
+                                 ((MutableText)info.getSecond()).formatted(Formatting.GOLD),
                                  portal.getPortalState()
                               );
                            }
@@ -482,7 +476,7 @@ public class ClientPortalWandPortalDrag {
                );
                CustomTextOverlay.remove("1_invalid_dragging");
             } else {
-               CustomTextOverlay.putText(Text.translatable("imm_ptl.wand.invalid_dragging").formatted(Formatting.field_1061), 3.0, "1_invalid_dragging");
+               CustomTextOverlay.putText(Text.translatable("imm_ptl.wand.invalid_dragging").formatted(Formatting.RED), 3.0, "1_invalid_dragging");
             }
          }
       }
@@ -520,7 +514,7 @@ public class ClientPortalWandPortalDrag {
          .orElseThrow();
    }
 
-   public static void render(MatrixStack matrixStack, class_4598 bufferSource, double camX, double camY, double camZ) {
+   public static void render(MatrixStack matrixStack, Immediate bufferSource, double camX, double camY, double camZ) {
       ClientPlayerEntity player = MinecraftClient.getInstance().player;
       if (player != null) {
          if (!PortalRendering.isRendering()) {

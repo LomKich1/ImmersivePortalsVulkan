@@ -1,10 +1,10 @@
 package qouteall.imm_ptl.core.mixin.common.entity_sync;
 
 import io.netty.channel.ChannelFutureListener;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.server.network.ServerCommonNetworkHandler;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerCommonNetworkHandler;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +22,7 @@ public class MixinServerGamePacketListenerImpl_Redirect {
    protected MinecraftServer server;
 
    @ModifyVariable(
-      method = {"send(Lnet/minecraft/Packet;Lio/netty/channel/ChannelFutureListener;)V"},
+      method = {"send(Lnet/minecraft/network/packet/Packet;Lio/netty/channel/ChannelFutureListener;)V"},
       at = {@At("HEAD")},
       argsOnly = true
    )
@@ -33,10 +33,10 @@ public class MixinServerGamePacketListenerImpl_Redirect {
    }
 
    @Inject(
-      method = {"send(Lnet/minecraft/Packet;Lio/netty/channel/ChannelFutureListener;)V"},
+      method = {"send(Lnet/minecraft/network/packet/Packet;Lio/netty/channel/ChannelFutureListener;)V"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ClientConnection;send(Lnet/minecraft/Packet;Lio/netty/channel/ChannelFutureListener;Z)V"
+         target = "Lnet/minecraft/network/ClientConnection;send(Lnet/minecraft/network/packet/Packet;Lio/netty/channel/ChannelFutureListener;Z)V"
       )},
       cancellable = true
    )

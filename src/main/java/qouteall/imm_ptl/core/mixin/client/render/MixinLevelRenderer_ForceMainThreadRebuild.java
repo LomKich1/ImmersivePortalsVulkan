@@ -12,7 +12,7 @@ public class MixinLevelRenderer_ForceMainThreadRebuild {
       method = {"updateChunks"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/GameOptions;getChunkBuilderMode()Lnet/minecraft/SimpleOption;",
+         target = "Lnet/minecraft/client/option/GameOptions;getChunkBuilderMode()Lnet/minecraft/client/option/SimpleOption;",
          ordinal = 0
       )},
       ordinal = 1,

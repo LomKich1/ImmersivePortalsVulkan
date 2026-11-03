@@ -3,11 +3,11 @@ package qouteall.imm_ptl.core.portal.shape;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.collision.CollisionHelper;
 import qouteall.imm_ptl.core.collision.PortalCollisionHandler;
@@ -63,12 +63,7 @@ public final class RectangularPortalShape implements PortalShape {
    public double roughDistanceToPortalShape(UnilateralPortalState portalState, Vec3d pos) {
       Vec3d localPos = portalState.transformGlobalToLocal(pos);
       double distToRec = Helper.getDistanceToRectangle(
-         localPos.getX(),
-         localPos.getY(),
-         -portalState.width() / 2.0,
-         -portalState.height() / 2.0,
-         portalState.width() / 2.0,
-         portalState.height() / 2.0
+         localPos.getX(), localPos.getY(), -portalState.width() / 2.0, -portalState.height() / 2.0, portalState.width() / 2.0, portalState.height() / 2.0
       );
       return Math.sqrt(distToRec * distToRec + localPos.getZ() * localPos.getZ());
    }
@@ -112,9 +107,7 @@ public final class RectangularPortalShape implements PortalShape {
 
    @Environment(EnvType.CLIENT)
    @Override
-   public void renderViewAreaMesh(
-      Vec3d portalOriginRelativeToCamera, UnilateralPortalState portalState, TriangleConsumer vertexOutput, boolean isGlobalPortal
-   ) {
+   public void renderViewAreaMesh(Vec3d portalOriginRelativeToCamera, UnilateralPortalState portalState, TriangleConsumer vertexOutput, boolean isGlobalPortal) {
       double w = Math.min(portalState.width(), 23333.0);
       double h = Math.min(portalState.height(), 23333.0);
       Vec3d localXAxis = portalState.getAxisW().multiply(w / 2.0);

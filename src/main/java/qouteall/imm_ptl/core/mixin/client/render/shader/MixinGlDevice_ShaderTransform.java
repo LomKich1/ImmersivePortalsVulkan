@@ -12,10 +12,10 @@ import qouteall.imm_ptl.core.render.ShaderCodeTransformation;
 @Mixin({GlBackend.class})
 public class MixinGlDevice_ShaderTransform {
    @Redirect(
-      method = {"compileShader"},
+      method = {"compileShader(Lnet/minecraft/client/gl/GlBackend$ShaderKey;Lnet/minecraft/client/gl/ShaderSourceGetter;)Lnet/minecraft/client/gl/CompiledShader;"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ShaderSourceGetter;get(Lnet/minecraft/Identifier;Lcom/mojang/blaze3d/shaders/ShaderType;)Ljava/lang/String;"
+         target = "Lnet/minecraft/client/gl/ShaderSourceGetter;get(Lnet/minecraft/util/Identifier;Lcom/mojang/blaze3d/shaders/ShaderType;)Ljava/lang/String;"
       )}
    )
    private String redirectGetShaderSource(ShaderSourceGetter shaderSource, Identifier id, ShaderType type) {

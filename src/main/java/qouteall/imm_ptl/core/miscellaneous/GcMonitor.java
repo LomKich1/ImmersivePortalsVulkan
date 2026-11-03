@@ -6,9 +6,9 @@ import java.lang.management.ManagementFactory;
 import java.util.WeakHashMap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.Formatting;
-import net.minecraft.text.Text;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.slf4j.Logger;
 import qouteall.imm_ptl.core.CHelper;
 import qouteall.imm_ptl.core.IPGlobal;
@@ -47,10 +47,8 @@ public class GcMonitor {
                         if (IPConfig.getConfig().shouldDisplayWarning("low_max_memory")) {
                            CHelper.printChat(
                               Text.translatable("imm_ptl.low_max_memory", new Object[]{maxMemoryMB})
-                                 .formatted(Formatting.field_1061)
-                                 .append(
-                                    McHelper.getLinkText("https://filmora.wondershare.com/game-recording/how-to-allocate-more-ram-to-minecraft.html")
-                                 )
+                                 .formatted(Formatting.RED)
+                                 .append(McHelper.getLinkText("https://filmora.wondershare.com/game-recording/how-to-allocate-more-ram-to-minecraft.html"))
                                  .append(IPMcHelper.getDisableWarningText("low_max_memory"))
                            );
                         }

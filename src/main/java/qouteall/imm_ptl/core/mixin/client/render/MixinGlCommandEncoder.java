@@ -1,9 +1,9 @@
 package qouteall.imm_ptl.core.mixin.client.render;
 
 import java.util.Collection;
+import net.minecraft.client.gl.CompiledShaderPipeline;
 import net.minecraft.client.gl.GlCommandEncoder;
 import net.minecraft.client.gl.RenderPassImpl;
-import net.minecraft.client.gl.CompiledShaderPipeline;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,7 +20,7 @@ public class MixinGlCommandEncoder {
       if (cir.getReturnValueZ()) {
          CompiledShaderPipeline pipeline = ((IEGlRenderPass)renderPass).ip_getPipeline();
          if (pipeline != null) {
-            FrontClipping.onProgramBound(pipeline.comp_3802());
+            FrontClipping.onProgramBound(pipeline.program());
          }
       }
    }

@@ -3,12 +3,12 @@ package qouteall.imm_ptl.core.platform_specific;
 import java.lang.reflect.Method;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.network.ClientPlayerEntity;
 import org.apache.commons.lang3.Validate;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.core.teleportation.ClientTeleportationManager;
@@ -59,10 +59,10 @@ public class RequiemCompat {
    public static void onPlayerTeleportedServer(ServerPlayerEntity player) {
       if (isRequiemPresent) {
          MobEntity possessedEntity = getPossessedEntity(player);
-         if (possessedEntity != null && possessedEntity.getEntityWorld() != player.getServerWorld()) {
+         if (possessedEntity != null && possessedEntity.getEntityWorld() != player.getEntityWorld()) {
             Helper.log("Move Requiem Posessed Entity at Server");
             ServerTeleportationManager.of(player.server)
-               .changeEntityDimension(possessedEntity, player.getServerWorld().getRegistryKey(), McHelper.getEyePos(player), false);
+               .changeEntityDimension(possessedEntity, player.getEntityWorld().getRegistryKey(), McHelper.getEyePos(player), false);
          }
       }
    }

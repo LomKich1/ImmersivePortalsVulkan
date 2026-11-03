@@ -1,6 +1,7 @@
 package qouteall.imm_ptl.core.render;
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.ArrayList;
@@ -8,32 +9,31 @@ import java.util.Stack;
 import java.util.function.Consumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.profiler.Profilers;
-import com.mojang.blaze3d.systems.ProjectionType;
-import net.minecraft.client.render.state.WorldRenderState;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.option.TextureFilteringMode;
+import net.minecraft.client.render.BufferBuilderStorage;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.DefaultFramebufferSet;
+import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.SubmittableBatch;
+import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.render.DiffuseLighting.Type;
+import net.minecraft.client.render.chunk.BlockBufferAllocatorStorage;
+import net.minecraft.client.render.chunk.ChunkBuilder.BuiltChunk;
 import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
 import net.minecraft.client.render.command.RenderDispatcher;
-import net.minecraft.client.render.SubmittableBatch;
-import net.minecraft.client.option.TextureFilteringMode;
-import net.minecraft.world.World;
+import net.minecraft.client.render.fog.FogRenderer;
+import net.minecraft.client.render.fog.FogRenderer.FogType;
+import net.minecraft.client.render.state.WorldRenderState;
+import net.minecraft.client.util.Handle;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.BufferBuilderStorage;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.render.chunk.BlockBufferAllocatorStorage;
-import net.minecraft.client.render.fog.FogRenderer;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.util.Handle;
-import net.minecraft.client.render.DefaultFramebufferSet;
-import net.minecraft.client.render.DiffuseLighting.class_11274;
-import net.minecraft.client.render.fog.FogRenderer.class_4596;
-import net.minecraft.client.render.chunk.ChunkBuilder.class_851;
+import net.minecraft.util.profiler.Profilers;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
@@ -168,7 +168,7 @@ public class MyGameRenderer {
       LightmapTextureManager oldLightmap = client.gameRenderer.getLightmapTextureManager();
       boolean oldNoClip = client.player.noClip;
       boolean oldDoRenderHand = ieGameRenderer.ip_getDoRenderHand();
-      ObjectArrayList<class_851> oldChunkInfoList = ((IEWorldRenderer)oldWorldRenderer).portal_getChunkInfoList();
+      ObjectArrayList<BuiltChunk> oldChunkInfoList = ((IEWorldRenderer)oldWorldRenderer).portal_getChunkInfoList();
       HitResult oldCrosshairTarget = client.crosshairTarget;
       Camera oldCamera = client.gameRenderer.getCamera();
       BufferBuilderStorage oldRenderBuffers = ieWorldRenderer.ip_getRenderBuffers();
@@ -196,7 +196,7 @@ public class MyGameRenderer {
       GpuBufferSlice oldShaderFog = RenderSystem.getShaderFog();
       GpuBufferSlice oldShaderLights = RenderSystem.getShaderLights();
       Vec3d oldFogColor = RenderStates.currentFogColor;
-      ObjectArrayList<class_851> newChunkInfoList = VisibleSectionDiscovery.takeList();
+      ObjectArrayList<BuiltChunk> newChunkInfoList = VisibleSectionDiscovery.takeList();
       ((IEWorldRenderer)oldWorldRenderer).portal_setChunkInfoList(newChunkInfoList);
       Object irisPipeline = IrisInterface.invoker.getPipeline(worldRenderer);
       ((IEMinecraftClient)client).ip_setWorldRenderer(worldRenderer);
@@ -240,13 +240,13 @@ public class MyGameRenderer {
       SodiumInterface.invoker.switchContextWithCurrentWorldRenderer(newSodiumContext);
       IERenderSystem.ip_setModelViewStack(new Matrix4fStack(16));
       IrisInterface.invoker.setPipeline(worldRenderer, null);
-      client.gameRenderer.updateCamera(client.getRenderTickCounter());
+      client.gameRenderer.method_76295(client.getRenderTickCounter());
       updateGlobalSettingsUniform(client.gameRenderer.getCamera());
       if (!RenderStates.isDimensionRendered(newDimension)) {
          helper.lightmapTexture.update(0.0F);
       }
 
-      client.gameRenderer.getDiffuseLighting().updateLevelBuffer(newWorld.getDimension().comp_5221());
+      client.gameRenderer.getDiffuseLighting().updateLevelBuffer(newWorld.getDimension().cardinalLightType());
       Object nestedRenderToken = ClientPlatform.get().beforeNestedWorldRender(oldWorldRenderer);
       Object[] dhRenderState = DhRenderStateGuard.snapshot();
       invokeWrapper.accept(() -> {
@@ -316,14 +316,14 @@ public class MyGameRenderer {
             client.getRenderTickCounter(),
             client.options.getMenuBackgroundBlurrinessValue(),
             camera,
-            client.options.getTextureFiltering().getValue() == TextureFilteringMode.field_64664
+            client.options.getTextureFiltering().getValue() == TextureFilteringMode.RGSS
          );
    }
 
    @IPVanillaCopy
    public static void resetFogState() {
       FogRenderer fogRenderer = ((IEGameRenderer)client.gameRenderer).ip_getFogRenderer();
-      RenderSystem.setShaderFog(fogRenderer.getFogBuffer(class_4596.field_60102));
+      RenderSystem.setShaderFog(fogRenderer.getFogBuffer(FogType.WORLD));
    }
 
    public static void updateFogColor() {
@@ -336,8 +336,8 @@ public class MyGameRenderer {
       assert world != null;
 
       DiffuseLighting lighting = client.gameRenderer.getDiffuseLighting();
-      lighting.updateLevelBuffer(world.getDimension().comp_5221());
-      lighting.setShaderLights(class_11274.field_60025);
+      lighting.updateLevelBuffer(world.getDimension().cardinalLightType());
+      lighting.setShaderLights(Type.LEVEL);
    }
 
    public static class NestedRenderContext {

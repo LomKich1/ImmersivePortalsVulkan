@@ -1,9 +1,9 @@
 package qouteall.imm_ptl.core.mixin.common.chunk_sync;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.network.packet.c2s.play.AcknowledgeChunksC2SPacket;
 import net.minecraft.server.network.ChunkDataSender;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,10 +33,10 @@ public class MixinServerGamePacketListenerImpl_ChunkSync {
       method = {"onAcknowledgeChunks"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ChunkDataSender;onAcknowledgeChunks(F)V"
+         target = "Lnet/minecraft/server/network/ChunkDataSender;onAcknowledgeChunks(F)V"
       )}
    )
    private void redirectOnChunkBatchReceivedByClient(AcknowledgeChunksC2SPacket packet, CallbackInfo ci) {
-      ImmPtlChunkTracking.getPlayerInfo(this.player).onChunkBatchReceivedByClient(packet.comp_1730());
+      ImmPtlChunkTracking.getPlayerInfo(this.player).onChunkBatchReceivedByClient(packet.desiredChunksPerTick());
    }
 }

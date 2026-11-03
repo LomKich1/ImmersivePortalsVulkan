@@ -1,25 +1,25 @@
 package qouteall.imm_ptl.core.ducks;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.client.render.state.WorldRenderState;
-import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
-import net.minecraft.client.render.command.RenderDispatcher;
-import net.minecraft.client.render.SubmittableBatch;
-import net.minecraft.entity.Entity;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.BuiltChunkStorage;
-import net.minecraft.client.render.entity.EntityRenderManager;
 import net.minecraft.client.render.DefaultFramebufferSet;
-import net.minecraft.client.render.VertexConsumerProvider.class_4598;
-import net.minecraft.client.render.chunk.ChunkBuilder.class_851;
+import net.minecraft.client.render.SubmittableBatch;
+import net.minecraft.client.render.VertexConsumerProvider.Immediate;
+import net.minecraft.client.render.chunk.ChunkBuilder.BuiltChunk;
+import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
+import net.minecraft.client.render.command.RenderDispatcher;
+import net.minecraft.client.render.entity.EntityRenderManager;
+import net.minecraft.client.render.state.WorldRenderState;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 
 public interface IEWorldRenderer {
    EntityRenderManager ip_getEntityRenderDispatcher();
 
    BuiltChunkStorage ip_getBuiltChunkStorage();
 
-   void ip_renderSingleEntity(Entity var1, double var2, double var4, double var6, float var8, MatrixStack var9, class_4598 var10);
+   void ip_renderSingleEntity(Entity var1, double var2, double var4, double var6, float var8, MatrixStack var9, Immediate var10);
 
    BufferBuilderStorage ip_getRenderBuffers();
 
@@ -27,9 +27,9 @@ public interface IEWorldRenderer {
 
    void portal_fullyDispose();
 
-   void portal_setChunkInfoList(ObjectArrayList<class_851> var1);
+   void portal_setChunkInfoList(ObjectArrayList<BuiltChunk> var1);
 
-   ObjectArrayList<class_851> portal_getChunkInfoList();
+   ObjectArrayList<BuiltChunk> portal_getChunkInfoList();
 
    WorldRenderState ip_getLevelRenderState();
 

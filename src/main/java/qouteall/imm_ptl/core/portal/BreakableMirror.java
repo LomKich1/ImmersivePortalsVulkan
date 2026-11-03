@@ -1,23 +1,23 @@
 package qouteall.imm_ptl.core.portal;
 
 import java.util.function.Predicate;
-import net.minecraft.entity.EntityType;
-import net.minecraft.world.World;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.block.StainedGlassPaneBlock;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.StainedGlassBlock;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.block.StainedGlassPaneBlock;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.Entity.RemovalReason;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Pair;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.Entity.class_5529;
-import net.minecraft.util.math.Direction.class_2351;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.IPGlobal;
 import qouteall.imm_ptl.core.McHelper;
@@ -105,18 +105,18 @@ public class BreakableMirror extends Mirror {
       }
 
       if (!wallValid) {
-         this.remove(class_5529.KILLED);
+         this.remove(RemovalReason.KILLED);
       }
    }
 
    public static boolean isGlass(World world, BlockPos blockPos) {
       Block block = world.getBlockState(blockPos).getBlock();
-      return block == Blocks.field_10033 || block == Blocks.field_10285 || block instanceof StainedGlassBlock || block instanceof StainedGlassPaneBlock;
+      return block == Blocks.GLASS || block == Blocks.GLASS_PANE || block instanceof StainedGlassBlock || block instanceof StainedGlassPaneBlock;
    }
 
    private static boolean isGlassPane(World world, BlockPos blockPos) {
       Block block = world.getBlockState(blockPos).getBlock();
-      return block == Blocks.field_10285 || block instanceof StainedGlassPaneBlock;
+      return block == Blocks.GLASS_PANE || block instanceof StainedGlassPaneBlock;
    }
 
    public static BreakableMirror createMirror(ServerWorld world, BlockPos glassPos, Direction facing) {
@@ -124,19 +124,17 @@ public class BreakableMirror extends Mirror {
          return null;
       } else {
          boolean isPane = isGlassPane(world, glassPos);
-         if (facing.getAxis() == class_2351.field_11052 && isPane) {
+         if (facing.getAxis() == Axis.Y && isPane) {
             return null;
          } else {
             Predicate<BlockPos> glassWallPredicate = blockPos -> isGlass(world, blockPos)
                && isPane == isGlassPane(world, blockPos)
-               && world.getBlockState(blockPos.method_10093(facing)).isAir();
-            BlockPortalShape shape = BlockPortalShape.findArea(
-               glassPos, facing.getAxis(), glassWallPredicate, blockPos -> !glassWallPredicate.test(blockPos)
-            );
+               && world.getBlockState(blockPos.offset(facing)).isAir();
+            BlockPortalShape shape = BlockPortalShape.findArea(glassPos, facing.getAxis(), glassWallPredicate, blockPos -> !glassWallPredicate.test(blockPos));
             if (shape == null) {
                return null;
             } else {
-               BreakableMirror breakableMirror = (BreakableMirror)ENTITY_TYPE.create(world, SpawnReason.field_16461);
+               BreakableMirror breakableMirror = (BreakableMirror)ENTITY_TYPE.create(world, SpawnReason.TRIGGERED);
 
                assert breakableMirror != null;
 
@@ -150,10 +148,7 @@ public class BreakableMirror extends Mirror {
                   pos = Helper.putCoordinate(
                      pos,
                      facing.getAxis(),
-                     Helper.getCoordinate(
-                        shape.innerAreaBox.getCenterVec().add(Vec3d.of(facing.getVector()).multiply(distanceToCenter)),
-                        facing.getAxis()
-                     )
+                     Helper.getCoordinate(shape.innerAreaBox.getCenterVec().add(Vec3d.of(facing.getVector()).multiply(distanceToCenter)), facing.getAxis())
                   );
                   breakableMirror.setPosition(pos.x, pos.y, pos.z);
                   breakableMirror.setDestination(pos);
@@ -219,6 +214,6 @@ public class BreakableMirror extends Mirror {
          .filter(mirror1 -> mirror1.getNormal().dotProduct(newMirror.getNormal()) > 0.5)
          .filter(mirror1 -> IntBox.getIntersect(mirror1.getAreaBox(), newMirror.getAreaBox()) != null)
          .filter(mirror -> mirror != newMirror)
-         .forEach(e -> e.remove(class_5529.KILLED));
+         .forEach(e -> e.remove(RemovalReason.KILLED));
    }
 }

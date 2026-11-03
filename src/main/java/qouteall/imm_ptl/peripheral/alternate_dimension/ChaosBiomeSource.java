@@ -5,15 +5,15 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+import net.minecraft.registry.RegistryEntryLookup;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.biome.source.SeedMixer;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.registry.RegistryEntryLookup;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.world.biome.source.util.MultiNoiseUtil.class_6552;
+import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
 import org.jetbrains.annotations.NotNull;
 import qouteall.imm_ptl.core.McHelper;
 
@@ -119,7 +119,7 @@ public class ChaosBiomeSource extends BiomeSource {
       return this.allowedBiomes.stream();
    }
 
-   public RegistryEntry<Biome> getBiome(int x, int y, int z, class_6552 sampler) {
+   public RegistryEntry<Biome> getBiome(int x, int y, int z, MultiNoiseSampler noise) {
       return this.getRandomBiome(x, z);
    }
 }

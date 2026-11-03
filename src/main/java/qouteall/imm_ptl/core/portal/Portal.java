@@ -8,39 +8,38 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.MovementType;
-import net.minecraft.util.Util;
+import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.Entity.RemovalReason;
+import net.minecraft.entity.EntityType.Builder;
+import net.minecraft.entity.EntityType.EntityFactory;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.EntityTrackerEntry;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.entity.Entity.class_5529;
-import net.minecraft.entity.EntityType.class_1300;
-import net.minecraft.entity.EntityType.class_4049;
-import net.minecraft.entity.data.DataTracker.class_9222;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.EntityTrackerEntry;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -145,13 +144,13 @@ public class Portal extends Entity implements PortalLike, IPEntityEventListenabl
    public static final Event<BiConsumer<Portal, NbtCompound>> WRITE_PORTAL_DATA_SIGNAL = Helper.createBiConsumerEvent();
 
    public static RegistryKey<EntityType<?>> portalEntityTypeKey(String path) {
-      return RegistryKey.of(RegistryKeys.field_41266, McHelper.newResourceLocation("immersive_portals", path));
+      return RegistryKey.of(RegistryKeys.ENTITY_TYPE, McHelper.newResourceLocation("immersive_portals", path));
    }
 
-   public static <T extends Portal> EntityType<T> createPortalEntityType(class_4049<T> constructor, RegistryKey<EntityType<?>> entityTypeKey) {
+   public static <T extends Portal> EntityType<T> createPortalEntityType(EntityFactory<T> constructor, RegistryKey<EntityType<?>> entityTypeKey) {
       return Platform.get()
          .forceTrackedVelocityUpdates(
-            class_1300.create(constructor, SpawnGroup.field_17715).dimensions(0.0F, 0.0F).makeFireImmune().maxTrackingRange(6).trackingTickInterval(20), true
+            Builder.create(constructor, SpawnGroup.MISC).dimensions(0.0F, 0.0F).makeFireImmune().maxTrackingRange(6).trackingTickInterval(20), true
          )
          .build(entityTypeKey);
    }
@@ -160,21 +159,21 @@ public class Portal extends Entity implements PortalLike, IPEntityEventListenabl
       super(entityType, world);
    }
 
-   protected void initDataTracker(class_9222 builder) {
+   protected void initDataTracker(net.minecraft.entity.data.DataTracker.Builder builder) {
    }
 
-   public boolean damage(ServerWorld level, DamageSource source, float amount) {
+   public boolean damage(ServerWorld world, DamageSource source, float amount) {
       return false;
    }
 
-   protected void readCustomData(ReadView input) {
-      this.readAdditionalSaveData(Helper.readWholeCompound(input));
+   protected void readCustomData(ReadView view) {
+      this.readAdditionalSaveData(Helper.readWholeCompound(view));
    }
 
-   protected void writeCustomData(WriteView output) {
+   protected void writeCustomData(WriteView view) {
       NbtCompound compoundTag = new NbtCompound();
       this.addAdditionalSaveData(compoundTag);
-      Helper.writeWholeCompound(output, compoundTag);
+      Helper.writeWholeCompound(view, compoundTag);
    }
 
    protected void readAdditionalSaveData(NbtCompound compoundTag) {
@@ -268,7 +267,7 @@ public class Portal extends Entity implements PortalLike, IPEntityEventListenabl
 
       if (compoundTag.contains("commandsOnTeleported")) {
          NbtList list = compoundTag.getListOrEmpty("commandsOnTeleported");
-         this.commandsOnTeleported = list.stream().map(t -> ((NbtString)t).comp_3831()).collect(Collectors.toList());
+         this.commandsOnTeleported = list.stream().map(t -> ((NbtString)t).value()).collect(Collectors.toList());
       } else {
          this.commandsOnTeleported = null;
       }
@@ -367,7 +366,7 @@ public class Portal extends Entity implements PortalLike, IPEntityEventListenabl
    }
 
    @Override
-   public void ip_onRemoved(class_5529 reason) {
+   public void ip_onRemoved(RemovalReason reason) {
       PORTAL_DISPOSE_SIGNAL.invoker().accept(this);
    }
 
@@ -665,7 +664,7 @@ public class Portal extends Entity implements PortalLike, IPEntityEventListenabl
    }
 
    @NotNull
-   public Packet<ClientPlayPacketListener> createSpawnPacket(EntityTrackerEntry serverEntity) {
+   public Packet<ClientPlayPacketListener> createSpawnPacket(EntityTrackerEntry entityTrackerEntry) {
       return this.createSyncPacket();
    }
 
@@ -707,7 +706,7 @@ public class Portal extends Entity implements PortalLike, IPEntityEventListenabl
       } else {
          if (!this.isPortalValid()) {
             LOGGER.info("Removed invalid portal {}", this);
-            this.remove(class_5529.KILLED);
+            this.remove(RemovalReason.KILLED);
             return;
          }
 
@@ -719,7 +718,7 @@ public class Portal extends Entity implements PortalLike, IPEntityEventListenabl
    }
 
    @NotNull
-   protected Box calculateDefaultBoundingBox(Vec3d position) {
+   protected Box calculateDefaultBoundingBox(Vec3d pos) {
       if (this.axisW == null) {
          this.boundingBoxCache = null;
          return NULL_BOX;
@@ -1295,7 +1294,7 @@ public class Portal extends Entity implements PortalLike, IPEntityEventListenabl
       } catch (Exception var3) {
          LOGGER.error("Failed to read portal data from nbt {}", compound, var3);
          if (!this.isPortalValid()) {
-            this.setRemoved(class_5529.KILLED);
+            this.setRemoved(RemovalReason.KILLED);
          }
       }
    }
@@ -1384,11 +1383,7 @@ public class Portal extends Entity implements PortalLike, IPEntityEventListenabl
    }
 
    public Vec3d transformFromPortalLocalToWorld(Vec3d localPos) {
-      return this.axisW
-         .multiply(localPos.x)
-         .add(this.axisH.multiply(localPos.y))
-         .add(this.getNormal().multiply(localPos.z))
-         .add(this.getOriginPos());
+      return this.axisW.multiply(localPos.x).add(this.axisH.multiply(localPos.y)).add(this.getNormal().multiply(localPos.z)).add(this.getOriginPos());
    }
 
    public Vec3d transformFromWorldToPortalLocal(Vec3d worldPos) {

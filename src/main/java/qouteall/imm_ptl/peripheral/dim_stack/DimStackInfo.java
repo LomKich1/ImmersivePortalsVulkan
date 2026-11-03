@@ -7,15 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
-import net.minecraft.block.Block;
-import net.minecraft.text.Text;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.MinecraftServer;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.McHelper;
@@ -106,8 +106,7 @@ public class DimStackInfo {
          for (DimStackEntry entry : this.entries) {
             if (server.getWorld(entry.getDimension()) == null) {
                McHelper.sendMessageToFirstLoggedPlayer(
-                  server,
-                  Text.literal("Failed to apply dimension stack. Missing dimension " + entry.dimensionIdStr).formatted(Formatting.field_1061)
+                  server, Text.literal("Failed to apply dimension stack. Missing dimension " + entry.dimensionIdStr).formatted(Formatting.RED)
                );
                return;
             }
@@ -118,7 +117,7 @@ public class DimStackInfo {
             McHelper.sendMessageToFirstLoggedPlayer(
                server,
                Text.literal("Failed to apply dimension stack because there are already global portals when initializing dimension stack")
-                  .formatted(Formatting.field_1061)
+                  .formatted(Formatting.RED)
             );
          } else {
             Map<DimStackInfo.PortalInfo, List<DimStackEntry>> portalInfoMap = this.getPortalInfoMap();
@@ -133,7 +132,7 @@ public class DimStackInfo {
                            "Failed to apply dimension stack because of connection conflict. There are multiple connections in the %s of %s"
                               .formatted(key.connectorType, key.dimension.getValue())
                         )
-                        .formatted(Formatting.field_1061)
+                        .formatted(Formatting.RED)
                   );
                   return;
                }

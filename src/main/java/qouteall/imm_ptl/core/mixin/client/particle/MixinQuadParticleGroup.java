@@ -3,8 +3,8 @@ package qouteall.imm_ptl.core.mixin.client.particle;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.client.particle.BillboardParticleRenderer;
 import net.minecraft.client.particle.BillboardParticle;
+import net.minecraft.client.particle.BillboardParticleRenderer;
 import net.minecraft.client.render.Frustum;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,7 +16,7 @@ public class MixinQuadParticleGroup {
       method = {"render"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/Frustum;intersectPoint(DDD)Z"
+         target = "Lnet/minecraft/client/render/Frustum;intersectPoint(DDD)Z"
       )}
    )
    private boolean wrapParticleFrustumCheck(Frustum frustum, double x, double y, double z, Operation<Boolean> original, @Local BillboardParticle particle) {

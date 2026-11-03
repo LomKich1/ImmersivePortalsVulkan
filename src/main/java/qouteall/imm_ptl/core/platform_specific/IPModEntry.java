@@ -2,8 +2,8 @@ package qouteall.imm_ptl.core.platform_specific;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.registry.Registry;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import qouteall.imm_ptl.core.IPModMain;
 import qouteall.imm_ptl.core.compat.GravityChangerInterface;
 import qouteall.q_misc_util.Helper;

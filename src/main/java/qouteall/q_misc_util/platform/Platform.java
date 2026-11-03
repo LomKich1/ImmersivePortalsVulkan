@@ -8,24 +8,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ActionResult;
+import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.command.argument.serialize.ArgumentSerializer;
+import net.minecraft.command.argument.serialize.ArgumentSerializer.ArgumentTypeProperties;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
+import net.minecraft.item.ItemGroup.Builder;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.command.argument.serialize.ArgumentSerializer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.entity.EntityType.class_1300;
-import net.minecraft.item.ItemGroup.class_7913;
-import net.minecraft.command.argument.serialize.ArgumentSerializer.class_7217;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
 
 public interface Platform {
    static Platform get() {
@@ -52,13 +51,15 @@ public interface Platform {
 
    <T> void registerDynamicRegistry(RegistryKey<Registry<T>> var1, Codec<T> var2);
 
-   <A extends ArgumentType<?>, T extends class_7217<A>, I extends ArgumentSerializer<A, T>> void registerArgumentType(Identifier var1, Class<A> var2, I var3);
+   <A extends ArgumentType<?>, T extends ArgumentTypeProperties<A>, I extends ArgumentSerializer<A, T>> void registerArgumentType(
+      Identifier var1, Class<A> var2, I var3
+   );
 
    <T> void registerBuiltIn(Registry<T> var1, Identifier var2, T var3);
 
-   class_7913 createCreativeTabBuilder();
+   Builder createCreativeTabBuilder();
 
-   <T extends Entity> class_1300<T> forceTrackedVelocityUpdates(class_1300<T> var1, boolean var2);
+   <T extends Entity> net.minecraft.entity.EntityType.Builder<T> forceTrackedVelocityUpdates(net.minecraft.entity.EntityType.Builder<T> var1, boolean var2);
 
    void onServerTickEnd(Consumer<MinecraftServer> var1);
 

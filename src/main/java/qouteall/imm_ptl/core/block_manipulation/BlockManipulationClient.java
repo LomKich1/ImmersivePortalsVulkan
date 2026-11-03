@@ -1,25 +1,25 @@
 package qouteall.imm_ptl.core.block_manipulation;
 
 import java.util.function.Supplier;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.Pair;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.hit.HitResult.Type;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.Pair;
-import net.minecraft.fluid.FluidState;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.hit.HitResult.class_240;
-import net.minecraft.world.RaycastContext.class_242;
-import net.minecraft.world.RaycastContext.class_3960;
+import net.minecraft.world.World;
+import net.minecraft.world.RaycastContext.FluidHandling;
+import net.minecraft.world.RaycastContext.ShapeType;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.ClientWorldLoader;
@@ -48,7 +48,7 @@ public class BlockManipulationClient {
    }
 
    private static boolean hitResultIsMissedOrNull(HitResult bhr) {
-      return bhr == null || bhr.getType() == class_240.field_1333;
+      return bhr == null || bhr.getType() == Type.MISS;
    }
 
    public static void updatePointedBlock(float partialTick) {
@@ -58,9 +58,7 @@ public class BlockManipulationClient {
          if (BlockManipulationServer.canDoCrossPortalInteractionEvent.invoker().test(client.player)) {
             Vec3d cameraPos = client.gameRenderer.getCamera().getCameraPos();
             double reachDistance = client.player.getBlockInteractionRange();
-            PortalUtils.raytracePortalFromEntityView(
-                  client.player, partialTick, reachDistance, true, portal1 -> portal1.isInteractableBy(client.player)
-               )
+            PortalUtils.raytracePortalFromEntityView(client.player, partialTick, reachDistance, true, portal1 -> portal1.isInteractableBy(client.player))
                .ifPresent(
                   pair -> {
                      Portal portal = (Portal)pair.getFirst();
@@ -104,7 +102,7 @@ public class BlockManipulationClient {
    ) {
       Vec3d from = portal.transformPoint(cameraPos.add(viewVector.multiply(beginDistance)));
       Vec3d to = portal.transformPoint(cameraPos.add(viewVector.multiply(endDistance)));
-      RaycastContext context = new RaycastContext(from, to, class_3960.field_17559, class_242.field_1348, client.player);
+      RaycastContext context = new RaycastContext(from, to, ShapeType.OUTLINE, FluidHandling.NONE, client.player);
       ClientWorld world = ClientWorldLoader.getWorld(portal.getDestDim());
       remoteHitResult = (HitResult)BlockView.raycast(
          from,
@@ -114,7 +112,7 @@ public class BlockManipulationClient {
             BlockState blockState = world.getBlockState(blockPos);
             if (blockState.getBlock() == PortalPlaceholderBlock.instance) {
                return null;
-            } else if (blockState.getBlock() == Blocks.field_10499) {
+            } else if (blockState.getBlock() == Blocks.BARRIER) {
                return null;
             } else {
                FluidState fluidState = world.getFluidState(blockPos);
@@ -133,15 +131,13 @@ public class BlockManipulationClient {
          rayTraceContext -> {
             Vec3d vec3d = rayTraceContext.getStart().subtract(rayTraceContext.getEnd());
             return BlockHitResult.createMissed(
-               rayTraceContext.getEnd(),
-               Direction.getFacing(vec3d.x, vec3d.y, vec3d.z),
-               BlockPos.ofFloored(rayTraceContext.getEnd())
+               rayTraceContext.getEnd(), Direction.getFacing(vec3d.x, vec3d.y, vec3d.z), BlockPos.ofFloored(rayTraceContext.getEnd())
             );
          }
       );
       if (remoteHitResult.getPos().y < world.getBottomY() + 0.1) {
          remoteHitResult = new BlockHitResult(
-            remoteHitResult.getPos(), Direction.field_11033, ((BlockHitResult)remoteHitResult).getBlockPos(), ((BlockHitResult)remoteHitResult).isInsideBlock()
+            remoteHitResult.getPos(), Direction.DOWN, ((BlockHitResult)remoteHitResult).getBlockPos(), ((BlockHitResult)remoteHitResult).isInsideBlock()
          );
       }
 
@@ -189,10 +185,7 @@ public class BlockManipulationClient {
          return remoteHitResult instanceof BlockHitResult blockHitResult
             ? "Point:%s %d %d %d"
                .formatted(
-                  remotePointedDim.getValue(),
-                  blockHitResult.getBlockPos().getX(),
-                  blockHitResult.getBlockPos().getY(),
-                  blockHitResult.getBlockPos().getZ()
+                  remotePointedDim.getValue(), blockHitResult.getBlockPos().getX(), blockHitResult.getBlockPos().getY(), blockHitResult.getBlockPos().getZ()
                )
             : null;
       }

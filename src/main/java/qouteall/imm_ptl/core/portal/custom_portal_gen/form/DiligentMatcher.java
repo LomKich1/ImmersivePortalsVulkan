@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.Direction.class_2351;
-import net.minecraft.util.math.Direction.class_2352;
+import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.util.math.Direction.AxisDirection;
 import org.apache.commons.lang3.Validate;
 import qouteall.imm_ptl.core.portal.nether_portal.BlockPortalShape;
 import qouteall.imm_ptl.core.portal.nether_portal.FastBlockPortalShape;
@@ -62,7 +62,7 @@ public class DiligentMatcher {
 
    public static BlockPortalShape rotateShape(BlockPortalShape shape, IntMatrix3 t) {
       Set<BlockPos> newArea = shape.area.stream().map(b -> t.transform(b)).collect(Collectors.toSet());
-      class_2351 newAxis = t.transformDirection(Direction.from(shape.axis, class_2352.field_11056)).getAxis();
+      Axis newAxis = t.transformDirection(Direction.from(shape.axis, AxisDirection.POSITIVE)).getAxis();
       return new BlockPortalShape(newArea, newAxis);
    }
 
@@ -70,12 +70,12 @@ public class DiligentMatcher {
       HashSet<BlockPos> area = new HashSet<>(shape.area);
       ArrayList<IntBox> boxList = decomposeShape(shape, area);
       IntArrayList sideLenList = new IntArrayList();
-      Pair<class_2351, class_2351> axs = Helper.getAnotherTwoAxis(shape.axis);
+      Pair<Axis, Axis> axs = Helper.getAnotherTwoAxis(shape.axis);
 
       for (IntBox box : boxList) {
          BlockPos boxSize = box.getSize();
-         int a = Helper.getCoordinate(boxSize, (class_2351)axs.getLeft());
-         int b = Helper.getCoordinate(boxSize, (class_2351)axs.getRight());
+         int a = Helper.getCoordinate(boxSize, (Axis)axs.getLeft());
+         int b = Helper.getCoordinate(boxSize, (Axis)axs.getRight());
          sideLenList.add(a);
          sideLenList.add(b);
       }
@@ -113,9 +113,9 @@ public class DiligentMatcher {
    }
 
    public static BlockPortalShape upscaleShape(BlockPortalShape shape, int multiplyFactor) {
-      Pair<class_2351, class_2351> axs = Helper.getAnotherTwoAxis(shape.axis);
-      Vec3i v1 = Direction.from((class_2351)axs.getLeft(), class_2352.field_11056).getVector();
-      Vec3i v2 = Direction.from((class_2351)axs.getRight(), class_2352.field_11056).getVector();
+      Pair<Axis, Axis> axs = Helper.getAnotherTwoAxis(shape.axis);
+      Vec3i v1 = Direction.from((Axis)axs.getLeft(), AxisDirection.POSITIVE).getVector();
+      Vec3i v2 = Direction.from((Axis)axs.getRight(), AxisDirection.POSITIVE).getVector();
       return new BlockPortalShape(
          shape.area
             .stream()
@@ -124,7 +124,7 @@ public class DiligentMatcher {
                   .boxed()
                   .flatMap(
                      dx -> IntStream.range(0, multiplyFactor)
-                        .mapToObj(dy -> Helper.scale(basePos, multiplyFactor).method_10081(Helper.scale(v1, dx).method_10081(Helper.scale(v2, dy))))
+                        .mapToObj(dy -> Helper.scale(basePos, multiplyFactor).add(Helper.scale(v1, dx).add(Helper.scale(v2, dy))))
                   )
             )
             .collect(Collectors.toSet()),
@@ -132,7 +132,7 @@ public class DiligentMatcher {
       );
    }
 
-   private static IntBox splitBoxFromArea(Set<BlockPos> area, class_2351 axis) {
+   private static IntBox splitBoxFromArea(Set<BlockPos> area, Axis axis) {
       Iterator<BlockPos> iterator = area.iterator();
       if (!iterator.hasNext()) {
          return null;

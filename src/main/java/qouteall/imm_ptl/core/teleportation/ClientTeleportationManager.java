@@ -8,18 +8,18 @@ import java.util.List;
 import java.util.function.Function;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.profiler.Profilers;
-import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity.class_5529;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.Entity.RemovalReason;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.profiler.Profilers;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -338,7 +338,7 @@ public class ClientTeleportationManager {
       RegistryKey<World> toDimension = toWorld.getRegistryKey();
       RegistryKey<World> fromDimension = fromWorld.getRegistryKey();
       ((IEClientPlayNetworkHandler)client.getNetworkHandler()).ip_setWorld(toWorld);
-      fromWorld.removeEntity(player.getId(), class_5529.CHANGED_DIMENSION);
+      fromWorld.removeEntity(player.getId(), RemovalReason.CHANGED_DIMENSION);
       ((IEEntity)player).ip_setWorld(toWorld);
       McHelper.setEyePos(player, newEyePos, newEyePos);
       McHelper.updateBoundingBox(player);
@@ -364,11 +364,7 @@ public class ClientTeleportationManager {
 
       Helper.log(
          String.format(
-            "Client Changed Dimension from %s to %s time: %s age: %s",
-            fromDimension.getValue(),
-            toDimension.getValue(),
-            tickTimeForTeleportation,
-            player.age
+            "Client Changed Dimension from %s to %s time: %s age: %s", fromDimension.getValue(), toDimension.getValue(), tickTimeForTeleportation, player.age
          )
       );
       FogRendererContext.onPlayerTeleport(fromDimension, toDimension);
@@ -394,7 +390,7 @@ public class ClientTeleportationManager {
 
    public static void moveClientEntityAcrossDimension(Entity entity, ClientWorld newWorld, Vec3d newPos) {
       ClientWorld oldWorld = (ClientWorld)entity.getEntityWorld();
-      oldWorld.removeEntity(entity.getId(), class_5529.CHANGED_DIMENSION);
+      oldWorld.removeEntity(entity.getId(), RemovalReason.CHANGED_DIMENSION);
       ((IEEntity)entity).ip_setWorld(newWorld);
       entity.setPosition(newPos.x, newPos.y, newPos.z);
       ((IEEntity)entity).ip_unsetRemoved();

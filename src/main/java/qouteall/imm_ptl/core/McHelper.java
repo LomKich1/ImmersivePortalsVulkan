@@ -23,44 +23,44 @@ import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.permission.LeveledPermissionPredicate;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.World;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.util.Identifier;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.resource.Resource;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.resource.Resource;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.server.world.ServerChunkLoadingManager.EntityTracker;
+import net.minecraft.storage.NbtReadView;
+import net.minecraft.storage.NbtWriteView;
 import net.minecraft.text.MutableText;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.entity.SectionedEntityCache;
-import net.minecraft.util.TypeFilter;
-import net.minecraft.world.entity.EntityLookup;
+import net.minecraft.text.Text;
+import net.minecraft.text.ClickEvent.OpenUrl;
 import net.minecraft.util.ErrorReporter;
-import net.minecraft.text.ClickEvent.class_10608;
-import net.minecraft.world.level.storage.LevelStorage.class_5143;
-import net.minecraft.server.world.ServerChunkLoadingManager.class_3208;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.TypeFilter;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
+import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.entity.EntityLookup;
+import net.minecraft.world.entity.SectionedEntityCache;
+import net.minecraft.world.level.storage.LevelStorage.Session;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
@@ -97,7 +97,7 @@ public class McHelper {
 
    @Deprecated
    public static IEChunkMap getIEChunkMap(RegistryKey<World> dimension) {
-      return (IEChunkMap)getServerWorld(dimension).method_14178().chunkLoadingManager;
+      return (IEChunkMap)getServerWorld(dimension).getChunkManager().chunkLoadingManager;
    }
 
    @Deprecated
@@ -188,9 +188,9 @@ public class McHelper {
 
    @IPVanillaCopy
    public static int getPlayerLoadDistance(ServerPlayerEntity player) {
-      assert player.getServerWorld().getServer() != null;
+      assert player.getEntityWorld().getServer() != null;
 
-      int loadDistanceOnServer = getLoadDistanceOnServer(player.getServerWorld().getServer());
+      int loadDistanceOnServer = getLoadDistanceOnServer(player.getEntityWorld().getServer());
       return MathHelper.clamp(player.getViewDistance(), 2, loadDistanceOnServer);
    }
 
@@ -253,7 +253,7 @@ public class McHelper {
    }
 
    public static WorldChunk getServerChunkIfPresent(ServerWorld world, int x, int z) {
-      ChunkHolder chunkHolder_ = ((IEChunkMap)world.method_14178().chunkLoadingManager).ip_getChunkHolder(ChunkPos.toLong(x, z));
+      ChunkHolder chunkHolder_ = ((IEChunkMap)world.getChunkManager().chunkLoadingManager).ip_getChunkHolder(ChunkPos.toLong(x, z));
       return chunkHolder_ == null ? null : chunkHolder_.getWorldChunk();
    }
 
@@ -279,7 +279,7 @@ public class McHelper {
    }
 
    public static Portal copyEntity(Portal portal) {
-      Portal newPortal = (Portal)portal.getType().create(portal.getEntityWorld(), SpawnReason.field_52444);
+      Portal newPortal = (Portal)portal.getType().create(portal.getEntityWorld(), SpawnReason.LOAD);
       Validate.notNull(newPortal);
       loadEntityFromNbt(newPortal, saveEntityWithoutIdToNbt(portal));
       return newPortal;
@@ -297,7 +297,7 @@ public class McHelper {
 
    public static boolean getDoesRegionFileExist(RegistryKey<World> toDimension, BlockPos toPos) {
       ChunkPos chunkPos = new ChunkPos(toPos);
-      class_5143 storageSource = MiscHelper.getServer().session;
+      Session storageSource = MiscHelper.getServer().session;
       Path regionFilePath = storageSource.getWorldDirectory(toDimension)
          .resolve("region")
          .resolve("r." + chunkPos.getRegionX() + "." + chunkPos.getRegionZ() + ".mca");
@@ -305,7 +305,7 @@ public class McHelper {
    }
 
    public static MutableText getLinkText(String link) {
-      return Text.literal(link).styled(style -> style.withClickEvent(new class_10608(URI.create(link))).withUnderline(true));
+      return Text.literal(link).styled(style -> style.withClickEvent(new OpenUrl(URI.create(link))).withUnderline(true));
    }
 
    public static void validateOnServerThread() {
@@ -334,7 +334,7 @@ public class McHelper {
    }
 
    public static void sendToTrackers(Entity entity, Packet<? super ClientPlayPacketListener> packet) {
-      class_3208 entityTracker = (class_3208)getIEChunkMap(entity.getEntityWorld().getRegistryKey()).ip_getEntityTrackerMap().get(entity.getId());
+      EntityTracker entityTracker = (EntityTracker)getIEChunkMap(entity.getEntityWorld().getRegistryKey()).ip_getEntityTrackerMap().get(entity.getId());
       if (entityTracker != null) {
          entityTracker.sendToSelfAndListeners(packet);
       }
@@ -360,7 +360,7 @@ public class McHelper {
    }
 
    public static McHelper.ChunkAccessor getChunkAccessor(World world) {
-      return world.isClient() ? world::method_8497 : (x, z) -> getServerChunkIfPresent((ServerWorld)world, x, z);
+      return world.isClient() ? world::getChunk : (x, z) -> getServerChunkIfPresent((ServerWorld)world, x, z);
    }
 
    public static <T extends Entity> List<T> findEntities(
@@ -414,9 +414,7 @@ public class McHelper {
          );
    }
 
-   public static <E extends Entity, R> R traverseEntitiesByBox(
-      Class<E> entityClass, World world, Box box, double maxEntityRadius, Function<E, R> function
-   ) {
+   public static <E extends Entity, R> R traverseEntitiesByBox(Class<E> entityClass, World world, Box box, double maxEntityRadius, Function<E, R> function) {
       return traverseEntitiesByApproximateRegion(
          entityClass, world, box, maxEntityRadius, entity -> entity.getBoundingBox().intersects(box) ? function.apply(entity) : null
       );
@@ -439,9 +437,7 @@ public class McHelper {
       });
    }
 
-   public static <T extends Entity> List<T> findEntitiesRough(
-      Class<T> entityClass, World world, Vec3d center, int radiusChunks, Predicate<T> predicate
-   ) {
+   public static <T extends Entity> List<T> findEntitiesRough(Class<T> entityClass, World world, Vec3d center, int radiusChunks, Predicate<T> predicate) {
       if (radiusChunks <= 0) {
          radiusChunks = 1;
       }
@@ -464,9 +460,7 @@ public class McHelper {
       );
    }
 
-   public static <T extends Entity> List<T> findEntitiesByBox(
-      Class<T> entityClass, World world, Box box, double maxEntityRadius, Predicate<T> predicate
-   ) {
+   public static <T extends Entity> List<T> findEntitiesByBox(Class<T> entityClass, World world, Box box, double maxEntityRadius, Predicate<T> predicate) {
       ArrayList<T> result = new ArrayList<>();
       foreachEntitiesByBox(entityClass, world, box, maxEntityRadius, predicate, result::add);
       return result;
@@ -624,7 +618,7 @@ public class McHelper {
    }
 
    public static int getMaxContentYExclusive(WorldAccess world) {
-      return world.getDimension().comp_653() + getMinY(world);
+      return world.getDimension().logicalHeight() + getMinY(world);
    }
 
    public static int getMinSectionY(WorldAccess world) {
@@ -690,8 +684,7 @@ public class McHelper {
       MutableText component = Text.translatable(translationkey);
       if (component.getString().equals(translationkey)) {
          String modName = O_O.getModName(namespace);
-         return Text.translatable("imm_ptl.a_dimension_of", new Object[]{modName != null ? modName : namespace})
-            .append(" (" + dimension.getValue() + ")");
+         return Text.translatable("imm_ptl.a_dimension_of", new Object[]{modName != null ? modName : namespace}).append(" (" + dimension.getValue() + ")");
       } else {
          return component;
       }

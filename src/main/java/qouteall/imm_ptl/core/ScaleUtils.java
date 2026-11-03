@@ -2,18 +2,18 @@ package qouteall.imm_ptl.core;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.attribute.EntityAttributeModifier.Operation;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.attribute.EntityAttributeModifier.class_1323;
+import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.ducks.IECamera;
@@ -45,7 +45,7 @@ public class ScaleUtils {
 
    @Nullable
    public static EntityAttributeInstance getScaleAttr(Entity entity) {
-      return entity instanceof LivingEntity livingEntity ? livingEntity.getAttributes().getCustomInstance(EntityAttributes.field_47760) : null;
+      return entity instanceof LivingEntity livingEntity ? livingEntity.getAttributes().getCustomInstance(EntityAttributes.SCALE) : null;
    }
 
    public static double getScale(Entity entity) {
@@ -63,7 +63,7 @@ public class ScaleUtils {
          return 1.0;
       } else {
          EntityAttributeModifier modifier = scaleAttr.getModifier(IPORTAL_SCALING);
-         return modifier == null ? 1.0 : modifier.comp_2449() + 1.0;
+         return modifier == null ? 1.0 : modifier.value() + 1.0;
       }
    }
 
@@ -74,7 +74,7 @@ public class ScaleUtils {
             scaleAttr.removeModifier(IPORTAL_SCALING);
             entity.calculateDimensions();
          } else {
-            scaleAttr.overwritePersistentModifier(new EntityAttributeModifier(IPORTAL_SCALING, newScale - 1.0, class_1323.Lnet/minecraft/entity/attribute/EntityAttributeModifier$Operation;));
+            scaleAttr.overwritePersistentModifier(new EntityAttributeModifier(IPORTAL_SCALING, newScale - 1.0, Operation.ADD_MULTIPLIED_TOTAL));
             entity.calculateDimensions();
          }
       }

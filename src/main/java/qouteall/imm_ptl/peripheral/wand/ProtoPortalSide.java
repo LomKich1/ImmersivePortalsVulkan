@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.peripheral.wand;
 
-import net.minecraft.world.World;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

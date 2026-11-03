@@ -3,7 +3,7 @@ package qouteall.imm_ptl.peripheral.mixin.common.alternate_dimension;
 import java.util.List;
 import java.util.function.Supplier;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.feature.util.PlacedFeatureIndexer.class_6827;
+import net.minecraft.world.gen.feature.util.PlacedFeatureIndexer.IndexedFeatures;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -15,10 +15,10 @@ public abstract class MixinChunkGenerator_AlternateDim implements IEChunkGenerat
    @Shadow
    @Final
    @Mutable
-   private Supplier<List<class_6827>> indexedFeaturesListSupplier;
+   private Supplier<List<IndexedFeatures>> indexedFeaturesListSupplier;
 
    @Override
-   public void ip_setFeaturesPerStep(Supplier<List<class_6827>> arg) {
+   public void ip_setFeaturesPerStep(Supplier<List<IndexedFeatures>> arg) {
       this.indexedFeaturesListSupplier = arg;
    }
 }

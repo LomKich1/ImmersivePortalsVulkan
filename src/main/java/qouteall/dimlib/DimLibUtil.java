@@ -11,10 +11,10 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
-import net.minecraft.world.World;
-import net.minecraft.util.Identifier;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 
 public class DimLibUtil {
    public static final String MODID = "dimlib";

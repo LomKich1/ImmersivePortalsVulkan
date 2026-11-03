@@ -9,24 +9,24 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.minecraft.util.profiler.Profilers;
-import net.minecraft.entity.ai.pathing.Path;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.Entity.RemovalReason;
+import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.world.World;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.entity.Entity.class_5529;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.profiler.Profilers;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -163,9 +163,9 @@ public class ServerTeleportationManager {
             } else {
                LOGGER.error(
                   "Player {} {} {} cannot teleport through portal {}\nReason: {}",
-                  new Object[]{player, player.getServerWorld().getRegistryKey().getValue(), player.getEntityPos(), portal, failReason}
+                  new Object[]{player, player.getEntityWorld().getRegistryKey().getValue(), player.getEntityPos(), portal, failReason}
                );
-               teleportEntityGeneral(player, player.getEntityPos(), player.getServerWorld());
+               teleportEntityGeneral(player, player.getEntityPos(), player.getEntityWorld());
                ScaleUtils.setBaseScale(player, ScaleUtils.getBaseScale(player));
                GravityChangerInterface.invoker.setBaseGravityDirectionServer(player, GravityChangerInterface.invoker.getGravityDirection(player));
             }
@@ -205,7 +205,7 @@ public class ServerTeleportationManager {
          return "has awaiting teleport";
       } else if (!portal.canTeleportEntity(player)) {
          return "portal cannot teleport player";
-      } else if (player.getServerWorld().getRegistryKey() != dimensionBefore) {
+      } else if (player.getEntityWorld().getRegistryKey() != dimensionBefore) {
          return "player is not in the dimensionBefore in packet";
       } else if (player.getEntityPos().squaredDistanceTo(posBefore) > 256.0) {
          return "player is too far from the posBefore in packet";
@@ -216,7 +216,7 @@ public class ServerTeleportationManager {
 
    public static boolean canPlayerReachPos(ServerPlayerEntity player, RegistryKey<World> dimension, Vec3d pos) {
       Vec3d playerPos = player.getEntityPos();
-      return player.getServerWorld().getRegistryKey() == dimension && playerPos.squaredDistanceTo(pos) < 256.0
+      return player.getEntityWorld().getRegistryKey() == dimension && playerPos.squaredDistanceTo(pos) < 256.0
          ? true
          : IPMcHelper.getNearbyPortals(player, 20.0)
             .filter(portal -> portal.getDestDim() == dimension)
@@ -233,9 +233,9 @@ public class ServerTeleportationManager {
    public void teleportPlayer(ServerPlayerEntity player, RegistryKey<World> dimensionTo, Vec3d newEyePos) {
       MinecraftServer server = player.server;
       Profilers.get().push("portal_teleport");
-      ServerWorld fromWorld = player.getServerWorld();
+      ServerWorld fromWorld = player.getEntityWorld();
       ServerWorld toWorld = server.getWorld(dimensionTo);
-      if (player.getServerWorld().getRegistryKey() == dimensionTo) {
+      if (player.getEntityWorld().getRegistryKey() == dimensionTo) {
          McHelper.setEyePos(player, newEyePos, newEyePos);
          McHelper.updateBoundingBox(player);
       } else {
@@ -257,12 +257,12 @@ public class ServerTeleportationManager {
          LOGGER.info("Force teleporting {} to {} {}", new Object[]{player, dimensionTo.getValue(), newPos});
       }
 
-      ServerWorld fromWorld = player.getServerWorld();
+      ServerWorld fromWorld = player.getEntityWorld();
       ServerWorld toWorld = player.server.getWorld(dimensionTo);
       if (toWorld == null) {
          LOGGER.error("Cannot teleport player {} to non-existing dimension {}", player, dimensionTo.getValue());
       } else {
-         if (player.getServerWorld().getRegistryKey() == dimensionTo) {
+         if (player.getEntityWorld().getRegistryKey() == dimensionTo) {
             player.setPosition(newPos.x, newPos.y, newPos.z);
          } else {
             this.changePlayerDimension(player, fromWorld, toWorld, newPos.add(McHelper.getEyeOffset(player)));
@@ -287,7 +287,7 @@ public class ServerTeleportationManager {
       }
 
       Vec3d oldPos = player.getEntityPos();
-      fromWorld.removePlayer(player, class_5529.CHANGED_DIMENSION);
+      fromWorld.removePlayer(player, RemovalReason.CHANGED_DIMENSION);
       ((IEEntity)player).ip_unsetRemoved();
       McHelper.setEyePos(player, newEyePos, newEyePos);
       McHelper.updateBoundingBox(player);
@@ -392,9 +392,7 @@ public class ServerTeleportationManager {
       Vec3d eyePosLastTick = McHelper.getLastTickEyePos(entity);
       Vec3d deltaMovement = eyePosThisTick.subtract(eyePosLastTick);
       Vec3d deltaMovementDirection = deltaMovement.normalize();
-      Vec3d collidingPoint = portal.rayTrace(
-         eyePosThisTick.subtract(deltaMovementDirection.multiply(5.0)), eyePosThisTick.add(deltaMovementDirection)
-      );
+      Vec3d collidingPoint = portal.rayTrace(eyePosThisTick.subtract(deltaMovementDirection.multiply(5.0)), eyePosThisTick.add(deltaMovementDirection));
       if (collidingPoint == null) {
          collidingPoint = eyePosLastTick;
       }
@@ -417,7 +415,7 @@ public class ServerTeleportationManager {
          } else {
             entity.detach();
             if (recreateEntity) {
-               Entity newEntity = entity.getType().create(toWorld, SpawnReason.field_52445);
+               Entity newEntity = entity.getType().create(toWorld, SpawnReason.DIMENSION_TRAVEL);
                if (newEntity == null) {
                   return entity;
                } else {
@@ -426,12 +424,12 @@ public class ServerTeleportationManager {
                   McHelper.setEyePos(newEntity, newEyePos, newEyePos);
                   McHelper.updateBoundingBox(newEntity);
                   newEntity.setHeadYaw(entity.getHeadYaw());
-                  entity.remove(class_5529.CHANGED_DIMENSION);
+                  entity.remove(RemovalReason.CHANGED_DIMENSION);
                   toWorld.onDimensionChanged(newEntity);
                   return newEntity;
                }
             } else {
-               entity.remove(class_5529.CHANGED_DIMENSION);
+               entity.remove(RemovalReason.CHANGED_DIMENSION);
                ((IEEntity)entity).ip_unsetRemoved();
                McHelper.setEyePos(entity, newEyePos, newEyePos);
                McHelper.updateBoundingBox(entity);
@@ -448,14 +446,14 @@ public class ServerTeleportationManager {
       this.teleportingEntities.add(entity);
       ServerWorld fromWorld = (ServerWorld)entity.getEntityWorld();
       ServerWorld toWorld = MiscHelper.getServer().getWorld(toDimension);
-      Entity newEntity = entity.getType().create(toWorld, SpawnReason.field_52445);
+      Entity newEntity = entity.getType().create(toWorld, SpawnReason.DIMENSION_TRAVEL);
       Validate.isTrue(newEntity != null);
       newEntity.copyFrom(entity);
       newEntity.setId(entity.getId());
       McHelper.setEyePos(newEntity, newEyePos, newEyePos);
       McHelper.updateBoundingBox(newEntity);
       newEntity.setHeadYaw(entity.getHeadYaw());
-      entity.remove(class_5529.CHANGED_DIMENSION);
+      entity.remove(RemovalReason.CHANGED_DIMENSION);
       ((IEEntity)entity).ip_unsetRemoved();
       toWorld.onDimensionChanged(newEntity);
       return newEntity;
@@ -500,7 +498,7 @@ public class ServerTeleportationManager {
    }
 
    private static void notifyChasersForPlayer(ServerPlayerEntity player, Portal portal) {
-      for (MobEntity chaser : McHelper.findEntitiesRough(MobEntity.class, player.getServerWorld(), player.getEntityPos(), 1, e -> e.getTarget() == player)) {
+      for (MobEntity chaser : McHelper.findEntitiesRough(MobEntity.class, player.getEntityWorld(), player.getEntityPos(), 1, e -> e.getTarget() == player)) {
          chaser.setTarget(null);
          notifyChaser(player, portal, chaser);
       }
@@ -534,13 +532,11 @@ public class ServerTeleportationManager {
 
    private void evacuatePlayersFromDimension(ServerWorld world) {
       for (ServerPlayerEntity player : new ArrayList(MiscHelper.getServer().getPlayerManager().getPlayerList())) {
-         if (player.getServerWorld().getRegistryKey() == world.getRegistryKey()) {
+         if (player.getEntityWorld().getRegistryKey() == world.getRegistryKey()) {
             ServerWorld overWorld = McHelper.getOverWorldOnServer();
             BlockPos spawnPos = overWorld.getSpawnPoint().getPos();
             this.forceTeleportPlayer(player, World.OVERWORLD, Vec3d.ofCenter(spawnPos));
-            player.sendMessage(
-               Text.literal("Teleported to spawn pos because dimension %s had been removed".formatted(world.getRegistryKey().getValue()))
-            );
+            player.sendMessage(Text.literal("Teleported to spawn pos because dimension %s had been removed".formatted(world.getRegistryKey().getValue())));
          }
       }
    }

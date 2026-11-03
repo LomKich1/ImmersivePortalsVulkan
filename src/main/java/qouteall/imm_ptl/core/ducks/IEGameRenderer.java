@@ -1,12 +1,12 @@
 package qouteall.imm_ptl.core.ducks;
 
 import com.mojang.blaze3d.systems.ProjectionType;
-import net.minecraft.client.render.state.WorldRenderState;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
 import net.minecraft.client.render.command.RenderDispatcher;
-import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.fog.FogRenderer;
-import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.state.WorldRenderState;
 import org.joml.Matrix4f;
 
 public interface IEGameRenderer {

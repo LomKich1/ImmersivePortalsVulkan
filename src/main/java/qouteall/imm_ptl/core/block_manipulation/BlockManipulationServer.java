@@ -3,27 +3,27 @@ package qouteall.imm_ptl.core.block_manipulation;
 import com.mojang.logging.LogUtils;
 import java.util.List;
 import java.util.function.Predicate;
-import net.minecraft.util.Hand;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Pair;
-import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.ActionResult.class_9860;
-import net.minecraft.util.ActionResult.class_9861;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.class_2847;
-import net.minecraft.world.RaycastContext.class_3960;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Pair;
+import net.minecraft.util.ActionResult.Success;
+import net.minecraft.util.ActionResult.SwingSource;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import net.minecraft.world.RaycastContext.ShapeType;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -41,15 +41,17 @@ import qouteall.q_misc_util.platform.event.EventFactory;
 public class BlockManipulationServer {
    private static final Logger LOGGER = LogUtils.getLogger();
    public static final ThreadLocal<BlockManipulationServer.Context> REDIRECT_CONTEXT = ThreadLocal.withInitial(() -> null);
-   public static final Event<Predicate<PlayerEntity>> canDoCrossPortalInteractionEvent = EventFactory.createArrayBacked(Predicate.class, handlers -> player -> {
-      for (Predicate<PlayerEntity> handler : handlers) {
-         if (!handler.test(player)) {
-            return false;
+   public static final Event<Predicate<PlayerEntity>> canDoCrossPortalInteractionEvent = EventFactory.createArrayBacked(
+      Predicate.class, handlers -> player -> {
+         for (Predicate<PlayerEntity> handler : handlers) {
+            if (!handler.test(player)) {
+               return false;
+            }
          }
-      }
 
-      return true;
-   });
+         return true;
+      }
+   );
 
    private static boolean canPlayerReach(RegistryKey<World> dimension, ServerPlayerEntity player, BlockPos requestPos) {
       if (!canDoCrossPortalInteractionEvent.invoker().test(player)) {
@@ -59,7 +61,7 @@ public class BlockManipulationServer {
          Vec3d pos = Vec3d.ofCenter(requestPos);
          Vec3d playerPos = player.getEntityPos();
          double distanceSquare = 576.0 * playerScale * playerScale;
-         return player.getServerWorld().getRegistryKey() == dimension && playerPos.squaredDistanceTo(pos) < distanceSquare
+         return player.getEntityWorld().getRegistryKey() == dimension && playerPos.squaredDistanceTo(pos) < distanceSquare
             ? true
             : IPMcHelper.getNearbyPortals(player, IPGlobal.maxNormalPortalRadius)
                .anyMatch(
@@ -112,7 +114,7 @@ public class BlockManipulationServer {
    private static void doProcessPlayerAction(ServerWorld world, ServerPlayerEntity player, PlayerActionC2SPacket packet) {
       player.updateLastActionTime();
       BlockPos blockPos = packet.getPos();
-      class_2847 action = packet.getAction();
+      Action action = packet.getAction();
       if (!canPlayerReach(world.getRegistryKey(), player, blockPos)) {
          LOGGER.error("Reject cross-portal action {} {} {}", new Object[]{player, world, blockPos});
       } else {
@@ -123,8 +125,8 @@ public class BlockManipulationServer {
       }
    }
 
-   public static boolean isAttackingAction(class_2847 action) {
-      return action == class_2847.field_12968 || action == class_2847.field_12971 || action == class_2847.field_12973;
+   public static boolean isAttackingAction(Action action) {
+      return action == Action.START_DESTROY_BLOCK || action == Action.ABORT_DESTROY_BLOCK || action == Action.STOP_DESTROY_BLOCK;
    }
 
    @IPVanillaCopy
@@ -144,14 +146,14 @@ public class BlockManipulationServer {
                return;
             }
 
-            if (player.interactionManager.interactBlock(player, world, itemStack, hand, blockHitResult) instanceof class_9860 success
-               && success.comp_2909() == class_9861.field_52428) {
+            if (player.interactionManager.interactBlock(player, world, itemStack, hand, blockHitResult) instanceof Success success
+               && success.swingSource() == SwingSource.SERVER) {
                player.swingHand(hand, true);
             }
          }
 
          PacketRedirection.sendRedirectedMessage(player, dimension, new BlockUpdateS2CPacket(world, blockPos));
-         BlockPos offseted = blockPos.method_10093(direction);
+         BlockPos offseted = blockPos.offset(direction);
          if (offseted.getY() >= world.getBottomY() && offseted.getY() < world.getTopYInclusive() + 1) {
             PacketRedirection.sendRedirectedMessage(player, dimension, new BlockUpdateS2CPacket(world, offseted));
          }
@@ -160,7 +162,7 @@ public class BlockManipulationServer {
 
    public static boolean validateReach(PlayerEntity player, World targetWorld, BlockPos targetPos) {
       PortalUtils.PortalAwareRaytraceResult result = PortalUtils.portalAwareRayTrace(
-         player.getEntityWorld(), player.getEyePos(), player.getRotationVec(1.0F), 32.0, player, class_3960.field_17558
+         player.getEntityWorld(), player.getEyePos(), player.getRotationVec(1.0F), 32.0, player, ShapeType.COLLIDER
       );
       return result != null && result.world() == targetWorld && result.hitResult().getBlockPos().getManhattanDistance(targetPos) < 8;
    }

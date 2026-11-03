@@ -4,23 +4,23 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.world.World;
-import net.minecraft.registry.Registry;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.util.Identifier;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.world.dimension.DimensionTypes;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload.class_9154;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.packet.CustomPayload.Id;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.dimension.DimensionTypes;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class DimLibNetworking {
    }
 
    public record DimSyncPacket(NbtCompound dimIdToTypeIdTag) implements CustomPayload {
-      public static final class_9154<DimLibNetworking.DimSyncPacket> TYPE = new class_9154(Identifier.of("dimlib:dim_sync"));
+      public static final Id<DimLibNetworking.DimSyncPacket> TYPE = new Id(Identifier.of("dimlib:dim_sync"));
       public static final PacketCodec<PacketByteBuf, DimLibNetworking.DimSyncPacket> CODEC = PacketCodec.ofStatic(
          (b, p) -> p.write(b), DimLibNetworking.DimSyncPacket::read
       );
@@ -58,7 +58,7 @@ public class DimLibNetworking {
 
       public static DimLibNetworking.DimSyncPacket createPacket(MinecraftServer server) {
          DynamicRegistryManager registryManager = server.getRegistryManager();
-         Registry<DimensionType> dimensionTypes = registryManager.get(RegistryKeys.field_41241);
+         Registry<DimensionType> dimensionTypes = registryManager.getOrThrow(RegistryKeys.DIMENSION_TYPE);
          NbtCompound dimIdToDimTypeId = new NbtCompound();
 
          for (ServerWorld world : server.getWorlds()) {
@@ -68,7 +68,7 @@ public class DimLibNetworking {
             if (dimTypeId == null) {
                DimLibNetworking.LOGGER.error("Cannot find dimension type for {}", dimId.getValue());
                DimLibNetworking.LOGGER.error("Registered dimension types {}", dimensionTypes.getIds());
-               dimTypeId = DimensionTypes.field_37666.getValue();
+               dimTypeId = DimensionTypes.OVERWORLD.getValue();
             }
 
             dimIdToDimTypeId.putString(dimId.getValue().toString(), dimTypeId.toString());
@@ -84,7 +84,7 @@ public class DimLibNetworking {
          for (String key : tag.getKeys()) {
             RegistryKey<World> dimId = RegistryKey.of(RegistryKeys.WORLD, Identifier.of(key));
             String dimTypeId = tag.getString(key, "");
-            RegistryKey<DimensionType> dimType = RegistryKey.of(RegistryKeys.field_41241, Identifier.of(dimTypeId));
+            RegistryKey<DimensionType> dimType = RegistryKey.of(RegistryKeys.DIMENSION_TYPE, Identifier.of(dimTypeId));
             builder.put(dimId, dimType);
          }
 
@@ -102,7 +102,7 @@ public class DimLibNetworking {
       }
 
       @NotNull
-      public class_9154<? extends CustomPayload> getId() {
+      public Id<? extends CustomPayload> getId() {
          return TYPE;
       }
    }

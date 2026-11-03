@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.core.ducks;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.Vec3d;
 
 public interface IEServerPlayerEntity {
    void ip_stopRidingWithoutTeleportRequest();

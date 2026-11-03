@@ -8,27 +8,27 @@ import java.util.List;
 import java.util.function.Predicate;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.world.PersistentStateType;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.world.PersistentState;
-import net.minecraft.world.World;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Identifier;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.entity.Entity.RemovalReason;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.network.listener.ClientCommonPacketListener;
-import net.minecraft.entity.Entity.class_5529;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
+import net.minecraft.world.PersistentState;
+import net.minecraft.world.PersistentStateType;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -101,7 +101,7 @@ public class GlobalPortalStorage extends PersistentState {
       if (ClientWorldLoader.getIsInitialized()) {
          for (ClientWorld clientWorld : ClientWorldLoader.getClientWorlds()) {
             for (Portal globalPortal : getGlobalPortals(clientWorld)) {
-               globalPortal.remove(class_5529.UNLOADED_TO_CHUNK);
+               globalPortal.remove(RemovalReason.UNLOADED_TO_CHUNK);
             }
          }
       }
@@ -136,7 +136,7 @@ public class GlobalPortalStorage extends PersistentState {
 
    public void removePortal(Portal portal) {
       this.data.remove(portal);
-      portal.remove(class_5529.KILLED);
+      portal.remove(RemovalReason.KILLED);
       this.onDataChanged();
    }
 
@@ -153,7 +153,7 @@ public class GlobalPortalStorage extends PersistentState {
       this.data.removeIf(portal -> {
          boolean shouldRemove = predicate.test(portal);
          if (shouldRemove) {
-            portal.remove(class_5529.KILLED);
+            portal.remove(RemovalReason.KILLED);
          }
 
          return shouldRemove;
@@ -178,7 +178,9 @@ public class GlobalPortalStorage extends PersistentState {
       }
 
       if (tag.contains("bedrockReplacement")) {
-         this.bedrockReplacement = NbtHelper.toBlockState(currWorld.createCommandRegistryWrapper(RegistryKeys.field_41254), tag.getCompoundOrEmpty("bedrockReplacement"));
+         this.bedrockReplacement = NbtHelper.toBlockState(
+            currWorld.createCommandRegistryWrapper(RegistryKeys.BLOCK), tag.getCompoundOrEmpty("bedrockReplacement")
+         );
       } else {
          this.bedrockReplacement = null;
       }
@@ -206,7 +208,7 @@ public class GlobalPortalStorage extends PersistentState {
    private static Portal readPortalFromTag(World currWorld, NbtCompound compoundTag) {
       Identifier entityId = McHelper.newResourceLocation(compoundTag.getString("entity_type", ""));
       EntityType<?> entityType = (EntityType<?>)Registries.ENTITY_TYPE.get(entityId);
-      Entity e = entityType.create(currWorld, SpawnReason.field_52444);
+      Entity e = entityType.create(currWorld, SpawnReason.LOAD);
       McHelper.loadEntityFromNbt(e, compoundTag);
       ((Portal)e).isGlobalPortal = true;
       ((Portal)e).updateCache();
@@ -273,7 +275,7 @@ public class GlobalPortalStorage extends PersistentState {
       List<Portal> oldGlobalPortals = ((IEClientWorld)world).ip_getGlobalPortals();
       if (oldGlobalPortals != null) {
          for (Portal p : oldGlobalPortals) {
-            p.remove(class_5529.KILLED);
+            p.remove(RemovalReason.KILLED);
          }
       }
 
@@ -294,7 +296,7 @@ public class GlobalPortalStorage extends PersistentState {
       Validate.isTrue(!portal.getIsGlobal());
       Validate.isTrue(!portal.getEntityWorld().isClient());
       portal.setPortalShapeToDefault();
-      portal.remove(class_5529.KILLED);
+      portal.remove(RemovalReason.KILLED);
       Portal newPortal = McHelper.copyEntity(portal);
       get((ServerWorld)portal.getEntityWorld()).addPortal(newPortal);
    }
@@ -309,7 +311,7 @@ public class GlobalPortalStorage extends PersistentState {
 
    private void onServerClose() {
       for (Portal portal : this.data) {
-         portal.remove(class_5529.UNLOADED_TO_CHUNK);
+         portal.remove(RemovalReason.UNLOADED_TO_CHUNK);
       }
    }
 

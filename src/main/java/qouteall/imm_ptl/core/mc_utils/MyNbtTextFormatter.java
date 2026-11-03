@@ -10,24 +10,24 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
-import net.minecraft.util.Formatting;
-import net.minecraft.nbt.NbtByteArray;
 import net.minecraft.nbt.NbtByte;
+import net.minecraft.nbt.NbtByteArray;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtDouble;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtEnd;
 import net.minecraft.nbt.NbtFloat;
-import net.minecraft.nbt.NbtIntArray;
 import net.minecraft.nbt.NbtInt;
+import net.minecraft.nbt.NbtIntArray;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtLongArray;
 import net.minecraft.nbt.NbtLong;
+import net.minecraft.nbt.NbtLongArray;
 import net.minecraft.nbt.NbtShort;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.text.Text;
-import net.minecraft.text.MutableText;
 import net.minecraft.nbt.visitor.NbtElementVisitor;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import qouteall.imm_ptl.core.miscellaneous.IPVanillaCopy;
@@ -37,10 +37,10 @@ public class MyNbtTextFormatter implements NbtElementVisitor {
    private static final Logger LOGGER = LogManager.getLogger();
    private static final int field_33271 = 8;
    private static final ByteCollection SINGLE_LINE_ELEMENT_TYPES = new ByteOpenHashSet(Arrays.asList((byte)1, (byte)2, (byte)3, (byte)4, (byte)5, (byte)6));
-   private static final Formatting NAME_COLOR = Formatting.field_1075;
-   private static final Formatting STRING_COLOR = Formatting.field_1060;
-   private static final Formatting NUMBER_COLOR = Formatting.field_1065;
-   private static final Formatting TYPE_SUFFIX_COLOR = Formatting.field_1061;
+   private static final Formatting NAME_COLOR = Formatting.AQUA;
+   private static final Formatting STRING_COLOR = Formatting.GREEN;
+   private static final Formatting NUMBER_COLOR = Formatting.GOLD;
+   private static final Formatting TYPE_SUFFIX_COLOR = Formatting.RED;
    private static final Pattern SIMPLE_NAME = Pattern.compile("[A-Za-z0-9._+-]+");
    private static final String KEY_VALUE_SEPARATOR = String.valueOf(':');
    private static final String ENTRY_SEPARATOR = String.valueOf(',');
@@ -66,45 +66,45 @@ public class MyNbtTextFormatter implements NbtElementVisitor {
    }
 
    public void visitString(NbtString element) {
-      String string = NbtString.escape(element.comp_3831());
+      String string = NbtString.escape(element.value());
       String string2 = string.substring(0, 1);
       MutableText text = Text.literal(string.substring(1, string.length() - 1)).formatted(STRING_COLOR);
       this.result = Text.literal(string2).append(text).append(string2);
    }
 
    public void visitByte(NbtByte element) {
-      if (element.comp_3817() == 0) {
+      if (element.value() == 0) {
          this.result = Text.literal("false").formatted(NUMBER_COLOR);
-      } else if (element.comp_3817() == 1) {
+      } else if (element.value() == 1) {
          this.result = Text.literal("true").formatted(NUMBER_COLOR);
       } else {
          MutableText text = Text.literal("b").formatted(TYPE_SUFFIX_COLOR);
-         this.result = Text.literal(String.valueOf(element.comp_3817())).append(text).formatted(NUMBER_COLOR);
+         this.result = Text.literal(String.valueOf(element.value())).append(text).formatted(NUMBER_COLOR);
       }
    }
 
    public void visitShort(NbtShort element) {
       MutableText text = Text.literal("s").formatted(TYPE_SUFFIX_COLOR);
-      this.result = Text.literal(String.valueOf(element.comp_3822())).append(text).formatted(NUMBER_COLOR);
+      this.result = Text.literal(String.valueOf(element.value())).append(text).formatted(NUMBER_COLOR);
    }
 
    public void visitInt(NbtInt element) {
-      this.result = Text.literal(String.valueOf(element.comp_3820())).formatted(NUMBER_COLOR);
+      this.result = Text.literal(String.valueOf(element.value())).formatted(NUMBER_COLOR);
    }
 
    public void visitLong(NbtLong element) {
       MutableText text = Text.literal("L").formatted(TYPE_SUFFIX_COLOR);
-      this.result = Text.literal(String.valueOf(element.comp_3821())).append(text).formatted(NUMBER_COLOR);
+      this.result = Text.literal(String.valueOf(element.value())).append(text).formatted(NUMBER_COLOR);
    }
 
    public void visitFloat(NbtFloat element) {
       MutableText text = Text.literal("f").formatted(TYPE_SUFFIX_COLOR);
-      this.result = Text.literal(String.valueOf(element.comp_3819())).append(text).formatted(NUMBER_COLOR);
+      this.result = Text.literal(String.valueOf(element.value())).append(text).formatted(NUMBER_COLOR);
    }
 
    public void visitDouble(NbtDouble element) {
       MutableText text = Text.literal("d").formatted(TYPE_SUFFIX_COLOR);
-      this.result = Text.literal(String.valueOf(element.comp_3818())).append(text).formatted(NUMBER_COLOR);
+      this.result = Text.literal(String.valueOf(element.value())).append(text).formatted(NUMBER_COLOR);
    }
 
    public void visitByteArray(NbtByteArray element) {

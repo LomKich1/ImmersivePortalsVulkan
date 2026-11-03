@@ -12,7 +12,7 @@ import qouteall.imm_ptl.core.render.context_management.WorldRenderInfo;
 @Mixin({GameRenderer.class})
 public class MixinGameRenderer_B {
    @Inject(
-      method = {"Lnet/minecraft/GameRenderer;updateCrosshairTarget(F)V"},
+      method = {"Lnet/minecraft/client/render/GameRenderer;updateCrosshairTarget(F)V"},
       at = {@At("HEAD")},
       cancellable = true
    )
@@ -23,7 +23,7 @@ public class MixinGameRenderer_B {
    }
 
    @Inject(
-      method = {"Lnet/minecraft/GameRenderer;updateCrosshairTarget(F)V"},
+      method = {"Lnet/minecraft/client/render/GameRenderer;updateCrosshairTarget(F)V"},
       at = {@At("RETURN")}
    )
    private void onUpdateTargetedEntityFinish(float partialTick, CallbackInfo ci) {

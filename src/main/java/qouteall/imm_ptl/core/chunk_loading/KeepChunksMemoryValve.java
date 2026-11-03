@@ -8,9 +8,9 @@ import java.lang.management.MemoryType;
 import java.lang.management.MemoryUsage;
 import java.util.List;
 import java.util.Locale;
-import net.minecraft.text.Text;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 

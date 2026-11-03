@@ -17,40 +17,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import net.minecraft.command.DefaultPermissions;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.command.argument.DimensionArgumentType;
-import net.minecraft.block.Blocks;
-import net.minecraft.command.argument.BlockPosArgumentType;
-import net.minecraft.command.argument.Vec3ArgumentType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
 import net.minecraft.block.BlockState;
-import net.minecraft.world.chunk.EmptyChunk;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.util.Identifier;
+import net.minecraft.block.Blocks;
+import net.minecraft.command.DefaultPermissions;
+import net.minecraft.command.argument.BlockPosArgumentType;
+import net.minecraft.command.argument.DimensionArgumentType;
+import net.minecraft.command.argument.Vec3ArgumentType;
+import net.minecraft.entity.Entity;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.DynamicRegistryManager.Immutable;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ChunkLevelManager;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicket;
 import net.minecraft.server.world.ChunkTicketType;
-import net.minecraft.util.profiler.ProfilerSystem;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.entity.EntityLookup;
 import net.minecraft.server.world.ServerEntityManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.DynamicRegistryManager.class_6890;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.profiler.ProfilerSystem;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.EmptyChunk;
+import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.entity.EntityLookup;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import qouteall.imm_ptl.core.CHelper;
@@ -117,20 +117,13 @@ public class PortalDebugCommands {
          McRemoteProcedureCall.tellClientToInvoke(player, "qouteall.imm_ptl.core.render.TransformationManager.RemoteCallables.disableIsometricView");
          return 0;
       }));
-      builder.then(
-         CommandManager.literal("align")
-            .executes(
-               context -> {
-                  ServerPlayerEntity player = ((ServerCommandSource)context.getSource()).getPlayerOrThrow();
-                  Vec3d pos = player.getEntityPos();
-                  Vec3d newPos = new Vec3d(
-                     Math.round(pos.x * 2.0) / 2.0, Math.round(pos.y * 2.0) / 2.0, Math.round(pos.z * 2.0) / 2.0
-                  );
-                  player.networkHandler.requestTeleport(newPos.x, newPos.y, newPos.z, 45.0F, 30.0F);
-                  return 0;
-               }
-            )
-      );
+      builder.then(CommandManager.literal("align").executes(context -> {
+         ServerPlayerEntity player = ((ServerCommandSource)context.getSource()).getPlayerOrThrow();
+         Vec3d pos = player.getEntityPos();
+         Vec3d newPos = new Vec3d(Math.round(pos.x * 2.0) / 2.0, Math.round(pos.y * 2.0) / 2.0, Math.round(pos.z * 2.0) / 2.0);
+         player.networkHandler.requestTeleport(newPos.x, newPos.y, newPos.z, 45.0F, 30.0F);
+         return 0;
+      }));
       builder.then(
          ((LiteralArgumentBuilder)CommandManager.literal("profile")
                .then(
@@ -220,11 +213,11 @@ public class PortalDebugCommands {
                            ServerPlayerEntity player = ((ServerCommandSource)context.getSource()).getPlayerOrThrow();
                            ChunkPos center = new ChunkPos(BlockPos.ofFloored(player.getEntityPos()));
                            invokeEraseChunk(
-                              player.getServerWorld(),
+                              player.getEntityWorld(),
                               center,
                               IntegerArgumentType.getInteger(context, "rChunks"),
-                              McHelper.getMinY(player.getServerWorld()),
-                              McHelper.getMaxYExclusive(player.getServerWorld())
+                              McHelper.getMinY(player.getEntityWorld()),
+                              McHelper.getMaxYExclusive(player.getEntityWorld())
                            );
                            return 0;
                         }
@@ -238,7 +231,7 @@ public class PortalDebugCommands {
                                     ServerPlayerEntity player = ((ServerCommandSource)context.getSource()).getPlayerOrThrow();
                                     ChunkPos center = new ChunkPos(BlockPos.ofFloored(player.getEntityPos()));
                                     invokeEraseChunk(
-                                       player.getServerWorld(),
+                                       player.getEntityWorld(),
                                        center,
                                        IntegerArgumentType.getInteger(context, "rChunks"),
                                        IntegerArgumentType.getInteger(context, "downY"),
@@ -266,7 +259,7 @@ public class PortalDebugCommands {
             .executes(
                context -> {
                   ServerPlayerEntity player = ((ServerCommandSource)context.getSource()).getPlayerOrThrow();
-                  List<Entity> entities = player.getServerWorld()
+                  List<Entity> entities = player.getEntityWorld()
                      .getEntitiesByClass(Entity.class, new Box(player.getEntityPos(), player.getEntityPos()).expand(32.0), e -> true);
                   McHelper.serverLog(player, entities.stream().<CharSequence>map(Entity::toString).collect(Collectors.joining("\n")));
                   return 0;
@@ -312,14 +305,17 @@ public class PortalDebugCommands {
       builder.then(
          ((LiteralArgumentBuilder)CommandManager.literal("report_chunk_at")
                .requires(serverCommandSource -> serverCommandSource.getPermissions().hasPermission(DefaultPermissions.GAMEMASTERS)))
-            .then(CommandManager.argument("dim", DimensionArgumentType.dimension()).then(CommandManager.argument("pos", BlockPosArgumentType.blockPos()).executes(context -> {
-               ServerWorld world = DimensionArgumentType.getDimensionArgument(context, "dim");
-               ServerPlayerEntity player = ((ServerCommandSource)context.getSource()).getPlayerOrThrow();
-               BlockPos pos = BlockPosArgumentType.getBlockPos(context, "pos");
-               ChunkPos chunkPos = new ChunkPos(pos);
-               doReportChunkStatus(chunkPos.x, chunkPos.z, world, player);
-               return 0;
-            })))
+            .then(
+               CommandManager.argument("dim", DimensionArgumentType.dimension())
+                  .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos()).executes(context -> {
+                     ServerWorld world = DimensionArgumentType.getDimensionArgument(context, "dim");
+                     ServerPlayerEntity player = ((ServerCommandSource)context.getSource()).getPlayerOrThrow();
+                     BlockPos pos = BlockPosArgumentType.getBlockPos(context, "pos");
+                     ChunkPos chunkPos = new ChunkPos(pos);
+                     doReportChunkStatus(chunkPos.x, chunkPos.z, world, player);
+                     return 0;
+                  }))
+            )
       );
       builder.then(
          CommandManager.literal("report_player_status")
@@ -329,10 +325,10 @@ public class PortalDebugCommands {
                   CHelper.printChat(
                      String.format(
                         "On Server %s %s removal:%s added:%s age:%s",
-                        player.getServerWorld().getRegistryKey().getValue(),
+                        player.getEntityWorld().getRegistryKey().getValue(),
                         player.getBlockPos(),
                         player.getRemovalReason(),
-                        player.getServerWorld().getEntityById(player.getId()) != null,
+                        player.getEntityWorld().getEntityById(player.getId()) != null,
                         player.age
                      )
                   );
@@ -387,31 +383,33 @@ public class PortalDebugCommands {
       builder.then(
          ((LiteralArgumentBuilder)CommandManager.literal("report_chunk_ticket_stat")
                .requires(serverCommandSource -> serverCommandSource.getPermissions().hasPermission(DefaultPermissions.GAMEMASTERS)))
-            .executes(context -> {
-               ServerWorld world = ((ServerCommandSource)context.getSource()).getWorld();
-               Iterable<ChunkHolder> chunkHolders = ((IEChunkMap_Accessor)world.method_14178().chunkLoadingManager).ip_getVisibleChunkMap().values();
-               Object2IntOpenHashMap<ChunkTicketType> stat = new Object2IntOpenHashMap();
+            .executes(
+               context -> {
+                  ServerWorld world = ((ServerCommandSource)context.getSource()).getWorld();
+                  Iterable<ChunkHolder> chunkHolders = ((IEChunkMap_Accessor)world.getChunkManager().chunkLoadingManager).ip_getVisibleChunkMap().values();
+                  Object2IntOpenHashMap<ChunkTicketType> stat = new Object2IntOpenHashMap();
 
-               for (ChunkHolder chunkHolder : chunkHolders) {
-                  long chunkPos = chunkHolder.getPos().toLong();
+                  for (ChunkHolder chunkHolder : chunkHolders) {
+                     long chunkPos = chunkHolder.getPos().toLong();
 
-                  for (ChunkTicket ticket : ((IEDistanceManager)ImmPtlChunkTickets.getDistanceManager(world)).portal_getTicketSet(chunkPos)) {
-                     stat.addTo(ticket.getType(), 1);
+                     for (ChunkTicket ticket : ((IEDistanceManager)ImmPtlChunkTickets.getDistanceManager(world)).portal_getTicketSet(chunkPos)) {
+                        stat.addTo(ticket.getType(), 1);
+                     }
                   }
+
+                  ((ServerCommandSource)context.getSource()).sendFeedback(() -> Text.literal(""), false);
+                  ObjectIterator var11 = stat.object2IntEntrySet().iterator();
+
+                  while (var11.hasNext()) {
+                     it.unimi.dsi.fastutil.objects.Object2IntMap.Entry<ChunkTicketType> entry = (it.unimi.dsi.fastutil.objects.Object2IntMap.Entry<ChunkTicketType>)var11.next();
+                     ChunkTicketType ticketType = (ChunkTicketType)entry.getKey();
+                     ((ServerCommandSource)context.getSource())
+                        .sendFeedback(() -> Text.literal(getTicketTypeName(ticketType) + " " + entry.getIntValue()), false);
+                  }
+
+                  return 0;
                }
-
-               ((ServerCommandSource)context.getSource()).sendFeedback(() -> Text.literal(""), false);
-               ObjectIterator var11 = stat.object2IntEntrySet().iterator();
-
-               while (var11.hasNext()) {
-                  it.unimi.dsi.fastutil.objects.Object2IntMap.Entry<ChunkTicketType> entry = (it.unimi.dsi.fastutil.objects.Object2IntMap.Entry<ChunkTicketType>)var11.next();
-                  ChunkTicketType ticketType = (ChunkTicketType)entry.getKey();
-                  ((ServerCommandSource)context.getSource())
-                     .sendFeedback(() -> Text.literal(getTicketTypeName(ticketType) + " " + entry.getIntValue()), false);
-               }
-
-               return 0;
-            })
+            )
       );
       builder.then(
          ((LiteralArgumentBuilder)CommandManager.literal("report_per_player_chunk_loading")
@@ -450,8 +448,8 @@ public class PortalDebugCommands {
                .requires(serverCommandSource -> serverCommandSource.getPermissions().hasPermission(DefaultPermissions.ADMINS)))
             .executes(
                context -> {
-                  class_6890 registryAccess = MiscHelper.getServer().getRegistryManager();
-                  Registry<Biome> biomes = registryAccess.get(RegistryKeys.BIOME);
+                  Immutable registryAccess = MiscHelper.getServer().getRegistryManager();
+                  Registry<Biome> biomes = registryAccess.getOrThrow(RegistryKeys.BIOME);
                   Map<String, Integer> map = new HashMap<>();
 
                   for (Entry<RegistryKey<Biome>, Biome> entry : biomes.getEntrySet()) {
@@ -461,7 +459,9 @@ public class PortalDebugCommands {
                   }
 
                   McRemoteProcedureCall.tellClientToInvoke(
-                     ((ServerCommandSource)context.getSource()).getPlayerOrThrow(), "qouteall.imm_ptl.core.ClientWorldLoader.RemoteCallables.checkBiomeRegistry", map
+                     ((ServerCommandSource)context.getSource()).getPlayerOrThrow(),
+                     "qouteall.imm_ptl.core.ClientWorldLoader.RemoteCallables.checkBiomeRegistry",
+                     map
                   );
                   return 0;
                }
@@ -472,7 +472,9 @@ public class PortalDebugCommands {
             .executes(
                context -> {
                   McRemoteProcedureCall.tellClientToInvoke(
-                     ((ServerCommandSource)context.getSource()).getPlayerOrThrow(), "qouteall.imm_ptl.core.commands.ClientDebugCommand.RemoteCallables.setNoFog", true
+                     ((ServerCommandSource)context.getSource()).getPlayerOrThrow(),
+                     "qouteall.imm_ptl.core.commands.ClientDebugCommand.RemoteCallables.setNoFog",
+                     true
                   );
                   return 0;
                }
@@ -483,7 +485,9 @@ public class PortalDebugCommands {
             .executes(
                context -> {
                   McRemoteProcedureCall.tellClientToInvoke(
-                     ((ServerCommandSource)context.getSource()).getPlayerOrThrow(), "qouteall.imm_ptl.core.commands.ClientDebugCommand.RemoteCallables.setNoFog", false
+                     ((ServerCommandSource)context.getSource()).getPlayerOrThrow(),
+                     "qouteall.imm_ptl.core.commands.ClientDebugCommand.RemoteCallables.setNoFog",
+                     false
                   );
                   return 0;
                }
@@ -491,7 +495,7 @@ public class PortalDebugCommands {
       );
       builder.then(CommandManager.literal("report_air").executes(context -> {
          ServerPlayerEntity player = ((ServerCommandSource)context.getSource()).getPlayerOrThrow();
-         BlockState blockState = player.getServerWorld().getBlockState(player.getBlockPos());
+         BlockState blockState = player.getEntityWorld().getBlockState(player.getBlockPos());
          ((ServerCommandSource)context.getSource()).sendFeedback(() -> blockState.getBlock().getName(), false);
          return 0;
       }));
@@ -500,7 +504,8 @@ public class PortalDebugCommands {
             .executes(
                context -> {
                   McRemoteProcedureCall.tellClientToInvoke(
-                     ((ServerCommandSource)context.getSource()).getPlayerOrThrow(), "qouteall.imm_ptl.core.commands.ClientDebugCommand.RemoteCallables.testInvalidRPC"
+                     ((ServerCommandSource)context.getSource()).getPlayerOrThrow(),
+                     "qouteall.imm_ptl.core.commands.ClientDebugCommand.RemoteCallables.testInvalidRPC"
                   );
                   return 0;
                }
@@ -528,7 +533,7 @@ public class PortalDebugCommands {
          McHelper.serverLog(player, "no chunk holder");
       } else {
          McHelper.serverLog(player, String.format("chunk holder level:%s %s", chunkHolder.getLevel(), chunk == null ? "" : chunk.getLevelType()));
-         ChunkLevelManager distanceManager = ((IEServerChunkCache)world.method_14178()).ip_getDistanceManager();
+         ChunkLevelManager distanceManager = ((IEServerChunkCache)world.getChunkManager()).ip_getDistanceManager();
 
          for (ChunkTicket ticket : ((IEDistanceManager)distanceManager).portal_getTicketSet(longChunkPos)) {
             McHelper.serverLog(player, getTicketTypeName(ticket.getType()) + " " + ticket);
@@ -550,7 +555,7 @@ public class PortalDebugCommands {
             world.getRegistryKey().getValue(),
             ImmPtlChunkTracking.getLoadedChunkNum(world.getRegistryKey()),
             dimTicketManager.getLoadedChunkNum(),
-            world.method_14178().chunkLoadingManager.getLoadedChunkCount(),
+            world.getChunkManager().chunkLoadingManager.getLoadedChunkCount(),
             ((IELevelEntityGetterAdapter)entityLookup).getIndex().size(),
             ((IELevelEntityGetterAdapter)entityLookup).getCache().sectionCount()
          )
@@ -586,7 +591,7 @@ public class PortalDebugCommands {
       for (int x = 0; x < 16; x++) {
          for (int z = 0; z < 16; z++) {
             for (int y = yStart; y < yEnd; y++) {
-               world.setBlockState(new BlockPos(chunkPos.getStartX() + x, y, chunkPos.getStartZ() + z), Blocks.field_10124.getDefaultState());
+               world.setBlockState(new BlockPos(chunkPos.getStartX() + x, y, chunkPos.getStartZ() + z), Blocks.AIR.getDefaultState());
             }
          }
       }

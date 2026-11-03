@@ -6,12 +6,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Frustum;
 import net.minecraft.client.option.GraphicsMode;
+import net.minecraft.client.render.Frustum;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -242,7 +242,7 @@ public abstract class PortalRenderer {
 
    public static void switchToCorrectRenderer() {
       if (!PortalRendering.isRendering()) {
-         if (MinecraftClient.getInstance().options.getPreset().getValue() == GraphicsMode.field_25429 && !fabulousWarned) {
+         if (MinecraftClient.getInstance().options.getPreset().getValue() == GraphicsMode.FABULOUS && !fabulousWarned) {
             fabulousWarned = true;
             CHelper.printChat(Text.translatable("imm_ptl.fabulous_warning"));
          }

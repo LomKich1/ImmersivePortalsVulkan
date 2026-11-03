@@ -6,8 +6,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.function.Predicate;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.world.ServerWorld;
 import qouteall.imm_ptl.core.portal.nether_portal.BlockPortalShape;
 import qouteall.imm_ptl.core.portal.nether_portal.NetherPortalGeneration;
 

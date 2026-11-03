@@ -2,10 +2,10 @@ package qouteall.imm_ptl.core.portal.global_portals;
 
 import java.util.function.Predicate;
 import net.minecraft.entity.EntityType;
-import net.minecraft.world.World;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.imm_ptl.core.portal.PortalExtension;
@@ -36,9 +36,7 @@ public class VerticalConnectingPortal extends GlobalTrackedPortal {
       connect(from, connectorType, to, false);
    }
 
-   public static void connect(
-      RegistryKey<World> from, VerticalConnectingPortal.ConnectorType connectorType, RegistryKey<World> to, boolean respectSpaceRatio
-   ) {
+   public static void connect(RegistryKey<World> from, VerticalConnectingPortal.ConnectorType connectorType, RegistryKey<World> to, boolean respectSpaceRatio) {
       removeConnectingPortal(connectorType, from);
       ServerWorld fromWorld = MiscHelper.getServer().getWorld(from);
       ServerWorld toWorld = MiscHelper.getServer().getWorld(to);
@@ -46,7 +44,7 @@ public class VerticalConnectingPortal extends GlobalTrackedPortal {
          fromWorld,
          connectorType,
          toWorld,
-         respectSpaceRatio ? fromWorld.getDimension().comp_646() / toWorld.getDimension().comp_646() : 1.0,
+         respectSpaceRatio ? fromWorld.getDimension().coordinateScale() / toWorld.getDimension().coordinateScale() : 1.0,
          false,
          0.0,
          McHelper.getMinY(fromWorld),

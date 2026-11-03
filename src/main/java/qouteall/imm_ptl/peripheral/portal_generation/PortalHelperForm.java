@@ -2,13 +2,13 @@ package qouteall.imm_ptl.peripheral.portal_generation;
 
 import com.mojang.serialization.MapCodec;
 import java.util.function.Predicate;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.text.Text;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.imm_ptl.core.portal.PortalExtension;
@@ -39,11 +39,11 @@ public class PortalHelperForm extends AbstractDiligentForm {
       ServerWorld world = McHelper.getServerWorld(info.from);
 
       for (BlockPos blockPos : info.fromShape.area) {
-         world.setBlockState(blockPos, Blocks.field_10124.getDefaultState());
+         world.setBlockState(blockPos, Blocks.AIR.getDefaultState());
       }
 
-      world.setBlockState(info.fromShape.firstFramePos, Blocks.field_10124.getDefaultState());
-      world.setBlockState(info.toShape.firstFramePos, Blocks.field_10124.getDefaultState());
+      world.setBlockState(info.fromShape.firstFramePos, Blocks.AIR.getDefaultState());
+      world.setBlockState(info.toShape.firstFramePos, Blocks.AIR.getDefaultState());
       Portal portal = info.createTemplatePortal(Portal.ENTITY_TYPE);
       PortalExtension.get(portal).bindCluster = true;
       Portal flipped = PortalManipulation.createFlippedPortal(portal, Portal.ENTITY_TYPE);

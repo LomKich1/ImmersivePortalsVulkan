@@ -1,4 +1,4 @@
-accessWidener v2 named
+accessWidener	v2	named
 transitive-accessible	field	net/minecraft/server/MinecraftServer	session	Lnet/minecraft/world/level/storage/LevelStorage$Session;
 transitive-accessible	field	net/minecraft/world/biome/source/BiomeAccess	seed	J
 transitive-accessible	field	net/minecraft/util/profiler/ProfilerSystem	TIMEOUT_NANOSECONDS	J

@@ -2,13 +2,13 @@ package qouteall.imm_ptl.peripheral.dim_stack;
 
 import java.util.List;
 import java.util.function.Consumer;
-import net.minecraft.world.World;
-import net.minecraft.text.Text;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.text.Text;
+import net.minecraft.world.World;
 
 public class SelectDimensionScreen extends Screen {
    public final DimStackScreen parent;
@@ -46,9 +46,9 @@ public class SelectDimensionScreen extends Screen {
       this.client.setScreen(this.parent);
    }
 
-   public void render(DrawContext guiGraphics, int mouseX, int mouseY, float delta) {
-      super.render(guiGraphics, mouseX, mouseY, delta);
-      this.dimListWidget.render(guiGraphics, mouseX, mouseY, delta);
-      guiGraphics.drawCenteredTextWithShadow(this.textRenderer, this.title.getString(), this.width / 2, 10, -1);
+   public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+      super.render(context, mouseX, mouseY, deltaTicks);
+      this.dimListWidget.render(context, mouseX, mouseY, deltaTicks);
+      context.drawCenteredTextWithShadow(this.textRenderer, this.title.getString(), this.width / 2, 10, -1);
    }
 }

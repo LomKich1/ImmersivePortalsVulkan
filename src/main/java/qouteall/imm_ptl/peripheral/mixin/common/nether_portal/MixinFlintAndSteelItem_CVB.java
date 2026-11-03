@@ -1,19 +1,19 @@
 package qouteall.imm_ptl.peripheral.mixin.common.nether_portal;
 
-import net.minecraft.util.ActionResult;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.FlintAndSteelItem;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.World;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.Block;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.entity.EntityPose;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,7 +26,7 @@ import qouteall.imm_ptl.peripheral.portal_generation.IntrinsicPortalGeneration;
 @Mixin({FlintAndSteelItem.class})
 public class MixinFlintAndSteelItem_CVB {
    @Inject(
-      method = {"Lnet/minecraft/FlintAndSteelItem;useOnBlock(Lnet/minecraft/ItemUsageContext;)Lnet/minecraft/ActionResult;"},
+      method = {"Lnet/minecraft/item/FlintAndSteelItem;useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;"},
       at = {@At("HEAD")},
       cancellable = true
    )
@@ -35,7 +35,7 @@ public class MixinFlintAndSteelItem_CVB {
       if (!world.isClient()) {
          BlockPos targetPos = context.getBlockPos();
          Direction side = context.getSide();
-         BlockPos firePos = targetPos.method_10093(side);
+         BlockPos firePos = targetPos.offset(side);
          BlockState targetBlockState = world.getBlockState(targetPos);
          Block targetBlock = targetBlockState.getBlock();
          if (BreakableMirror.isGlass((World)world, targetPos) && IPGlobal.enableMirrorCreation) {
@@ -50,10 +50,10 @@ public class MixinFlintAndSteelItem_CVB {
             return;
          }
 
-         if (targetBlock == Blocks.field_10540) {
+         if (targetBlock == Blocks.OBSIDIAN) {
             PlayerEntity player = context.getPlayer();
             if (player != null) {
-               if (player.getPose() == EntityPose.field_18081) {
+               if (player.getPose() == EntityPose.CROUCHING) {
                   boolean succeeded = IntrinsicPortalGeneration.onCrouchingPlayerIgnite((ServerWorld)world, (ServerPlayerEntity)player, firePos);
                   if (succeeded) {
                      cir.setReturnValue(ActionResult.SUCCESS);

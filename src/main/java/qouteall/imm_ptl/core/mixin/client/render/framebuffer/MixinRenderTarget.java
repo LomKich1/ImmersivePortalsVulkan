@@ -51,7 +51,7 @@ public abstract class MixinRenderTarget implements IEFrameBuffer {
    }
 
    @Inject(
-      method = {"Lnet/minecraft/Framebuffer;copyDepthFrom(Lnet/minecraft/Framebuffer;)V"},
+      method = {"Lnet/minecraft/client/gl/Framebuffer;copyDepthFrom(Lnet/minecraft/client/gl/Framebuffer;)V"},
       at = {@At("RETURN")}
    )
    private void onCopiedDepthFrom(Framebuffer framebuffer, CallbackInfo ci) {

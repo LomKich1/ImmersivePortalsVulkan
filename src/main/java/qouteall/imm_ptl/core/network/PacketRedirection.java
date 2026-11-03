@@ -8,27 +8,27 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.world.World;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
-import net.minecraft.util.Identifier;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.network.packet.BundleSplitterPacket;
-import net.minecraft.network.packet.BundlePacket;
-import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
-import net.minecraft.server.network.ServerCommonNetworkHandler;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.network.state.PlayStateFactories;
-import net.minecraft.network.state.NetworkState;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload.class_9154;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.BundlePacket;
+import net.minecraft.network.packet.BundleSplitterPacket;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.CustomPayload.Id;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
+import net.minecraft.network.state.NetworkState;
+import net.minecraft.network.state.PlayStateFactories;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerCommonNetworkHandler;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -88,7 +88,9 @@ public class PacketRedirection {
       return serverPacketRedirection.get();
    }
 
-   public static void sendRedirectedPacket(ServerPlayNetworkHandler serverPlayNetworkHandler, Packet<ClientPlayPacketListener> packet, RegistryKey<World> dimension) {
+   public static void sendRedirectedPacket(
+      ServerPlayNetworkHandler serverPlayNetworkHandler, Packet<ClientPlayPacketListener> packet, RegistryKey<World> dimension
+   ) {
       if (getForceRedirectDimension() == dimension) {
          serverPlayNetworkHandler.sendPacket(packet);
       } else {
@@ -100,7 +102,9 @@ public class PacketRedirection {
       Validate.isTrue(getForceRedirectDimension() != null);
    }
 
-   public static Packet<ClientPlayPacketListener> createRedirectedMessage(MinecraftServer server, RegistryKey<World> dimension, Packet<ClientPlayPacketListener> packet) {
+   public static Packet<ClientPlayPacketListener> createRedirectedMessage(
+      MinecraftServer server, RegistryKey<World> dimension, Packet<ClientPlayPacketListener> packet
+   ) {
       if (isRedirectPacket(packet)) {
          return packet;
       } else {
@@ -126,7 +130,7 @@ public class PacketRedirection {
    }
 
    public static boolean isRedirectPacket(Packet<?> packet) {
-      return packet instanceof CustomPayloadS2CPacket customPayloadPacket && customPayloadPacket.comp_1646() instanceof PacketRedirection.Payload;
+      return packet instanceof CustomPayloadS2CPacket customPayloadPacket && customPayloadPacket.payload() instanceof PacketRedirection.Payload;
    }
 
    public static <R> R withForceBundle(Supplier<R> func) {
@@ -173,7 +177,7 @@ public class PacketRedirection {
    }
 
    public record Payload(int dimensionIntId, Packet<? extends ClientPlayPacketListener> packet) implements CustomPayload {
-      public static final class_9154<PacketRedirection.Payload> TYPE = new class_9154(PacketRedirection.payloadId);
+      public static final Id<PacketRedirection.Payload> TYPE = new Id(PacketRedirection.payloadId);
       public static final PacketCodec<RegistryByteBuf, PacketRedirection.Payload> CODEC = PacketCodec.ofStatic(
          (b, p) -> p.write(b), PacketRedirection.Payload::read
       );
@@ -181,12 +185,12 @@ public class PacketRedirection {
       public void write(RegistryByteBuf buf) {
          Validate.notNull(this.packet, "packet is null", new Object[0]);
          buf.writeVarInt(this.dimensionIntId);
-         PacketRedirection.PLACEHOLDER_PROTOCOL_INFO.comp_2236().encode(buf, this.packet);
+         PacketRedirection.PLACEHOLDER_PROTOCOL_INFO.codec().encode(buf, this.packet);
       }
 
       public static PacketRedirection.Payload read(PacketByteBuf buf) {
          int dimensionIntId = buf.readVarInt();
-         Packet<ClientPlayPacketListener> packet = (Packet<ClientPlayPacketListener>)PacketRedirection.PLACEHOLDER_PROTOCOL_INFO.comp_2236().decode(buf);
+         Packet<ClientPlayPacketListener> packet = (Packet<ClientPlayPacketListener>)PacketRedirection.PLACEHOLDER_PROTOCOL_INFO.codec().decode(buf);
          return new PacketRedirection.Payload(dimensionIntId, packet);
       }
 
@@ -196,7 +200,7 @@ public class PacketRedirection {
       }
 
       @NotNull
-      public class_9154<? extends CustomPayload> getId() {
+      public Id<? extends CustomPayload> getId() {
          return TYPE;
       }
    }

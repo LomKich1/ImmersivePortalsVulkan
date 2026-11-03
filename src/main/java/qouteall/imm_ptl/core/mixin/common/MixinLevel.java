@@ -1,9 +1,9 @@
 package qouteall.imm_ptl.core.mixin.common;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
-import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.MutableWorldProperties;
+import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLookup;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,7 +37,7 @@ public abstract class MixinLevel implements IEWorld {
    protected abstract EntityLookup<Entity> getEntityLookup();
 
    @Inject(
-      method = {"Lnet/minecraft/World;initWeatherGradients()V"},
+      method = {"Lnet/minecraft/world/World;initWeatherGradients()V"},
       at = {@At("TAIL")}
    )
    private void onInitWeatherGradients(CallbackInfo ci) {

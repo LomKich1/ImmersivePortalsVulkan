@@ -4,13 +4,13 @@ import com.mojang.datafixers.DataFixer;
 import java.lang.ref.WeakReference;
 import java.net.Proxy;
 import java.util.concurrent.Executor;
-import net.minecraft.world.chunk.ChunkLoadProgress;
 import net.minecraft.resource.ResourcePackManager;
-import net.minecraft.util.thread.ReentrantThreadExecutor;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.SaveLoader;
 import net.minecraft.util.ApiServices;
-import net.minecraft.world.level.storage.LevelStorage.class_5143;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.thread.ReentrantThreadExecutor;
+import net.minecraft.world.chunk.ChunkLoadProgress;
+import net.minecraft.world.level.storage.LevelStorage.Session;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,7 +25,7 @@ import qouteall.q_misc_util.ducks.IEMinecraftServer_Misc;
 public abstract class MixinMinecraftServer_Misc extends ReentrantThreadExecutor implements IEMinecraftServer_Misc {
    @Shadow
    @Final
-   public class_5143 session;
+   public Session session;
    @Shadow
    @Final
    private Executor workerExecutor;
@@ -47,7 +47,7 @@ public abstract class MixinMinecraftServer_Misc extends ReentrantThreadExecutor 
    )
    private void onConstruct(
       Thread thread,
-      class_5143 levelStorageAccess,
+      Session levelStorageAccess,
       ResourcePackManager packRepository,
       SaveLoader worldStem,
       Proxy proxy,
@@ -68,7 +68,7 @@ public abstract class MixinMinecraftServer_Misc extends ReentrantThreadExecutor 
    }
 
    @Override
-   public class_5143 ip_getStorageSource() {
+   public Session ip_getStorageSource() {
       return this.session;
    }
 }

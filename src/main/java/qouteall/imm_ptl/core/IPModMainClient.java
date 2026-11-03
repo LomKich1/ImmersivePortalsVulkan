@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.core;
 
-import net.minecraft.util.Formatting;
-import net.minecraft.text.Text;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import qouteall.imm_ptl.core.collision.CollisionHelper;
 import qouteall.imm_ptl.core.commands.ClientDebugCommand;
 import qouteall.imm_ptl.core.compat.IPFlywheelCompat;
@@ -45,7 +45,7 @@ public class IPModMainClient {
                      if (IPMcHelper.isNvidiaVideocard() && !SodiumInterface.invoker.isSodiumPresent()) {
                         CHelper.printChat(
                            Text.translatable("imm_ptl.nvidia_warning")
-                              .formatted(Formatting.field_1061)
+                              .formatted(Formatting.RED)
                               .append(McHelper.getLinkText("https://github.com/CaffeineMC/sodium-fabric/issues/1486"))
                         );
                      }

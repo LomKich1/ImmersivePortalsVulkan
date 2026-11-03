@@ -10,21 +10,21 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.text.ClickEvent.RunCommand;
+import net.minecraft.util.Pair;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.hit.HitResult.Type;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.Text;
-import net.minecraft.util.Pair;
 import net.minecraft.world.RaycastContext;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.text.MutableText;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.hit.HitResult.class_240;
-import net.minecraft.text.ClickEvent.class_10609;
+import net.minecraft.world.World;
 import qouteall.imm_ptl.core.ducks.IERayTraceContext;
 import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.imm_ptl.core.portal.global_portals.GlobalPortalStorage;
@@ -83,9 +83,7 @@ public class IPMcHelper {
       CrossPortalEntityRenderer.onEntityTickClient(entity);
    }
 
-   public static List<Pair<Portal, Vec3d>> rayTracePortals(
-      World world, Vec3d start, Vec3d end, boolean includeGlobalPortals, Predicate<Portal> filter
-   ) {
+   public static List<Pair<Portal, Vec3d>> rayTracePortals(World world, Vec3d start, Vec3d end, boolean includeGlobalPortals, Predicate<Portal> filter) {
       Vec3d middle = start.multiply(0.5).add(end.multiply(0.5));
       int chunkRadius = (int)Math.ceil(Math.abs(start.distanceTo(end) / 2.0) / 16.0);
       List<Portal> nearby = McHelper.getEntitiesNearby(world, middle, Portal.class, chunkRadius * 16);
@@ -119,9 +117,7 @@ public class IPMcHelper {
       Vec3d end = context.getEnd();
       if (portals.size() > IPGlobal.maxPortalLayer) {
          Vec3d diff = end.subtract(start);
-         return new Pair(
-            BlockHitResult.createMissed(end, Direction.getFacing(diff.x, diff.y, diff.z), BlockPos.ofFloored(end)), portals
-         );
+         return new Pair(BlockHitResult.createMissed(end, Direction.getFacing(diff.x, diff.y, diff.z), BlockPos.ofFloored(end)), portals);
       } else {
          BlockHitResult hitResult = world.raycast(context);
          List<Pair<Portal, Vec3d>> rayTracedPortals = rayTracePortals(world, start, end, includeGlobalPortals, Portal::isInteractable);
@@ -138,9 +134,7 @@ public class IPMcHelper {
                betterContext.ip_setStart(portal.transformPoint(intersection)).ip_setEnd(portal.transformPoint(end));
                portals.add(portal);
                World destWorld = portal.getDestinationWorld();
-               Pair<BlockHitResult, List<Portal>> recursion = withSwitchedContext(
-                  destWorld, () -> rayTrace(destWorld, context, includeGlobalPortals, portals)
-               );
+               Pair<BlockHitResult, List<Portal>> recursion = withSwitchedContext(destWorld, () -> rayTrace(destWorld, context, includeGlobalPortals, portals));
                betterContext.ip_setStart(start).ip_setEnd(end);
                return recursion;
             }
@@ -153,24 +147,21 @@ public class IPMcHelper {
    }
 
    public static boolean hitResultIsMissedOrNull(HitResult hitResult) {
-      return hitResult == null || hitResult.getType() == class_240.field_1333;
+      return hitResult == null || hitResult.getType() == Type.MISS;
    }
 
    public static MutableText getTextWithCommand(MutableText component, String command) {
-      return component.styled(style -> style.withClickEvent(new class_10609(command)).withUnderline(true));
+      return component.styled(style -> style.withClickEvent(new RunCommand(command)).withUnderline(true));
    }
 
    public static Text getDisableWarningText(String warningKey) {
       return Text.literal(" ")
-         .append(
-            getTextWithCommand(Text.translatable("imm_ptl.disable_warning"), "/imm_ptl_client_debug disable_warning_for \"" + warningKey + "\"")
-         )
+         .append(getTextWithCommand(Text.translatable("imm_ptl.disable_warning"), "/imm_ptl_client_debug disable_warning_for \"" + warningKey + "\""))
          .append(" ");
    }
 
    public static Text getDisableUpdateCheckText() {
-      return Text.literal(" ")
-         .append(getTextWithCommand(Text.translatable("imm_ptl.disable_update_check"), "/imm_ptl_client_debug disable_update_check"));
+      return Text.literal(" ").append(getTextWithCommand(Text.translatable("imm_ptl.disable_update_check"), "/imm_ptl_client_debug disable_update_check"));
    }
 
    @Environment(EnvType.CLIENT)
@@ -184,7 +175,7 @@ public class IPMcHelper {
 
    public static byte[] bufToBytes(PacketByteBuf buf) {
       byte[] packetBytes = new byte[buf.readableBytes()];
-      buf.method_52979(packetBytes);
+      buf.readBytes(packetBytes);
       return packetBytes;
    }
 }

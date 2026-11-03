@@ -5,18 +5,18 @@ import java.util.List;
 import java.util.Optional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.Entity;
 import net.minecraft.SharedConstants;
-import net.minecraft.world.World;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.BlockState;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.util.Identifier;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.world.ClientChunkManager;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.McHelper;
@@ -31,7 +31,7 @@ import qouteall.q_misc_util.platform.Platform;
 
 public class O_O {
    public static boolean isDimensionalThreadingPresent = false;
-   private static final BlockState obsidianState = Blocks.field_10540.getDefaultState();
+   private static final BlockState obsidianState = Blocks.OBSIDIAN.getDefaultState();
 
    public static boolean isForge() {
       return Platform.get().isForgeLike();
@@ -81,7 +81,7 @@ public class O_O {
 
    @Nullable
    public static String getImmPtlModInfoUrl() {
-      String gameVersion = SharedConstants.getGameVersion().comp_4025();
+      String gameVersion = SharedConstants.getGameVersion().name();
       return isForge()
          ? "https://qouteall.fun/immptl_info/forge-%s.json".formatted(gameVersion)
          : "https://qouteall.fun/immptl_info/%s.json".formatted(gameVersion);

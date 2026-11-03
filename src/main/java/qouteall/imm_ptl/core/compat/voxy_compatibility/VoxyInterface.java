@@ -9,11 +9,11 @@ import java.util.Map.Entry;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.world.World;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;

@@ -1,9 +1,9 @@
 package qouteall.imm_ptl.core.mixin.client.sync;
 
-import net.minecraft.world.World;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.thread.ReentrantThreadExecutor;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,7 +19,7 @@ public abstract class MixinMinecraft_RedirectedPacket extends ReentrantThreadExe
    }
 
    @Inject(
-      method = {"Lnet/minecraft/MinecraftClient;createTask(Ljava/lang/Runnable;)Ljava/lang/Runnable;"},
+      method = {"Lnet/minecraft/client/MinecraftClient;createTask(Ljava/lang/Runnable;)Ljava/lang/Runnable;"},
       at = {@At("HEAD")},
       cancellable = true
    )

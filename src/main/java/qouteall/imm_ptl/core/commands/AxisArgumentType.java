@@ -14,35 +14,35 @@ import java.util.stream.Collectors;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Direction.class_2351;
+import net.minecraft.util.math.Direction.Axis;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.q_misc_util.platform.Platform;
 
-public class AxisArgumentType implements ArgumentType<class_2351> {
+public class AxisArgumentType implements ArgumentType<Axis> {
    public static final AxisArgumentType instance = new AxisArgumentType();
    public static final DynamicCommandExceptionType exceptionType = new DynamicCommandExceptionType(object -> Text.literal("Invalid Axis " + object));
 
-   public static <S> class_2351 getAxis(CommandContext<S> context, String argName) {
-      return (class_2351)context.getArgument(argName, class_2351.class);
+   public static <S> Axis getAxis(CommandContext<S> context, String argName) {
+      return (Axis)context.getArgument(argName, Axis.class);
    }
 
-   public class_2351 parse(StringReader reader) throws CommandSyntaxException {
+   public Axis parse(StringReader reader) throws CommandSyntaxException {
       String s = reader.readUnquotedString();
 
       return switch (s) {
-         case "x", "X" -> class_2351.field_11048;
-         case "y", "Y" -> class_2351.field_11052;
-         case "z", "Z" -> class_2351.field_11051;
+         case "x", "X" -> Axis.X;
+         case "y", "Y" -> Axis.Y;
+         case "z", "Z" -> Axis.Z;
          default -> throw exceptionType.createWithContext(reader, s);
       };
    }
 
    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-      return CommandSource.suggestMatching(Arrays.stream(class_2351.values()).map(Enum::name).collect(Collectors.toList()), builder);
+      return CommandSource.suggestMatching(Arrays.stream(Axis.values()).map(Enum::name).collect(Collectors.toList()), builder);
    }
 
    public Collection<String> getExamples() {
-      return Arrays.stream(class_2351.values()).map(Enum::toString).collect(Collectors.toList());
+      return Arrays.stream(Axis.values()).map(Enum::toString).collect(Collectors.toList());
    }
 
    public static void init() {

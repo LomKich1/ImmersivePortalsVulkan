@@ -17,19 +17,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import net.minecraft.util.profiler.Profilers;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.UnloadChunkS2CPacket;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.profiler.Profilers;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import qouteall.dimlib.api.DimensionAPI;
@@ -60,7 +60,7 @@ public class ImmPtlChunkTracking {
 
    public static void removePlayerFromChunkTrackersAndEntityTrackers(ServerPlayerEntity oldPlayer) {
       for (ServerWorld world : oldPlayer.server.getWorlds()) {
-         ServerChunkManager chunkManager = world.method_14178();
+         ServerChunkManager chunkManager = world.getChunkManager();
          IEChunkMap storage = (IEChunkMap)chunkManager.chunkLoadingManager;
          storage.ip_onPlayerUnload(oldPlayer);
       }
@@ -69,7 +69,7 @@ public class ImmPtlChunkTracking {
    }
 
    public static void onDimensionRemove(ServerWorld world) {
-      ServerChunkManager chunkManager = world.method_14178();
+      ServerChunkManager chunkManager = world.getChunkManager();
       IEChunkMap storage = (IEChunkMap)chunkManager.chunkLoadingManager;
       storage.ip_onDimensionRemove();
       forceRemoveDimension(world);
@@ -109,7 +109,9 @@ public class ImmPtlChunkTracking {
       while (var5.hasNext()) {
          ChunkLoader chunkLoader = (ChunkLoader)var5.next();
          RegistryKey<World> dimension = chunkLoader.dimension();
-         Long2ObjectOpenHashMap<Object2ObjectOpenHashMap<ServerPlayerEntity, ImmPtlChunkTracking.PlayerWatchRecord>> chunkRecordMap = getDimChunkWatchRecords(dimension);
+         Long2ObjectOpenHashMap<Object2ObjectOpenHashMap<ServerPlayerEntity, ImmPtlChunkTracking.PlayerWatchRecord>> chunkRecordMap = getDimChunkWatchRecords(
+            dimension
+         );
          ServerWorld world = server.getWorld(dimension);
          if (world == null) {
             LOGGER.warn("Dimension not loaded {} in chunk loader {}", dimension, chunkLoader);
@@ -196,7 +198,7 @@ public class ImmPtlChunkTracking {
                                     player.networkHandler
                                        .sendPacket(
                                           PacketRedirection.createRedirectedMessage(
-                                             player.getServerWorld().getServer(), record.dimension, new UnloadChunkS2CPacket(new ChunkPos(record.chunkPos))
+                                             player.getEntityWorld().getServer(), record.dimension, new UnloadChunkS2CPacket(new ChunkPos(record.chunkPos))
                                           )
                                        );
                                  }
@@ -217,7 +219,9 @@ public class ImmPtlChunkTracking {
       for (ServerWorld world : server.getWorlds()) {
          RegistryKey<World> dimension = world.getRegistryKey();
          LongOpenHashSet additional = (LongOpenHashSet)additionalLoadedChunks.get(dimension);
-         Long2ObjectOpenHashMap<Object2ObjectOpenHashMap<ServerPlayerEntity, ImmPtlChunkTracking.PlayerWatchRecord>> watchRecs = chunkWatchRecords.get(dimension);
+         Long2ObjectOpenHashMap<Object2ObjectOpenHashMap<ServerPlayerEntity, ImmPtlChunkTracking.PlayerWatchRecord>> watchRecs = chunkWatchRecords.get(
+            dimension
+         );
          ImmPtlChunkTickets dimTicketManager = ImmPtlChunkTickets.get(world);
          dimTicketManager.purge(
             world, chunkPos -> watchRecs != null && watchRecs.containsKey(chunkPos) ? true : additional != null && additional.contains(chunkPos)
@@ -454,19 +458,23 @@ public class ImmPtlChunkTracking {
       MinecraftServer server = world.getServer();
       Long2ObjectOpenHashMap<Object2ObjectOpenHashMap<ServerPlayerEntity, ImmPtlChunkTracking.PlayerWatchRecord>> map = chunkWatchRecords.get(dim);
       if (map != null) {
-         map.forEach((chunkPos, records) -> {
-            Packet<ClientPlayPacketListener> unloadPacket = PacketRedirection.createRedirectedMessage(server, dim, new UnloadChunkS2CPacket(new ChunkPos(chunkPos)));
-            ObjectIterator var6 = records.values().iterator();
+         map.forEach(
+            (chunkPos, records) -> {
+               Packet<ClientPlayPacketListener> unloadPacket = PacketRedirection.createRedirectedMessage(
+                  server, dim, new UnloadChunkS2CPacket(new ChunkPos(chunkPos))
+               );
+               ObjectIterator var6 = records.values().iterator();
 
-            while (var6.hasNext()) {
-               ImmPtlChunkTracking.PlayerWatchRecord record = (ImmPtlChunkTracking.PlayerWatchRecord)var6.next();
-               if (record.isValid && record.isLoadedToPlayer) {
-                  record.player.networkHandler.sendPacket(unloadPacket);
+               while (var6.hasNext()) {
+                  ImmPtlChunkTracking.PlayerWatchRecord record = (ImmPtlChunkTracking.PlayerWatchRecord)var6.next();
+                  if (record.isValid && record.isLoadedToPlayer) {
+                     record.player.networkHandler.sendPacket(unloadPacket);
+                  }
+
+                  record.isValid = false;
                }
-
-               record.isValid = false;
             }
-         });
+         );
          chunkWatchRecords.remove(dim);
          additionalChunkLoaders.removeIf(chunkLoader -> chunkLoader.dimension() == dim);
          ObjectIterator var4 = playerInfoMap.values().iterator();
@@ -550,7 +558,7 @@ public class ImmPtlChunkTracking {
          getPlayerInfo(player).doChunkSending(player);
       }
 
-      IEChunkMap chunkMap = (IEChunkMap)world.method_14178().chunkLoadingManager;
+      IEChunkMap chunkMap = (IEChunkMap)world.getChunkManager().chunkLoadingManager;
 
       for (int x = lowPos.x; x <= highPos.x; x++) {
          for (int zx = lowPos.z; zx <= highPos.z; zx++) {

@@ -1,12 +1,12 @@
 package qouteall.imm_ptl.peripheral.dim_stack;
 
 import java.util.OptionalInt;
-import net.minecraft.text.Text;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.text.Text;
 import qouteall.q_misc_util.Helper;
 import qouteall.q_misc_util.my_util.GuiHelper;
 
@@ -77,13 +77,10 @@ public class DimStackEntryEditScreen extends Screen {
             }
          )
          .build();
-      this.connectsNextButton = ButtonWidget.builder(
-            Text.translatable(editing.entry.connectsNext ? "imm_ptl.enabled" : "imm_ptl.disabled"), button -> {
-               editing.entry.connectsNext = !editing.entry.connectsNext;
-               button.setMessage(Text.translatable(editing.entry.connectsNext ? "imm_ptl.enabled" : "imm_ptl.disabled"));
-            }
-         )
-         .build();
+      this.connectsNextButton = ButtonWidget.builder(Text.translatable(editing.entry.connectsNext ? "imm_ptl.enabled" : "imm_ptl.disabled"), button -> {
+         editing.entry.connectsNext = !editing.entry.connectsNext;
+         button.setMessage(Text.translatable(editing.entry.connectsNext ? "imm_ptl.enabled" : "imm_ptl.disabled"));
+      }).build();
       this.finishButton = ButtonWidget.builder(Text.translatable("imm_ptl.finish"), button -> {
          editing.entry.horizontalRotation = Helper.parseDouble(this.horizontalRotationField.getText()).orElse(0.0);
          editing.entry.scale = Helper.parseDouble(this.scaleField.getText()).orElse(1.0);
@@ -196,23 +193,23 @@ public class DimStackEntryEditScreen extends Screen {
       MinecraftClient.getInstance().setScreen(this.parent);
    }
 
-   public void render(DrawContext guiGraphics, int mouseX, int mouseY, float delta) {
-      this.renderBackground(guiGraphics, mouseX, mouseY, delta);
-      super.render(guiGraphics, mouseX, mouseY, delta);
-      this.scaleField.render(guiGraphics, mouseX, mouseY, delta);
-      this.horizontalRotationField.render(guiGraphics, mouseX, mouseY, delta);
-      this.topYField.render(guiGraphics, mouseX, mouseY, delta);
-      this.bottomYField.render(guiGraphics, mouseX, mouseY, delta);
-      this.bedrockBlockField.render(guiGraphics, mouseX, mouseY, delta);
-      this.connectsPreviousButton.render(guiGraphics, mouseX, mouseY, delta);
-      this.connectsNextButton.render(guiGraphics, mouseX, mouseY, delta);
-      this.scaleLabelRect.renderTextLeft(Text.translatable("imm_ptl.scale"), guiGraphics);
-      this.flipLabelRect.renderTextLeft(Text.translatable("imm_ptl.flipped"), guiGraphics);
-      this.horizontalRotationLabelRect.renderTextLeft(Text.translatable("imm_ptl.horizontal_rotation"), guiGraphics);
-      this.topYLabelRect.renderTextLeft(Text.translatable("imm_ptl.top_y"), guiGraphics);
-      this.bottomYLabelRect.renderTextLeft(Text.translatable("imm_ptl.bottom_y"), guiGraphics);
-      this.bedrockLabelRect.renderTextLeft(Text.translatable("imm_ptl.bedrock_replacement"), guiGraphics);
-      this.connectsPreviousRect.renderTextLeft(Text.translatable("imm_ptl.connects_previous"), guiGraphics);
-      this.connectsNextRect.renderTextLeft(Text.translatable("imm_ptl.connects_next"), guiGraphics);
+   public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+      this.renderBackground(context, mouseX, mouseY, deltaTicks);
+      super.render(context, mouseX, mouseY, deltaTicks);
+      this.scaleField.render(context, mouseX, mouseY, deltaTicks);
+      this.horizontalRotationField.render(context, mouseX, mouseY, deltaTicks);
+      this.topYField.render(context, mouseX, mouseY, deltaTicks);
+      this.bottomYField.render(context, mouseX, mouseY, deltaTicks);
+      this.bedrockBlockField.render(context, mouseX, mouseY, deltaTicks);
+      this.connectsPreviousButton.render(context, mouseX, mouseY, deltaTicks);
+      this.connectsNextButton.render(context, mouseX, mouseY, deltaTicks);
+      this.scaleLabelRect.renderTextLeft(Text.translatable("imm_ptl.scale"), context);
+      this.flipLabelRect.renderTextLeft(Text.translatable("imm_ptl.flipped"), context);
+      this.horizontalRotationLabelRect.renderTextLeft(Text.translatable("imm_ptl.horizontal_rotation"), context);
+      this.topYLabelRect.renderTextLeft(Text.translatable("imm_ptl.top_y"), context);
+      this.bottomYLabelRect.renderTextLeft(Text.translatable("imm_ptl.bottom_y"), context);
+      this.bedrockLabelRect.renderTextLeft(Text.translatable("imm_ptl.bedrock_replacement"), context);
+      this.connectsPreviousRect.renderTextLeft(Text.translatable("imm_ptl.connects_previous"), context);
+      this.connectsNextRect.renderTextLeft(Text.translatable("imm_ptl.connects_next"), context);
    }
 }

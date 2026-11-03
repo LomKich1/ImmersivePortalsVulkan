@@ -8,14 +8,14 @@ import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerLightingProvider;
-import net.minecraft.util.math.BlockPos.class_2339;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.BlockPos.Mutable;
+import net.minecraft.world.chunk.Chunk;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.q_misc_util.my_util.IntBox;
 
@@ -23,7 +23,7 @@ public class BorderBarrierFiller {
    private static final WeakHashMap<ServerPlayerEntity, Object> warnedPlayers = new WeakHashMap<>();
 
    public static void onCommandExecuted(ServerPlayerEntity player) {
-      ServerWorld world = player.getServerWorld();
+      ServerWorld world = player.getEntityWorld();
       Vec3d playerPos = player.getEntityPos();
       List<WorldWrappingPortal.WrappingZone> wrappingZones = WorldWrappingPortal.getWrappingZones(world);
       WorldWrappingPortal.WrappingZone zone = wrappingZones.stream()
@@ -38,7 +38,7 @@ public class BorderBarrierFiller {
    }
 
    public static void onCommandExecuted(ServerPlayerEntity player, int zoneId) {
-      ServerWorld world = player.getServerWorld();
+      ServerWorld world = player.getEntityWorld();
       List<WorldWrappingPortal.WrappingZone> wrappingZones = WorldWrappingPortal.getWrappingZones(world);
       WorldWrappingPortal.WrappingZone zone = wrappingZones.stream().filter(wrappingZone -> wrappingZone.id == zoneId).findFirst().orElse(null);
       if (zone == null) {
@@ -67,9 +67,9 @@ public class BorderBarrierFiller {
    private static void startFillingBorder(ServerWorld world, IntBox borderBox, Consumer<Text> informer) {
       Supplier<IntStream> xStream = () -> IntStream.range(borderBox.l.getX(), borderBox.h.getX() + 1);
       Supplier<IntStream> zStream = () -> IntStream.range(borderBox.l.getZ(), borderBox.h.getZ() + 1);
-      class_2339 temp = new class_2339();
-      class_2339 temp1 = new class_2339();
-      Stream<class_2339> stream = Streams.concat(
+      Mutable temp = new Mutable();
+      Mutable temp1 = new Mutable();
+      Stream<Mutable> stream = Streams.concat(
          new Stream[]{
             ((IntStream)xStream.get()).mapToObj(x -> temp.set(x, 0, borderBox.l.getZ())),
             ((IntStream)xStream.get()).mapToObj(x -> temp.set(x, 0, borderBox.h.getZ())),
@@ -81,13 +81,13 @@ public class BorderBarrierFiller {
       int totalColumns = size.getX() * 2 + size.getZ() * 2;
       int minY = McHelper.getMinY(world);
       int maxYEx = McHelper.getMaxYExclusive(world);
-      ServerLightingProvider lightingProvider = world.method_14178().method_17293();
+      ServerLightingProvider lightingProvider = world.getChunkManager().getLightingProvider();
       McHelper.performMultiThreadedFindingTaskOnServer(world.getServer(), stream, columnPos -> {
          Chunk chunk = world.getChunk(columnPos);
 
          for (int y = minY; y < maxYEx; y++) {
             temp1.set(columnPos.getX(), y, columnPos.getZ());
-            chunk.setBlockState(temp1, Blocks.field_10124.getDefaultState(), 1);
+            chunk.setBlockState(temp1, Blocks.AIR.getDefaultState(), 1);
             lightingProvider.checkBlock(temp1);
          }
 

@@ -8,19 +8,19 @@ import java.util.Set;
 import java.util.function.LongConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.profiler.Profilers;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.BuiltChunkStorage;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.chunk.ChunkBuilder;
-import net.minecraft.client.render.chunk.ChunkBuilder.class_851;
+import net.minecraft.client.render.chunk.ChunkBuilder.BuiltChunk;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.profiler.Profilers;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.ClientWorldLoader;
@@ -75,47 +75,47 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
       this.endSectionY = McHelper.getMaxSectionYExclusive(world);
    }
 
-   protected void createChunks(ChunkBuilder sectionBuilder_1) {
+   protected void createChunks(ChunkBuilder chunkBuilder) {
       int num = this.sizeX * this.sizeY * this.sizeZ;
-      this.chunks = new class_851[num];
+      this.chunks = new BuiltChunk[num];
    }
 
    public void clear() {
-      Set<class_851> allActiveBuiltChunks = this.getAllActiveBuiltChunks();
-      allActiveBuiltChunks.forEach(class_851::clear);
+      Set<BuiltChunk> allActiveBuiltChunks = this.getAllActiveBuiltChunks();
+      allActiveBuiltChunks.forEach(BuiltChunk::clear);
       this.columnMap.clear();
       this.presets.clear();
       this.isAlive = false;
    }
 
-   public void updateCameraPosition(ChunkSectionPos cameraSectionPos) {
+   public void updateCameraPosition(ChunkSectionPos sectionPos) {
       Profilers.get().push("built_section_storage");
-      int cameraChunkX = cameraSectionPos.getSectionX();
-      int cameraChunkZ = cameraSectionPos.getSectionZ();
+      int cameraChunkX = sectionPos.getSectionX();
+      int cameraChunkZ = sectionPos.getSectionZ();
       ChunkPos cameraChunkPos = new ChunkPos(cameraChunkX, cameraChunkZ);
       ImmPtlViewArea.Preset preset = (ImmPtlViewArea.Preset)this.presets
          .computeIfAbsent(cameraChunkPos.toLong(), whatever -> this.createPresetByChunkPos(cameraChunkX, cameraChunkZ));
       preset.lastActiveTime = System.nanoTime();
       this.chunks = preset.data;
       this.currentPreset = preset;
-      ((IEViewArea)this).ip_setCameraSectionPos(cameraSectionPos);
+      ((IEViewArea)this).ip_setCameraSectionPos(sectionPos);
       this.worldRenderer.getChunkRenderingDataPreparer().scheduleTerrainUpdate();
       Profilers.get().pop();
    }
 
-   public void scheduleRebuild(int cx, int cy, int cz, boolean isImportant) {
-      class_851 builtChunk = this.provideBuiltChunkByChunkPos(cx, cy, cz);
-      builtChunk.scheduleRebuild(isImportant);
+   public void scheduleRebuild(int x, int y, int z, boolean important) {
+      BuiltChunk builtChunk = this.provideBuiltChunkByChunkPos(x, y, z);
+      builtChunk.scheduleRebuild(important);
    }
 
-   public class_851 provideBuiltChunkByChunkPos(int cx, int cy, int cz) {
+   public BuiltChunk provideBuiltChunkByChunkPos(int cx, int cy, int cz) {
       ImmPtlViewArea.Column column = this.provideColumn(ChunkPos.toLong(cx, cz));
       int offsetChunkY = MathHelper.clamp(cy - McHelper.getMinSectionY(this.world), 0, McHelper.getYSectionNumber(this.world) - 1);
       return column.sections[offsetChunkY];
    }
 
    private ImmPtlViewArea.Preset createPresetByChunkPos(int sectionX, int sectionZ) {
-      class_851[] sections1 = new class_851[this.sizeX * this.sizeY * this.sizeZ];
+      BuiltChunk[] sections1 = new BuiltChunk[this.sizeX * this.sizeY * this.sizeZ];
 
       for (int cx = 0; cx < this.sizeX; cx++) {
          int xBlockSize = this.sizeX * 16;
@@ -141,7 +141,7 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
    }
 
    private void foreachPresetCoveredChunkPoses(int centerChunkX, int centerChunkZ, LongConsumer func) {
-      class_851[] sections1 = new class_851[this.sizeX * this.sizeY * this.sizeZ];
+      BuiltChunk[] sections1 = new BuiltChunk[this.sizeX * this.sizeY * this.sizeZ];
 
       for (int cx = 0; cx < this.sizeX; cx++) {
          int xBlockSize = this.sizeX * 16;
@@ -169,13 +169,13 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
    }
 
    private ImmPtlViewArea.Column createColumn(long sectionPos) {
-      class_851[] array = new class_851[this.sizeY];
+      BuiltChunk[] array = new BuiltChunk[this.sizeY];
       int sectionX = ChunkPos.getPackedX(sectionPos);
       int sectionZ = ChunkPos.getPackedZ(sectionPos);
       int minSectionY = McHelper.getMinSectionY(this.world);
 
       for (int offsetCY = 0; offsetCY < this.sizeY; offsetCY++) {
-         class_851 builtChunk = new class_851(this.factory, 0, ChunkSectionPos.asLong(sectionX, offsetCY + minSectionY, sectionZ));
+         BuiltChunk builtChunk = new BuiltChunk(this.factory, 0, ChunkSectionPos.asLong(sectionX, offsetCY + minSectionY, sectionZ));
          array[offsetCY] = builtChunk;
       }
 
@@ -215,7 +215,7 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
          return shouldDropPreset;
       });
       long timeThreshold = Helper.secondToNano(5.0);
-      ArrayDeque<class_851> toDelete = new ArrayDeque<>();
+      ArrayDeque<BuiltChunk> toDelete = new ArrayDeque<>();
       this.columnMap.long2ObjectEntrySet().removeIf(entry -> {
          ImmPtlViewArea.Column column = (ImmPtlViewArea.Column)entry.getValue();
          boolean shouldRemove = currentTime - column.mark > timeThreshold;
@@ -231,7 +231,7 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
                return true;
             } else {
                for (int num = 0; !toDelete.isEmpty() && num < 100; num++) {
-                  class_851 builtChunk = toDelete.poll();
+                  BuiltChunk builtChunk = toDelete.poll();
                   builtChunk.clear();
                }
 
@@ -247,8 +247,8 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
       return preset.data == this.chunks ? false : currentTime - preset.lastActiveTime > dropTime;
    }
 
-   private Set<class_851> getAllActiveBuiltChunks() {
-      HashSet<class_851> result = new HashSet<>();
+   private Set<BuiltChunk> getAllActiveBuiltChunks() {
+      HashSet<BuiltChunk> result = new HashSet<>();
       this.presets.forEach((key, preset) -> result.addAll(Arrays.asList(preset.data)));
       if (this.chunks != null) {
          result.addAll(Arrays.asList(this.chunks));
@@ -286,13 +286,13 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
       long sectionPos = ChunkPos.toLong(sectionX, sectionZ);
       ImmPtlViewArea.Column column = (ImmPtlViewArea.Column)this.columnMap.get(sectionPos);
       if (column != null) {
-         for (class_851 builtChunk : column.sections) {
+         for (BuiltChunk builtChunk : column.sections) {
             ((IERenderSection)builtChunk).portal_fullyReset();
          }
       }
    }
 
-   public class_851 getSectionFromRawArray(BlockPos sectionOrigin, class_851[] sections) {
+   public BuiltChunk getSectionFromRawArray(BlockPos sectionOrigin, BuiltChunk[] sections) {
       int i = MathHelper.floorDiv(sectionOrigin.getX(), 16);
       int j = MathHelper.floorDiv(sectionOrigin.getY() - McHelper.getMinY(this.world), 16);
       int k = MathHelper.floorDiv(sectionOrigin.getZ(), 16);
@@ -306,28 +306,28 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
    }
 
    @Nullable
-   protected class_851 getRenderedChunk(BlockPos pos) {
-      int i = MathHelper.floorDiv(pos.getX(), 16);
-      int j = MathHelper.floorDiv(pos.getY() - McHelper.getMinY(this.world), 16);
-      int k = MathHelper.floorDiv(pos.getZ(), 16);
-      return this.getRenderSectionByGridCoords(i, j, k, pos);
+   protected BuiltChunk getRenderedChunk(BlockPos blockPos) {
+      int i = MathHelper.floorDiv(blockPos.getX(), 16);
+      int j = MathHelper.floorDiv(blockPos.getY() - McHelper.getMinY(this.world), 16);
+      int k = MathHelper.floorDiv(blockPos.getZ(), 16);
+      return this.getRenderSectionByGridCoords(i, j, k, blockPos);
    }
 
    @Nullable
-   protected class_851 getRenderedChunk(long sectionNode) {
-      int i = ChunkSectionPos.unpackX(sectionNode);
-      int j = ChunkSectionPos.unpackY(sectionNode) - McHelper.getMinSectionY(this.world);
-      int k = ChunkSectionPos.unpackZ(sectionNode);
-      return this.getRenderSectionByGridCoords(i, j, k, ChunkSectionPos.from(sectionNode).getMinPos());
+   protected BuiltChunk getRenderedChunk(long sectionPos) {
+      int i = ChunkSectionPos.unpackX(sectionPos);
+      int j = ChunkSectionPos.unpackY(sectionPos) - McHelper.getMinSectionY(this.world);
+      int k = ChunkSectionPos.unpackZ(sectionPos);
+      return this.getRenderSectionByGridCoords(i, j, k, ChunkSectionPos.from(sectionPos).getMinPos());
    }
 
    @Nullable
-   private class_851 getRenderSectionByGridCoords(int i, int j, int k, BlockPos pos) {
+   private BuiltChunk getRenderSectionByGridCoords(int i, int j, int k, BlockPos pos) {
       if (j >= 0 && j < this.sizeY) {
          i = MathHelper.floorMod(i, this.sizeX);
          k = MathHelper.floorMod(k, this.sizeZ);
          int sectionIndex = this.getChunkIndex(i, j, k);
-         class_851 result = this.chunks[sectionIndex];
+         BuiltChunk result = this.chunks[sectionIndex];
          if (result == null) {
             Helper.err("Null RenderChunk " + pos);
             return null;
@@ -341,7 +341,7 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
    }
 
    @Nullable
-   public class_851 rawFetch(int cx, int cy, int cz, long timeMark) {
+   public BuiltChunk rawFetch(int cx, int cy, int cz, long timeMark) {
       if (cy >= this.minSectionY && cy < this.endSectionY) {
          long l = ChunkPos.toLong(cx, cz);
          ImmPtlViewArea.Column column = this.provideColumn(l);
@@ -354,7 +354,7 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
    }
 
    @Nullable
-   public class_851 rawGet(int cx, int cy, int cz) {
+   public BuiltChunk rawGet(int cx, int cy, int cz) {
       if (cy >= this.minSectionY && cy < this.endSectionY) {
          long l = ChunkPos.toLong(cx, cz);
          ImmPtlViewArea.Column column = (ImmPtlViewArea.Column)this.columnMap.get(l);
@@ -371,18 +371,18 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
 
    public static class Column {
       public long mark = 0L;
-      public class_851[] sections;
+      public BuiltChunk[] sections;
 
-      public Column(class_851[] sections) {
+      public Column(BuiltChunk[] sections) {
          this.sections = sections;
       }
    }
 
    public static class Preset {
-      public final class_851[] data;
+      public final BuiltChunk[] data;
       public long lastActiveTime = 0L;
 
-      public Preset(class_851[] data) {
+      public Preset(BuiltChunk[] data) {
          this.data = data;
       }
    }

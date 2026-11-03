@@ -7,15 +7,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import net.minecraft.entity.Entity;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.server.network.EntityTrackerEntry;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.server.network.PlayerAssociatedNetworkHandler;
-import net.minecraft.server.world.ServerChunkLoadingManager.class_3208;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.world.ServerChunkLoadingManager.EntityTracker;
+import net.minecraft.util.math.ChunkSectionPos;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,7 +32,7 @@ import qouteall.imm_ptl.core.ducks.IETrackedEntity;
 import qouteall.imm_ptl.core.miscellaneous.IPVanillaCopy;
 import qouteall.imm_ptl.core.network.PacketRedirection;
 
-@Mixin({class_3208.class})
+@Mixin({EntityTracker.class})
 public abstract class MixinTrackedEntity implements IETrackedEntity {
    @Shadow
    @Final
@@ -53,10 +53,10 @@ public abstract class MixinTrackedEntity implements IETrackedEntity {
    protected abstract int getMaxTrackDistance();
 
    @Redirect(
-      method = {"sendToListeners(Lnet/minecraft/Packet;)V", "sendToListenersIf(Lnet/minecraft/Packet;Ljava/util/function/Predicate;)V"},
+      method = {"sendToListeners(Lnet/minecraft/network/packet/Packet;)V", "sendToListenersIf(Lnet/minecraft/network/packet/Packet;Ljava/util/function/Predicate;)V"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/PlayerAssociatedNetworkHandler;sendPacket(Lnet/minecraft/Packet;)V"
+         target = "Lnet/minecraft/server/network/PlayerAssociatedNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"
       )}
    )
    private void onSendToOtherNearbyPlayers(PlayerAssociatedNetworkHandler entityTrackingListener, Packet<?> packet) {
@@ -64,10 +64,10 @@ public abstract class MixinTrackedEntity implements IETrackedEntity {
    }
 
    @Redirect(
-      method = {"sendToSelfAndListeners(Lnet/minecraft/Packet;)V"},
+      method = {"sendToSelfAndListeners(Lnet/minecraft/network/packet/Packet;)V"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/Packet;)V"
+         target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"
       )}
    )
    private void onSendToNearbyPlayers(ServerPlayNetworkHandler serverPlayNetworkHandler, Packet packet) {
@@ -75,7 +75,7 @@ public abstract class MixinTrackedEntity implements IETrackedEntity {
    }
 
    @Inject(
-      method = {"updateTrackedStatus"},
+      method = {"updateTrackedStatus(Lnet/minecraft/server/network/ServerPlayerEntity;)V"},
       at = {@At("HEAD")},
       cancellable = true
    )
@@ -84,7 +84,7 @@ public abstract class MixinTrackedEntity implements IETrackedEntity {
    }
 
    @Inject(
-      method = {"updateTrackedStatus"},
+      method = {"updateTrackedStatus(Ljava/util/List;)V"},
       at = {@At("HEAD")},
       cancellable = true
    )
@@ -100,7 +100,7 @@ public abstract class MixinTrackedEntity implements IETrackedEntity {
    @IPVanillaCopy
    @Override
    public void ip_updateEntityTrackingStatus() {
-      IEChunkMap chunkMap = (IEChunkMap)((ServerWorld)this.entity.getEntityWorld()).method_14178().chunkLoadingManager;
+      IEChunkMap chunkMap = (IEChunkMap)((ServerWorld)this.entity.getEntityWorld()).getChunkManager().chunkLoadingManager;
       Object2ObjectOpenHashMap<ServerPlayerEntity, ImmPtlChunkTracking.PlayerWatchRecord> watchRecMap = ImmPtlChunkTracking.getWatchRecordForChunk(
          this.entity.getEntityWorld().getRegistryKey(), this.entity.getChunkPos().x, this.entity.getChunkPos().z
       );

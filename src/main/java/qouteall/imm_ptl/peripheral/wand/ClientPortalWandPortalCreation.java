@@ -3,20 +3,20 @@ package qouteall.imm_ptl.peripheral.wand;
 import com.mojang.logging.LogUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.world.World;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.text.MutableText;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.hit.HitResult.class_240;
-import net.minecraft.client.render.VertexConsumerProvider.class_4598;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider.Immediate;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.text.MutableText;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.hit.HitResult.Type;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import qouteall.imm_ptl.core.mc_utils.WireRenderingHelper;
@@ -112,7 +112,7 @@ public class ClientPortalWandPortalCreation {
                }
             } else {
                HitResult hitResult = player.raycast(64.0, RenderStates.getPartialTick(), false);
-               if (hitResult.getType() == class_240.field_1332 && hitResult instanceof BlockHitResult blockHitResult) {
+               if (hitResult.getType() == Type.BLOCK && hitResult instanceof BlockHitResult blockHitResult) {
                   cursorPointing = WandUtil.alignOnBlocks(player.getEntityWorld(), blockHitResult.getPos(), alignment);
                }
             }
@@ -156,7 +156,7 @@ public class ClientPortalWandPortalCreation {
       }
    }
 
-   public static void render(MatrixStack matrixStack, class_4598 bufferSource, double camX, double camY, double camZ) {
+   public static void render(MatrixStack matrixStack, Immediate bufferSource, double camX, double camY, double camZ) {
       ClientPlayerEntity player = MinecraftClient.getInstance().player;
       if (player != null) {
          RegistryKey<World> currDim = player.getEntityWorld().getRegistryKey();

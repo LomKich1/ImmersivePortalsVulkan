@@ -1,7 +1,7 @@
 package qouteall.q_misc_util.my_util;
 
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 public record Sphere(Vec3d center, double radius) {

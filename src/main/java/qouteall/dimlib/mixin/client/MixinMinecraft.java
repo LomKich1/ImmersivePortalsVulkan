@@ -11,7 +11,7 @@ import qouteall.dimlib.ClientDimensionInfo;
 @Mixin({MinecraftClient.class})
 public class MixinMinecraft {
    @Inject(
-      method = {"setWorld(Lnet/minecraft/ClientWorld;Z)V"},
+      method = {"setWorld(Lnet/minecraft/client/world/ClientWorld;Z)V"},
       at = {@At("HEAD")}
    )
    private void onClientReset(ClientWorld level, boolean stopSound, CallbackInfo ci) {

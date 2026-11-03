@@ -7,7 +7,7 @@ import qouteall.imm_ptl.peripheral.PeripheralModMain;
 
 public class PeripheralModEntryClient implements ClientModInitializer {
    public static void registerBlockRenderLayers() {
-      BlockRenderLayerMap.putBlock(PeripheralModMain.portalHelperBlock, BlockRenderLayer.field_60925);
+      BlockRenderLayerMap.putBlock(PeripheralModMain.portalHelperBlock, BlockRenderLayer.CUTOUT);
    }
 
    public void onInitializeClient() {

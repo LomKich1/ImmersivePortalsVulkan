@@ -27,9 +27,7 @@ public class TeleportationUtil {
       return new TeleportationUtil.PortalPointVelocity(thisSideVelocity, otherSideVelocity);
    }
 
-   public static void transformEntityVelocity(
-      Portal portal, Entity entity, TeleportationUtil.PortalPointVelocity portalPointVelocity, Vec3d oldEntityPos
-   ) {
+   public static void transformEntityVelocity(Portal portal, Entity entity, TeleportationUtil.PortalPointVelocity portalPointVelocity, Vec3d oldEntityPos) {
       Vec3d oldVelocityRelativeToPortal = McHelper.getWorldVelocity(entity).subtract(portalPointVelocity.thisSidePointVelocity());
       Vec3d transformedVelocityRelativeToPortal = portal.transformVelocityRelativeToPortal(oldVelocityRelativeToPortal, entity, oldEntityPos);
       Vec3d newVelocity = transformedVelocityRelativeToPortal.add(portalPointVelocity.otherSidePointVelocity());

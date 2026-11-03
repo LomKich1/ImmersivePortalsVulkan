@@ -4,13 +4,13 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import java.util.List;
 import java.util.function.Function;
-import net.minecraft.util.profiler.Profilers;
-import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilderStorage;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.profiler.Profilers;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
@@ -64,7 +64,7 @@ public abstract class MixinMinecraft implements IEMinecraftClient {
    private Thread thread;
 
    @WrapOperation(
-      method = {"Lnet/minecraft/MinecraftClient;run()V"},
+      method = {"Lnet/minecraft/client/MinecraftClient;run()V"},
       at = {@At(
          value = "INVOKE",
          target = "Ljava/lang/Thread;currentThread()Ljava/lang/Thread;"
@@ -79,17 +79,17 @@ public abstract class MixinMinecraft implements IEMinecraftClient {
       method = {"tick"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ClientWorld;tickEntities()V"
+         target = "Lnet/minecraft/client/world/ClientWorld;tickEntities()V"
       )}
    )
    private void onBeforeTickingEntities(CallbackInfo ci) {
    }
 
    @Inject(
-      method = {"Lnet/minecraft/MinecraftClient;tick()V"},
+      method = {"Lnet/minecraft/client/MinecraftClient;tick()V"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ClientWorld;tick(Ljava/util/function/BooleanSupplier;)V",
+         target = "Lnet/minecraft/client/world/ClientWorld;tick(Ljava/util/function/BooleanSupplier;)V",
          shift = Shift.AFTER
       )}
    )
@@ -106,10 +106,10 @@ public abstract class MixinMinecraft implements IEMinecraftClient {
    }
 
    @Inject(
-      method = {"Lnet/minecraft/MinecraftClient;render(Z)V"},
+      method = {"Lnet/minecraft/client/MinecraftClient;render(Z)V"},
       at = {@At(
          value = "FIELD",
-         target = "Lnet/minecraft/MinecraftClient;currentFps:I",
+         target = "Lnet/minecraft/client/MinecraftClient;currentFps:I",
          shift = Shift.AFTER
       )}
    )
@@ -118,7 +118,7 @@ public abstract class MixinMinecraft implements IEMinecraftClient {
    }
 
    @Inject(
-      method = {"Lnet/minecraft/MinecraftClient;setWorld(Lnet/minecraft/ClientWorld;Z)V"},
+      method = {"Lnet/minecraft/client/MinecraftClient;setWorld(Lnet/minecraft/client/world/ClientWorld;Z)V"},
       at = {@At("HEAD")}
    )
    private void onSetWorld(ClientWorld clientLevel, boolean stopSounds, CallbackInfo ci) {
@@ -138,7 +138,7 @@ public abstract class MixinMinecraft implements IEMinecraftClient {
    }
 
    @Inject(
-      method = {"Lnet/minecraft/MinecraftClient;usesImprovedTransparency()Z"},
+      method = {"Lnet/minecraft/client/MinecraftClient;usesImprovedTransparency()Z"},
       at = {@At("HEAD")},
       cancellable = true
    )

@@ -1,16 +1,16 @@
 package qouteall.imm_ptl.core.mixin.common;
 
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
-import net.minecraft.world.RaycastContext.class_3960;
+import net.minecraft.world.World;
+import net.minecraft.world.RaycastContext.ShapeType;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -36,7 +36,7 @@ public abstract class MixinClipContext implements IERayTraceContext {
    private Vec3d end;
    @Shadow
    @Final
-   private class_3960 shapeType;
+   private ShapeType shapeType;
    @Shadow
    @Final
    private ShapeContext shapeContext;
@@ -55,11 +55,11 @@ public abstract class MixinClipContext implements IERayTraceContext {
 
    @Inject(
       at = {@At("HEAD")},
-      method = {"Lnet/minecraft/RaycastContext;getBlockShape(Lnet/minecraft/BlockState;Lnet/minecraft/BlockView;Lnet/minecraft/BlockPos;)Lnet/minecraft/VoxelShape;"},
+      method = {"Lnet/minecraft/world/RaycastContext;getBlockShape(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/shape/VoxelShape;"},
       cancellable = true
    )
    private void onGetBlockShape(BlockState blockState, BlockView blockView, BlockPos blockPos, CallbackInfoReturnable<VoxelShape> cir) {
-      if (blockState.getBlock() == PortalPlaceholderBlock.instance && this.shapeType == class_3960.field_17559 && blockView instanceof World world) {
+      if (blockState.getBlock() == PortalPlaceholderBlock.instance && this.shapeType == ShapeType.OUTLINE && blockView instanceof World world) {
          boolean intersectingWithPortal = McHelper.traverseEntitiesByBox(
                Portal.class, world, new Box(blockPos), IPGlobal.maxNormalPortalRadius, p -> McHelper.placeholder
             )

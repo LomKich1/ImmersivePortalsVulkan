@@ -4,19 +4,18 @@ import com.mojang.serialization.MapCodec;
 import java.util.function.BiConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.block.Block;
-import net.minecraft.text.Text;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.util.Identifier;
+import net.minecraft.block.AbstractBlock.Settings;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.item.Item.class_1793;
-import net.minecraft.block.AbstractBlock.class_2251;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import net.minecraft.world.biome.source.BiomeSource;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 import qouteall.dimlib.api.DimensionAPI;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.peripheral.alternate_dimension.AlternateDimensions;
@@ -33,15 +32,15 @@ import qouteall.q_misc_util.platform.Platform;
 
 public class PeripheralModMain {
    public static final Block portalHelperBlock = new Block(
-      class_2251.create()
+      Settings.create()
          .nonOpaque()
          .solidBlock((a, b, c) -> false)
-         .registryKey(RegistryKey.of(RegistryKeys.field_41254, McHelper.newResourceLocation("immersive_portals", "portal_helper")))
+         .registryKey(RegistryKey.of(RegistryKeys.BLOCK, McHelper.newResourceLocation("immersive_portals", "portal_helper")))
    );
    public static final BlockItem portalHelperBlockItem = new PortalHelperItem(
       portalHelperBlock,
-      new class_1793()
-         .registryKey(RegistryKey.of(RegistryKeys.field_41197, McHelper.newResourceLocation("immersive_portals", "portal_helper")))
+      new net.minecraft.item.Item.Settings()
+         .registryKey(RegistryKey.of(RegistryKeys.ITEM, McHelper.newResourceLocation("immersive_portals", "portal_helper")))
          .useBlockPrefixedTranslationKey()
    );
    public static final ItemGroup TAB = Platform.get()

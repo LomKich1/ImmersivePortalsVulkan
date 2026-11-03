@@ -1,10 +1,10 @@
 package qouteall.imm_ptl.peripheral.mixin.common.dim_stack;
 
 import java.util.Map;
-import net.minecraft.world.World;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,7 +26,7 @@ public abstract class MixinMinecraftServer_DimStack_CVB {
       method = {"Lnet/minecraft/server/MinecraftServer;createWorlds()V"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/server/MinecraftServer;setupSpawn(Lnet/minecraft/ServerWorld;Lnet/minecraft/ServerWorldProperties;ZZLnet/minecraft/ChunkLoadProgress;)V"
+         target = "Lnet/minecraft/server/MinecraftServer;setupSpawn(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/level/ServerWorldProperties;ZZLnet/minecraft/world/chunk/ChunkLoadProgress;)V"
       )}
    )
    private void onBeforeSetupSpawn(CallbackInfo ci) {

@@ -2,7 +2,7 @@ package qouteall.imm_ptl.core.mixin.client.render;
 
 import com.mojang.blaze3d.opengl.GlStateManager;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider.class_4598;
+import net.minecraft.client.render.VertexConsumerProvider.Immediate;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -10,10 +10,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import qouteall.imm_ptl.core.render.context_management.PortalRendering;
 import qouteall.imm_ptl.core.render.context_management.RenderStates;
 
-@Mixin({class_4598.class})
+@Mixin({Immediate.class})
 public class MixinMultiBufferSourceBufferSource {
    @Inject(
-      method = {"draw(Lnet/minecraft/RenderLayer;)V"},
+      method = {"draw(Lnet/minecraft/client/render/RenderLayer;)V"},
       at = {@At("HEAD")}
    )
    private void onBeginDraw(RenderLayer layer, CallbackInfo ci) {
@@ -24,7 +24,7 @@ public class MixinMultiBufferSourceBufferSource {
    }
 
    @Inject(
-      method = {"draw(Lnet/minecraft/RenderLayer;)V"},
+      method = {"draw(Lnet/minecraft/client/render/RenderLayer;)V"},
       at = {@At("RETURN")}
    )
    private void onEndDraw(RenderLayer layer, CallbackInfo ci) {

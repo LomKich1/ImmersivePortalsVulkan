@@ -5,14 +5,14 @@ import java.util.ArrayDeque;
 import java.util.Stack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Frustum;
+import net.minecraft.client.render.chunk.ChunkBuilder.BuiltChunk;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.render.chunk.ChunkBuilder.class_851;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.Vec3d;
 import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.IPCGlobal;
 import qouteall.imm_ptl.core.chunk_loading.PerformanceLevel;
@@ -27,15 +27,15 @@ import qouteall.imm_ptl.core.render.context_management.WorldRenderInfo;
 public class VisibleSectionDiscovery {
    private static ImmPtlViewArea builtChunks;
    private static Frustum vanillaFrustum;
-   private static ObjectArrayList<class_851> resultHolder;
-   private static final ArrayDeque<class_851> tempQueue = new ArrayDeque<>();
+   private static ObjectArrayList<BuiltChunk> resultHolder;
+   private static final ArrayDeque<BuiltChunk> tempQueue = new ArrayDeque<>();
    private static ChunkSectionPos cameraSectionPos;
    private static long timeMark;
    private static int viewDistance;
-   private static final Stack<ObjectArrayList<class_851>> listCaches = new Stack<>();
+   private static final Stack<ObjectArrayList<BuiltChunk>> listCaches = new Stack<>();
 
    public static void discoverVisibleSections(
-      ClientWorld world, ImmPtlViewArea builtChunks_, Camera camera, Frustum vanillaFrustum_, ObjectArrayList<class_851> resultHolder_
+      ClientWorld world, ImmPtlViewArea builtChunks_, Camera camera, Frustum vanillaFrustum_, ObjectArrayList<BuiltChunk> resultHolder_
    ) {
       builtChunks = builtChunks_;
       vanillaFrustum = vanillaFrustum_;
@@ -55,10 +55,7 @@ public class VisibleSectionDiscovery {
 
       if (modifiedVisibleSectionIterationOrigin != null) {
          checkSection(
-            modifiedVisibleSectionIterationOrigin.getX(),
-            modifiedVisibleSectionIterationOrigin.getY(),
-            modifiedVisibleSectionIterationOrigin.getZ(),
-            true
+            modifiedVisibleSectionIterationOrigin.getX(), modifiedVisibleSectionIterationOrigin.getY(), modifiedVisibleSectionIterationOrigin.getZ(), true
          );
       } else if (cameraPos.y < world.getBottomY()) {
          discoverBottomOrTopLayerVisibleChunks(builtChunks.minSectionY);
@@ -69,7 +66,7 @@ public class VisibleSectionDiscovery {
       }
 
       while (!tempQueue.isEmpty()) {
-         class_851 curr = tempQueue.poll();
+         BuiltChunk curr = tempQueue.poll();
          int cx = ChunkSectionPos.getSectionCoord(curr.getOrigin().getX());
          int cy = ChunkSectionPos.getSectionCoord(curr.getOrigin().getY());
          int cz = ChunkSectionPos.getSectionCoord(curr.getOrigin().getZ());
@@ -91,7 +88,7 @@ public class VisibleSectionDiscovery {
       viewDistance = PerformanceLevel.getPortalRenderingDistance(ClientPerformanceMonitor.level, distance);
    }
 
-   private static boolean isVisible(class_851 builtChunk) {
+   private static boolean isVisible(BuiltChunk builtChunk) {
       Box box = builtChunk.getBoundingBox();
       return vanillaFrustum.isVisible(box);
    }
@@ -107,7 +104,7 @@ public class VisibleSectionDiscovery {
       if (Math.abs(cx - cameraSectionPos.getSectionX()) <= viewDistance) {
          if (Math.abs(cy - cameraSectionPos.getSectionY()) <= viewDistance) {
             if (Math.abs(cz - cameraSectionPos.getSectionZ()) <= viewDistance) {
-               class_851 builtChunk = builtChunks.rawFetch(cx, cy, cz, timeMark);
+               BuiltChunk builtChunk = builtChunks.rawFetch(cx, cy, cz, timeMark);
                if (builtChunk != null) {
                   IERenderSection ieRenderSection = (IERenderSection)builtChunk;
                   if (ieRenderSection.portal_getMark() != timeMark) {
@@ -123,11 +120,11 @@ public class VisibleSectionDiscovery {
       }
    }
 
-   public static ObjectArrayList<class_851> takeList() {
+   public static ObjectArrayList<BuiltChunk> takeList() {
       return listCaches.isEmpty() ? new ObjectArrayList() : listCaches.pop();
    }
 
-   public static void returnList(ObjectArrayList<class_851> list) {
+   public static void returnList(ObjectArrayList<BuiltChunk> list) {
       list.clear();
       listCaches.push(list);
    }

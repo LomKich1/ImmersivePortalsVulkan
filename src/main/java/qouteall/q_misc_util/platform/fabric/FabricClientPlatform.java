@@ -13,13 +13,13 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents.Init;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.Join;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.render.WorldRenderer;
 import qouteall.imm_ptl.core.compat.axiom_compatibility.AxiomInterface;
 import qouteall.q_misc_util.platform.ClientPlatform;
 

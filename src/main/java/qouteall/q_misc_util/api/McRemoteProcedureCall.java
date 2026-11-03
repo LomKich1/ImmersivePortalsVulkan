@@ -2,11 +2,11 @@ package qouteall.q_misc_util.api;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.network.listener.ClientCommonPacketListener;
 import net.minecraft.network.listener.ServerCommonPacketListener;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.server.network.ServerPlayerEntity;
 import qouteall.q_misc_util.ImplRemoteProcedureCall;
 
 public class McRemoteProcedureCall {

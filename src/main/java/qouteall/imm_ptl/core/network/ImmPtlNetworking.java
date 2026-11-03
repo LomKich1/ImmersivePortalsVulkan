@@ -5,23 +5,23 @@ import java.util.Objects;
 import java.util.UUID;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.world.World;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload.class_9154;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.packet.CustomPayload.Id;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public class ImmPtlNetworking {
    }
 
    public record GlobalPortalSyncPacket(int dimensionId, NbtCompound data) implements CustomPayload {
-      public static final class_9154<ImmPtlNetworking.GlobalPortalSyncPacket> TYPE = new class_9154(McHelper.newResourceLocation("imm_ptl:upd_glb_ptl"));
+      public static final Id<ImmPtlNetworking.GlobalPortalSyncPacket> TYPE = new Id(McHelper.newResourceLocation("imm_ptl:upd_glb_ptl"));
       public static final PacketCodec<PacketByteBuf, ImmPtlNetworking.GlobalPortalSyncPacket> CODEC = PacketCodec.ofStatic(
          (b, p) -> p.write(b), ImmPtlNetworking.GlobalPortalSyncPacket::read
       );
@@ -73,14 +73,14 @@ public class ImmPtlNetworking {
       }
 
       @NotNull
-      public class_9154<? extends CustomPayload> getId() {
+      public Id<? extends CustomPayload> getId() {
          return TYPE;
       }
    }
 
    public record PortalSyncPacket(int id, UUID uuid, EntityType<?> entityType, int dimensionId, double x, double y, double z, NbtCompound extraData)
       implements CustomPayload {
-      public static final class_9154<ImmPtlNetworking.PortalSyncPacket> TYPE = new class_9154(McHelper.newResourceLocation("imm_ptl:spawn_portal"));
+      public static final Id<ImmPtlNetworking.PortalSyncPacket> TYPE = new Id(McHelper.newResourceLocation("imm_ptl:spawn_portal"));
       public static final PacketCodec<RegistryByteBuf, ImmPtlNetworking.PortalSyncPacket> CODEC = PacketCodec.ofStatic(
          (b, p) -> p.write(b), ImmPtlNetworking.PortalSyncPacket::read
       );
@@ -88,18 +88,18 @@ public class ImmPtlNetworking {
       public void write(RegistryByteBuf buf) {
          buf.writeVarInt(this.id);
          buf.writeUuid(this.uuid);
-         PacketCodecs.registryValue(RegistryKeys.field_41266).encode(buf, this.entityType);
+         PacketCodecs.registryValue(RegistryKeys.ENTITY_TYPE).encode(buf, this.entityType);
          buf.writeVarInt(this.dimensionId);
-         buf.method_52940(this.x);
-         buf.method_52940(this.y);
-         buf.method_52940(this.z);
+         buf.writeDouble(this.x);
+         buf.writeDouble(this.y);
+         buf.writeDouble(this.z);
          buf.writeNbt(this.extraData);
       }
 
       public static ImmPtlNetworking.PortalSyncPacket read(RegistryByteBuf buf) {
          int id = buf.readVarInt();
          UUID uuid = buf.readUuid();
-         EntityType<?> type = (EntityType<?>)PacketCodecs.registryValue(RegistryKeys.field_41266).decode(buf);
+         EntityType<?> type = (EntityType<?>)PacketCodecs.registryValue(RegistryKeys.ENTITY_TYPE).decode(buf);
          int dimensionId = buf.readVarInt();
          double x = buf.readDouble();
          double y = buf.readDouble();
@@ -125,7 +125,7 @@ public class ImmPtlNetworking {
 
             existingPortal.acceptDataSync(new Vec3d(this.x, this.y, this.z), this.extraData);
          } else {
-            Entity entity = this.entityType.create(world, SpawnReason.field_52444);
+            Entity entity = this.entityType.create(world, SpawnReason.LOAD);
             Validate.notNull(entity, "Entity type is null", new Object[0]);
             if (!(entity instanceof Portal portal)) {
                ImmPtlNetworking.LOGGER.error("Spawned entity is not a portal. {} {}", entity, this.entityType);
@@ -147,13 +147,13 @@ public class ImmPtlNetworking {
       }
 
       @NotNull
-      public class_9154<? extends CustomPayload> getId() {
+      public Id<? extends CustomPayload> getId() {
          return TYPE;
       }
    }
 
    public record TeleportPacket(int dimensionId, Vec3d eyePosBeforeTeleportation, UUID portalId) implements CustomPayload {
-      public static final class_9154<ImmPtlNetworking.TeleportPacket> TYPE = new class_9154(Identifier.of("imm_ptl", "teleport"));
+      public static final Id<ImmPtlNetworking.TeleportPacket> TYPE = new Id(Identifier.of("imm_ptl", "teleport"));
       public static final PacketCodec<PacketByteBuf, ImmPtlNetworking.TeleportPacket> CODEC = PacketCodec.ofStatic(
          (b, p) -> p.write(b), ImmPtlNetworking.TeleportPacket::read
       );
@@ -167,9 +167,9 @@ public class ImmPtlNetworking {
 
       public void write(PacketByteBuf buf) {
          buf.writeVarInt(this.dimensionId);
-         buf.method_52940(this.eyePosBeforeTeleportation.x);
-         buf.method_52940(this.eyePosBeforeTeleportation.y);
-         buf.method_52940(this.eyePosBeforeTeleportation.z);
+         buf.writeDouble(this.eyePosBeforeTeleportation.x);
+         buf.writeDouble(this.eyePosBeforeTeleportation.y);
+         buf.writeDouble(this.eyePosBeforeTeleportation.z);
          buf.writeUuid(this.portalId);
       }
 
@@ -179,7 +179,7 @@ public class ImmPtlNetworking {
       }
 
       @NotNull
-      public class_9154<? extends CustomPayload> getId() {
+      public Id<? extends CustomPayload> getId() {
          return TYPE;
       }
    }

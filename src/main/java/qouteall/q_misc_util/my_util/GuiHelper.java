@@ -1,11 +1,11 @@
 package qouteall.q_misc_util.my_util;
 
 import java.util.Arrays;
-import net.minecraft.text.Text;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.text.Text;
 
 public class GuiHelper {
    public static GuiHelper.LayoutFunc layoutButtonHorizontally(ClickableWidget widget) {

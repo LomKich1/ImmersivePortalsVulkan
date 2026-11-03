@@ -1,12 +1,12 @@
 package qouteall.imm_ptl.core.portal.custom_portal_gen;
 
 import net.minecraft.entity.EntityType;
-import net.minecraft.world.World;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.Direction.class_2352;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.Direction.AxisDirection;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.core.portal.Portal;
@@ -56,11 +56,11 @@ public class PortalGenInfo {
 
    public <T extends Portal> T createTemplatePortal(EntityType<T> entityType) {
       ServerWorld fromWorld = McHelper.getServerWorld(this.from);
-      T portal = (T)entityType.create(fromWorld, SpawnReason.field_16461);
+      T portal = (T)entityType.create(fromWorld, SpawnReason.TRIGGERED);
 
       assert portal != null;
 
-      this.fromShape.initPortalPosAxisShape(portal, class_2352.field_11056);
+      this.fromShape.initPortalPosAxisShape(portal, AxisDirection.POSITIVE);
       portal.setDestDim(this.to);
       portal.setDestination(this.toShape.innerAreaBox.getCenterVec());
       portal.setScaling(this.scale);

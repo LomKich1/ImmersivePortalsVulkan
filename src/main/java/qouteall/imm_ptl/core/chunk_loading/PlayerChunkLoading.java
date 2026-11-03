@@ -5,19 +5,19 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.ArrayList;
 import java.util.Set;
-import net.minecraft.world.World;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.server.world.ChunkHolder;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.server.world.ServerChunkLoadingManager;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.network.packet.s2c.play.ChunkSentS2CPacket;
 import net.minecraft.network.packet.s2c.play.StartChunkSendS2CPacket;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ChunkHolder;
+import net.minecraft.server.world.ServerChunkLoadingManager;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.slf4j.Logger;
@@ -85,7 +85,7 @@ public class PlayerChunkLoading {
                         LOGGER.error("Missing dimension when flushing pending loading {}", record.dimension.getValue());
                         return true;
                      } else {
-                        ServerChunkLoadingManager chunkMap = world.method_14178().chunkLoadingManager;
+                        ServerChunkLoadingManager chunkMap = world.getChunkManager().chunkLoadingManager;
                         ChunkHolder chunkHolder = ((IEChunkMap)chunkMap).ip_getChunkHolder(record.chunkPos);
                         if (chunkHolder == null) {
                            return false;

@@ -2,9 +2,9 @@ package qouteall.imm_ptl.core.mixin.client.interaction;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.hit.HitResult;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -36,7 +36,7 @@ public abstract class MixinMinecraft_B {
       method = {"handleInputEvents"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/MinecraftClient;doAttack()Z"
+         target = "Lnet/minecraft/client/MinecraftClient;doAttack()Z"
       )}
    )
    private boolean wrapStartAttack(MinecraftClient instance, Operation<Boolean> original) {
@@ -53,7 +53,7 @@ public abstract class MixinMinecraft_B {
       method = {"handleInputEvents"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/MinecraftClient;handleBlockBreaking(Z)V"
+         target = "Lnet/minecraft/client/MinecraftClient;handleBlockBreaking(Z)V"
       )}
    )
    private void wrapContinueAttack(MinecraftClient instance, boolean leftClick, Operation<Void> original) {
@@ -71,7 +71,7 @@ public abstract class MixinMinecraft_B {
       method = {"handleInputEvents"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/MinecraftClient;doItemUse()V"
+         target = "Lnet/minecraft/client/MinecraftClient;doItemUse()V"
       )}
    )
    private void wrapStartUseItem(MinecraftClient instance, Operation<Void> original) {
@@ -89,7 +89,7 @@ public abstract class MixinMinecraft_B {
       method = {"handleInputEvents"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/MinecraftClient;doItemPick()V"
+         target = "Lnet/minecraft/client/MinecraftClient;doItemPick()V"
       )}
    )
    private void wrapPickBlock(MinecraftClient instance, Operation<Void> original) {

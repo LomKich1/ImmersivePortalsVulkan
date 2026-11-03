@@ -4,21 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.model.BlockStateModel;
-import net.minecraft.client.render.model.BlockModelPart;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.TexturedRenderLayers;
+import net.minecraft.client.render.block.BlockRenderManager;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.model.BakedQuad;
+import net.minecraft.client.render.model.BlockModelPart;
+import net.minecraft.client.render.model.BlockStateModel;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.client.render.block.BlockRenderManager;
-import net.minecraft.client.render.model.BakedQuad;
 import qouteall.imm_ptl.core.CHelper;
 import qouteall.imm_ptl.core.compat.iris_compatibility.IrisInterface;
 import qouteall.imm_ptl.core.compat.sodium_compatibility.SodiumInterface;
@@ -75,7 +75,9 @@ public class OverlayRendering {
       return result;
    }
 
-   private static void renderBreakablePortalOverlay(BreakablePortalEntity portal, float partialTick, MatrixStack matrixStack, OrderedRenderCommandQueue submitNodeCollector) {
+   private static void renderBreakablePortalOverlay(
+      BreakablePortalEntity portal, float partialTick, MatrixStack matrixStack, OrderedRenderCommandQueue submitNodeCollector
+   ) {
       BreakablePortalEntity.OverlayInfo overlay = portal.getActualOverlay();
       if (overlay != null) {
          BlockState blockState = overlay.blockState();
@@ -96,9 +98,7 @@ public class OverlayRendering {
 
                for (BlockPos blockPos : blockPortalShape.area) {
                   matrixStack.push();
-                  matrixStack.translate(
-                     blockPos.getX() - pos.x, blockPos.getY() - pos.y, blockPos.getZ() - pos.z
-                  );
+                  matrixStack.translate(blockPos.getX() - pos.x, blockPos.getY() - pos.y, blockPos.getZ() - pos.z);
                   if (overlay.rotation() != null) {
                      matrixStack.multiply(overlay.rotation().toMcQuaternion());
                   }
@@ -108,7 +108,7 @@ public class OverlayRendering {
                      renderLayer,
                      (blockPose, buffer) -> {
                         for (BakedQuad quad : quads) {
-                           SodiumInterface.invoker.markSpriteActive(quad.comp_3724());
+                           SodiumInterface.invoker.markSpriteActive(quad.sprite());
                            buffer.quad(
                               blockPose,
                               quad,

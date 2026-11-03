@@ -29,25 +29,25 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtDouble;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.math.Direction.class_2351;
-import net.minecraft.util.math.Direction.class_2352;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.util.math.Direction.AxisDirection;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.logging.log4j.LogManager;
@@ -199,84 +199,84 @@ public class Helper {
       return point.add(planeNormal.multiply(t));
    }
 
-   public static Vec3i getUnitFromAxis(class_2351 axis) {
-      return Direction.get(class_2352.field_11056, axis).getVector();
+   public static Vec3i getUnitFromAxis(Axis axis) {
+      return Direction.get(AxisDirection.POSITIVE, axis).getVector();
    }
 
-   public static int getCoordinate(Vec3i v, class_2351 axis) {
+   public static int getCoordinate(Vec3i v, Axis axis) {
       return axis.choose(v.getX(), v.getY(), v.getZ());
    }
 
-   public static double getCoordinate(Vec3d v, class_2351 axis) {
+   public static double getCoordinate(Vec3d v, Axis axis) {
       return axis.choose(v.x, v.y, v.z);
    }
 
    public static int getCoordinate(Vec3i v, Direction direction) {
-      return getCoordinate(v, direction.getAxis()) * (direction.getDirection() == class_2352.field_11056 ? 1 : -1);
+      return getCoordinate(v, direction.getAxis()) * (direction.getDirection() == AxisDirection.POSITIVE ? 1 : -1);
    }
 
-   public static Vec3d putCoordinate(Vec3d v, class_2351 axis, double value) {
+   public static Vec3d putCoordinate(Vec3d v, Axis axis, double value) {
       return switch (axis) {
-         case field_11048 -> new Vec3d(value, v.y, v.z);
-         case field_11052 -> new Vec3d(v.x, value, v.z);
+         case X -> new Vec3d(value, v.y, v.z);
+         case Y -> new Vec3d(v.x, value, v.z);
          default -> new Vec3d(v.x, v.y, value);
       };
    }
 
-   public static BlockPos putCoordinate(Vec3i v, class_2351 axis, int value) {
+   public static BlockPos putCoordinate(Vec3i v, Axis axis, int value) {
       return switch (axis) {
-         case field_11048 -> new BlockPos(value, v.getY(), v.getZ());
-         case field_11052 -> new BlockPos(v.getX(), value, v.getZ());
+         case X -> new BlockPos(value, v.getY(), v.getZ());
+         case Y -> new BlockPos(v.getX(), value, v.getZ());
          default -> new BlockPos(v.getX(), v.getY(), value);
       };
    }
 
    public static Vec3d putSignedCoordinate(Vec3d vec, Direction direction, double value) {
       return switch (direction) {
-         case field_11033 -> new Vec3d(vec.x, -value, vec.z);
-         case field_11036 -> new Vec3d(vec.x, value, vec.z);
-         case field_11043 -> new Vec3d(vec.x, vec.y, -value);
-         case field_11035 -> new Vec3d(vec.x, vec.y, value);
-         case field_11039 -> new Vec3d(-value, vec.y, vec.z);
-         case field_11034 -> new Vec3d(value, vec.y, vec.z);
+         case DOWN -> new Vec3d(vec.x, -value, vec.z);
+         case UP -> new Vec3d(vec.x, value, vec.z);
+         case NORTH -> new Vec3d(vec.x, vec.y, -value);
+         case SOUTH -> new Vec3d(vec.x, vec.y, value);
+         case WEST -> new Vec3d(-value, vec.y, vec.z);
+         case EAST -> new Vec3d(value, vec.y, vec.z);
          default -> throw new RuntimeException();
       };
    }
 
    public static double getSignedCoordinate(Vec3d vec, Direction direction) {
       return switch (direction) {
-         case field_11033 -> -vec.y;
-         case field_11036 -> vec.y;
-         case field_11043 -> -vec.z;
-         case field_11035 -> vec.z;
-         case field_11039 -> -vec.x;
-         case field_11034 -> vec.x;
+         case DOWN -> -vec.y;
+         case UP -> vec.y;
+         case NORTH -> -vec.z;
+         case SOUTH -> vec.z;
+         case WEST -> -vec.x;
+         case EAST -> vec.x;
          default -> throw new RuntimeException();
       };
    }
 
-   public static double getDistanceSqrOnAxisPlane(Vec3d vec, class_2351 axis) {
+   public static double getDistanceSqrOnAxisPlane(Vec3d vec, Axis axis) {
       return switch (axis) {
-         case field_11048 -> vec.y * vec.y + vec.z * vec.z;
-         case field_11052 -> vec.x * vec.x + vec.z * vec.z;
-         case field_11051 -> vec.x * vec.x + vec.y * vec.y;
+         case X -> vec.y * vec.y + vec.z * vec.z;
+         case Y -> vec.x * vec.x + vec.z * vec.z;
+         case Z -> vec.x * vec.x + vec.y * vec.y;
          default -> throw new MatchException(null, null);
       };
    }
 
    public static double getBoxCoordinate(Box box, Direction direction) {
       switch (direction) {
-         case field_11033:
+         case DOWN:
             return box.minY;
-         case field_11036:
+         case UP:
             return box.maxY;
-         case field_11043:
+         case NORTH:
             return box.minZ;
-         case field_11035:
+         case SOUTH:
             return box.maxZ;
-         case field_11039:
+         case WEST:
             return box.minX;
-         case field_11034:
+         case EAST:
             return box.maxX;
          default:
             throw new RuntimeException();
@@ -285,17 +285,17 @@ public class Helper {
 
    public static Box replaceBoxCoordinate(Box box, Direction direction, double coordinate) {
       switch (direction) {
-         case field_11033:
+         case DOWN:
             return new Box(box.minX, coordinate, box.minZ, box.maxX, box.maxY, box.maxZ);
-         case field_11036:
+         case UP:
             return new Box(box.minX, box.minY, box.minZ, box.maxX, coordinate, box.maxZ);
-         case field_11043:
+         case NORTH:
             return new Box(box.minX, box.minY, coordinate, box.maxX, box.maxY, box.maxZ);
-         case field_11035:
+         case SOUTH:
             return new Box(box.minX, box.minY, box.minZ, box.maxX, box.maxY, coordinate);
-         case field_11039:
+         case WEST:
             return new Box(coordinate, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ);
-         case field_11034:
+         case EAST:
             return new Box(box.minX, box.minY, box.minZ, coordinate, box.maxY, box.maxZ);
          default:
             throw new RuntimeException();
@@ -319,25 +319,21 @@ public class Helper {
    }
 
    public static BlockPos max(BlockPos a, BlockPos b) {
-      return new BlockPos(
-         Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY()), Math.max(a.getZ(), b.getZ())
-      );
+      return new BlockPos(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY()), Math.max(a.getZ(), b.getZ()));
    }
 
    public static BlockPos min(BlockPos a, BlockPos b) {
-      return new BlockPos(
-         Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY()), Math.min(a.getZ(), b.getZ())
-      );
+      return new BlockPos(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY()), Math.min(a.getZ(), b.getZ()));
    }
 
-   public static Pair<class_2351, class_2351> getAnotherTwoAxis(class_2351 axis) {
+   public static Pair<Axis, Axis> getAnotherTwoAxis(Axis axis) {
       switch (axis) {
-         case field_11048:
-            return new Pair(class_2351.field_11052, class_2351.field_11051);
-         case field_11052:
-            return new Pair(class_2351.field_11051, class_2351.field_11048);
-         case field_11051:
-            return new Pair(class_2351.field_11048, class_2351.field_11052);
+         case X:
+            return new Pair(Axis.Y, Axis.Z);
+         case Y:
+            return new Pair(Axis.Z, Axis.X);
+         case Z:
+            return new Pair(Axis.X, Axis.Y);
          default:
             throw new IllegalArgumentException();
       }
@@ -355,26 +351,23 @@ public class Helper {
       return new BlockPos(Math.floorDiv(v.getX(), d), Math.floorDiv(v.getY(), d), Math.floorDiv(v.getZ(), d));
    }
 
-   public static Direction[] getAnotherFourDirections(class_2351 axisOfNormal) {
-      Pair<class_2351, class_2351> anotherTwoAxis = getAnotherTwoAxis(axisOfNormal);
+   public static Direction[] getAnotherFourDirections(Axis axisOfNormal) {
+      Pair<Axis, Axis> anotherTwoAxis = getAnotherTwoAxis(axisOfNormal);
       return new Direction[]{
-         Direction.get(class_2352.field_11056, (class_2351)anotherTwoAxis.getLeft()),
-         Direction.get(class_2352.field_11056, (class_2351)anotherTwoAxis.getRight()),
-         Direction.get(class_2352.field_11060, (class_2351)anotherTwoAxis.getLeft()),
-         Direction.get(class_2352.field_11060, (class_2351)anotherTwoAxis.getRight())
+         Direction.get(AxisDirection.POSITIVE, (Axis)anotherTwoAxis.getLeft()),
+         Direction.get(AxisDirection.POSITIVE, (Axis)anotherTwoAxis.getRight()),
+         Direction.get(AxisDirection.NEGATIVE, (Axis)anotherTwoAxis.getLeft()),
+         Direction.get(AxisDirection.NEGATIVE, (Axis)anotherTwoAxis.getRight())
       };
    }
 
    public static Pair<Direction, Direction> getPerpendicularDirections(Direction facing) {
-      Pair<class_2351, class_2351> axises = getAnotherTwoAxis(facing.getAxis());
-      if (facing.getDirection() == class_2352.field_11060) {
-         axises = new Pair((class_2351)axises.getRight(), (class_2351)axises.getLeft());
+      Pair<Axis, Axis> axises = getAnotherTwoAxis(facing.getAxis());
+      if (facing.getDirection() == AxisDirection.NEGATIVE) {
+         axises = new Pair((Axis)axises.getRight(), (Axis)axises.getLeft());
       }
 
-      return new Pair(
-         Direction.get(class_2352.field_11056, (class_2351)axises.getLeft()),
-         Direction.get(class_2352.field_11056, (class_2351)axises.getRight())
-      );
+      return new Pair(Direction.get(AxisDirection.POSITIVE, (Axis)axises.getLeft()), Direction.get(AxisDirection.POSITIVE, (Axis)axises.getRight()));
    }
 
    public static Vec3d getBoxSize(Box box) {
@@ -391,7 +384,7 @@ public class Helper {
       return getBoxSurfaceInversed(box, direction.getOpposite());
    }
 
-   public static IntBox expandRectangle(BlockPos startingPos, Predicate<BlockPos> blockPosPredicate, class_2351 axis) {
+   public static IntBox expandRectangle(BlockPos startingPos, Predicate<BlockPos> blockPosPredicate, Axis axis) {
       IntBox wallArea = new IntBox(startingPos, startingPos);
 
       for (Direction direction : getAnotherFourDirections(axis)) {
@@ -417,8 +410,7 @@ public class Helper {
 
    public static Box getBoxByBottomPosAndSize(Vec3d boxBottomCenter, Vec3d viewBoxSize) {
       return new Box(
-         boxBottomCenter.subtract(viewBoxSize.x / 2.0, 0.0, viewBoxSize.z / 2.0),
-         boxBottomCenter.add(viewBoxSize.x / 2.0, viewBoxSize.y, viewBoxSize.z / 2.0)
+         boxBottomCenter.subtract(viewBoxSize.x / 2.0, 0.0, viewBoxSize.z / 2.0), boxBottomCenter.add(viewBoxSize.x / 2.0, viewBoxSize.y, viewBoxSize.z / 2.0)
       );
    }
 
@@ -465,7 +457,7 @@ public class Helper {
    public static RegistryKey<World> getWorldId(NbtCompound tag, String tagName) {
       NbtElement term = tag.get(tagName);
       if (term instanceof NbtString) {
-         String id = ((NbtString)term).comp_3831();
+         String id = ((NbtString)term).value();
          return dimIdToKey(id);
       } else {
          LOGGER.error("Cannot read world id from {}. Fallback to overworld", tag);
@@ -760,9 +752,7 @@ public class Helper {
          T firstValue = iterator.next();
          Stream<T> newStream = Streams.stream(iterator);
          return mapReduce(
-               newStream,
-               (lastPair, curr) -> new Pair(curr, function.apply((T)lastPair.getLeft(), curr)),
-               new Helper.SimpleBox<>(new Pair(firstValue, null))
+               newStream, (lastPair, curr) -> new Pair(curr, function.apply((T)lastPair.getLeft(), curr)), new Helper.SimpleBox<>(new Pair(firstValue, null))
             )
             .map(pair -> (S)pair.getRight());
       }
@@ -793,12 +783,10 @@ public class Helper {
       return direction.multiply(vec.dotProduct(direction));
    }
 
-   public static Direction getFacingExcludingAxis(Vec3d vec, class_2351 axis) {
+   public static Direction getFacingExcludingAxis(Vec3d vec, Axis axis) {
       return Arrays.stream(Direction.values())
          .filter(d -> d.getAxis() != axis)
-         .max(
-            Comparator.comparingDouble(dir -> vec.x * dir.getOffsetX() + vec.y * dir.getOffsetY() + vec.z * dir.getOffsetZ())
-         )
+         .max(Comparator.comparingDouble(dir -> vec.x * dir.getOffsetX() + vec.y * dir.getOffsetY() + vec.z * dir.getOffsetZ()))
          .orElse(null);
    }
 
@@ -1000,9 +988,7 @@ public class Helper {
    public static double getDistanceFromPointToLine(Vec3d point, Vec3d lineOrigin, Vec3d lineDirection) {
       Vec3d lineDirectionNormalized = lineDirection.normalize();
       Vec3d pointToLineOrigin = lineOrigin.subtract(point);
-      Vec3d pointToLineOriginProjected = pointToLineOrigin.subtract(
-         lineDirectionNormalized.multiply(pointToLineOrigin.dotProduct(lineDirectionNormalized))
-      );
+      Vec3d pointToLineOriginProjected = pointToLineOrigin.subtract(lineDirectionNormalized.multiply(pointToLineOrigin.dotProduct(lineDirectionNormalized)));
       return pointToLineOriginProjected.length();
    }
 

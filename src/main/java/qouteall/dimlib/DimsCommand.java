@@ -12,18 +12,18 @@ import com.mojang.serialization.JsonOps;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import net.minecraft.command.DefaultPermissions;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.command.CommandManager;
 import net.minecraft.command.argument.DimensionArgumentType;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.SimpleRegistry;
-import net.minecraft.text.Text;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.util.Identifier;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.dimension.DimensionOptions;
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import qouteall.dimlib.api.DimensionAPI;
@@ -83,19 +83,12 @@ public class DimsCommand {
                   )
             )
       );
-      builder.then(
-         CommandManager.literal("list")
-            .executes(
-               context -> {
-                  MinecraftServer server = ((ServerCommandSource)context.getSource()).getServer();
-                  MutableText text = Text.literal(
-                     server.getWorldRegistryKeys().stream().map(k -> k.getValue().toString()).sorted().collect(Collectors.joining("\n"))
-                  );
-                  ((ServerCommandSource)context.getSource()).sendFeedback(() -> text, false);
-                  return 0;
-               }
-            )
-      );
+      builder.then(CommandManager.literal("list").executes(context -> {
+         MinecraftServer server = ((ServerCommandSource)context.getSource()).getServer();
+         MutableText text = Text.literal(server.getWorldRegistryKeys().stream().map(k -> k.getValue().toString()).sorted().collect(Collectors.joining("\n")));
+         ((ServerCommandSource)context.getSource()).sendFeedback(() -> text, false);
+         return 0;
+      }));
       builder.then(CommandManager.literal("view_dim_config").then(CommandManager.argument("dim", DimensionArgumentType.dimension()).executes(context -> {
          ServerWorld world = DimensionArgumentType.getDimensionArgument(context, "dim");
          SimpleRegistry<DimensionOptions> dimensionRegistry = DimensionImpl.getDimensionRegistry(world.getServer());
@@ -153,7 +146,7 @@ public class DimsCommand {
    }
 
    private static void cloneDimension(ServerWorld templateDimension, Identifier newDimId) {
-      ChunkGenerator generator = templateDimension.method_14178().getChunkGenerator();
+      ChunkGenerator generator = templateDimension.getChunkManager().getChunkGenerator();
       DimensionAPI.addDimension(templateDimension.getServer(), newDimId, new DimensionOptions(templateDimension.getDimensionEntry(), generator));
    }
 }

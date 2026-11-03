@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.core.mixin.client.render;
 
 import net.minecraft.client.render.BufferBuilderStorage;
-import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.client.render.chunk.BlockBufferBuilderPool;
+import net.minecraft.client.render.chunk.ChunkBuilder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,7 +21,7 @@ public class MixinSectionRenderDispatcher {
       method = {"<init>"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/BufferBuilderStorage;getBlockBufferBuildersPool()Lnet/minecraft/BlockBufferBuilderPool;"
+         target = "Lnet/minecraft/client/render/BufferBuilderStorage;getBlockBufferBuildersPool()Lnet/minecraft/client/render/chunk/BlockBufferBuilderPool;"
       )}
    )
    private BlockBufferBuilderPool redirectSectionBufferBuilderPool(BufferBuilderStorage instance) {

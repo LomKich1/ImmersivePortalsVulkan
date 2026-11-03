@@ -1,16 +1,16 @@
 package qouteall.imm_ptl.core.miscellaneous;
 
 import net.minecraft.client.font.DrawnTextConsumer;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
+import net.minecraft.client.gui.widget.IconWidget;
+import net.minecraft.client.gui.widget.MultilineTextWidget;
+import net.minecraft.client.gui.widget.TextWidget;
+import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.client.gui.widget.MultilineTextWidget;
-import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
-import net.minecraft.client.gui.widget.IconWidget;
-import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import qouteall.imm_ptl.core.platform_specific.IPConfig;
 
 public class IPortalInitialScreen extends Screen {
@@ -95,12 +95,12 @@ public class IPortalInitialScreen extends Screen {
          super(message, font);
       }
 
-      public void draw(DrawnTextConsumer collector) {
+      public void draw(DrawnTextConsumer textConsumer) {
          Text message = this.getMessage();
          int textWidth = this.getTextRenderer().getWidth(message);
          int x = this.getX() + Math.round(0.5F * (this.getWidth() - textWidth));
          int y = this.getY() + (this.getHeight() - 9) / 2;
-         collector.text(x, y, message.asOrderedText());
+         textConsumer.text(x, y, message.asOrderedText());
       }
    }
 }

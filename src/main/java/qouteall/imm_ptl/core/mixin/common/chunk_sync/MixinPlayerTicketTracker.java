@@ -7,11 +7,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import qouteall.imm_ptl.core.platform_specific.IPConfig;
 
 @Mixin(
-   targets = {"net/minecraft/ChunkLevelManager.NearbyChunkTicketUpdater"}
+   targets = {"net/minecraft/server/world/ChunkLevelManager$NearbyChunkTicketUpdater"}
 )
 public class MixinPlayerTicketTracker {
    @Inject(
-      method = {"Lnet/minecraft/ChunkLevelManager.NearbyChunkTicketUpdater;onDistanceChange(JII)V", "setWatchDistance", "Lnet/minecraft/ChunkLevelManager.NearbyChunkTicketUpdater;updateTicket(JIZZ)V", "updateLevels"},
+      method = {"Lnet/minecraft/server/world/ChunkLevelManager$NearbyChunkTicketUpdater;onDistanceChange(JII)V", "setWatchDistance", "Lnet/minecraft/server/world/ChunkLevelManager$NearbyChunkTicketUpdater;updateTicket(JIZZ)V", "updateLevels"},
       at = {@At("HEAD")},
       cancellable = true
    )

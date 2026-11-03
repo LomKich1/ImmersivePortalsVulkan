@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Objects;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Util;
-import net.minecraft.text.Text;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Util;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -88,9 +88,7 @@ public class IPModInfoChecking {
                                  () -> {
                                     List<MutableText> texts = new ArrayList<>();
                                     if (IPGlobal.enableUpdateNotification && O_O.shouldUpdateImmPtl(immPtlInfo.latestReleaseVersion)) {
-                                       MutableText text1 = Text.translatable(
-                                          "imm_ptl.new_version_available", new Object[]{immPtlInfo.latestReleaseVersion}
-                                       );
+                                       MutableText text1 = Text.translatable("imm_ptl.new_version_available", new Object[]{immPtlInfo.latestReleaseVersion});
                                        text1.append(McHelper.getLinkText(O_O.getModDownloadLink()));
                                        text1.append(Text.literal("  "));
                                        text1.append(IPMcHelper.getDisableUpdateCheckText());
@@ -110,7 +108,7 @@ public class IPModInfoChecking {
                                     for (IPModInfoChecking.ModIncompatInfo info : immPtlInfo.incompatible) {
                                        if (info != null && info.isModLoadedWithinVersion() && IPConfig.getConfig().shouldDisplayWarning(info.modId)) {
                                           MutableText text1 = Text.translatable("imm_ptl.incompatible", new Object[]{info.modName, info.modId})
-                                             .formatted(Formatting.field_1061)
+                                             .formatted(Formatting.RED)
                                              .append(IPMcHelper.getDisableWarningText(info.modId));
                                           if (info.desc != null) {
                                              text1.append(Text.literal(" " + info.desc + " "));
@@ -148,7 +146,7 @@ public class IPModInfoChecking {
                               Text.literal(
                                     "[Immersive Portals] WARNING: You are using many mods. It's likely that one of them has compatibility issues with Immersive Portals. If you are sure that there is no compatibility issue, disable this warning."
                                  )
-                                 .formatted(Formatting.field_1061)
+                                 .formatted(Formatting.RED)
                                  .append(IPMcHelper.getDisableWarningText("many_mods"))
                            );
                         }
@@ -166,12 +164,10 @@ public class IPModInfoChecking {
          if (info != null && info.isModLoadedWithinVersion()) {
             MutableText text1;
             if (info.startVersion == null && info.endVersion == null) {
-               text1 = Text.translatable("imm_ptl.severely_incompatible", new Object[]{info.modName, info.modId}).formatted(Formatting.field_1061);
+               text1 = Text.translatable("imm_ptl.severely_incompatible", new Object[]{info.modName, info.modId}).formatted(Formatting.RED);
             } else {
-               text1 = Text.translatable(
-                     "imm_ptl.severely_incompatible_within_version", new Object[]{info.modName, info.modId, info.getVersionRangeStr()}
-                  )
-                  .formatted(Formatting.field_1061);
+               text1 = Text.translatable("imm_ptl.severely_incompatible_within_version", new Object[]{info.modName, info.modId, info.getVersionRangeStr()})
+                  .formatted(Formatting.RED);
             }
 
             if (info.desc != null) {
@@ -211,7 +207,7 @@ public class IPModInfoChecking {
                                     MutableText text1;
                                     if (mod.startVersion == null && mod.endVersion == null) {
                                        text1 = Text.translatable("imm_ptl.severely_incompatible", new Object[]{mod.modName, mod.modId})
-                                          .formatted(Formatting.field_1061);
+                                          .formatted(Formatting.RED);
                                        LOGGER.error(
                                           "[Immersive Portals] Detected an incompatible mod: {} {} description: {} link: {}",
                                           new Object[]{mod.modName, mod.modId, mod.desc, mod.link}
@@ -220,7 +216,7 @@ public class IPModInfoChecking {
                                        text1 = Text.translatable(
                                              "imm_ptl.severely_incompatible_within_version", new Object[]{mod.modName, mod.modId, mod.getVersionRangeStr()}
                                           )
-                                          .formatted(Formatting.field_1061);
+                                          .formatted(Formatting.RED);
                                        LOGGER.error(
                                           "[Immersive Portals] Detected an incompatible mod: {} {} version range: {} description: {} link: {}",
                                           new Object[]{mod.modName, mod.modId, mod.getVersionRangeStr(), mod.desc, mod.link}
@@ -243,7 +239,7 @@ public class IPModInfoChecking {
                               for (IPModInfoChecking.ModIncompatInfo modx : immPtlInfo.incompatible) {
                                  if (modx != null && modx.isModLoadedWithinVersion() && IPConfig.getConfig().shouldDisplayWarning(modx.modId)) {
                                     MutableText text1x = Text.translatable("imm_ptl.incompatible", new Object[]{modx.modName, modx.modId})
-                                       .formatted(Formatting.field_1061);
+                                       .formatted(Formatting.RED);
                                     if (modx.desc != null) {
                                        text1x.append(Text.literal(" " + modx.desc + " "));
                                     }
@@ -275,7 +271,7 @@ public class IPModInfoChecking {
             if (shaderpackName != null && incompatibleShaderpacks != null) {
                boolean incompatible = incompatibleShaderpacks.stream().anyMatch(n -> shaderpackName.toLowerCase().contains(n.toLowerCase()));
                if (incompatible) {
-                  CHelper.printChat(Text.translatable("imm_ptl.incompatible_shaderpack").formatted(Formatting.field_1061));
+                  CHelper.printChat(Text.translatable("imm_ptl.incompatible_shaderpack").formatted(Formatting.RED));
                }
             }
          }

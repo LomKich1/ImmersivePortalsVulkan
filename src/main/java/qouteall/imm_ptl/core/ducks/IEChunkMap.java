@@ -2,11 +2,11 @@ package qouteall.imm_ptl.core.ducks;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.entity.Entity;
-import net.minecraft.server.world.ChunkHolder;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerLightingProvider;
-import net.minecraft.server.world.ServerChunkLoadingManager.class_3208;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.world.ServerChunkLoadingManager.EntityTracker;
 import org.jetbrains.annotations.Nullable;
 
 public interface IEChunkMap {
@@ -24,7 +24,7 @@ public interface IEChunkMap {
 
    void ip_resendSpawnPacketToTrackers(Entity var1);
 
-   Int2ObjectMap<class_3208> ip_getEntityTrackerMap();
+   Int2ObjectMap<EntityTracker> ip_getEntityTrackerMap();
 
    @Nullable
    ChunkHolder ip_getUpdatingChunkIfPresent(long var1);

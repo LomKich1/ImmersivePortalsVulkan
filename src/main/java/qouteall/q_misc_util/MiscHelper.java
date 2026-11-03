@@ -14,10 +14,10 @@ import java.lang.reflect.Type;
 import java.nio.file.Path;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.world.World;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -66,7 +66,7 @@ public class MiscHelper {
 
    public static Path getWorldSavingDirectory(MinecraftServer server) {
       Validate.notNull(server);
-      return ((IELevelStorageAccess_Misc)((IEMinecraftServer_Misc)server).ip_getStorageSource()).ip_getLevelPath().comp_732();
+      return ((IELevelStorageAccess_Misc)((IEMinecraftServer_Misc)server).ip_getStorageSource()).ip_getLevelPath().path();
    }
 
    static {

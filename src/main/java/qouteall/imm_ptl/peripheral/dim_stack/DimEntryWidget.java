@@ -4,24 +4,24 @@ import com.mojang.logging.LogUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.Click;
-import net.minecraft.world.World;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.widget.ElementListWidget.class_4266;
+import net.minecraft.client.gui.widget.ElementListWidget.Entry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import qouteall.imm_ptl.core.CHelper;
 import qouteall.imm_ptl.core.McHelper;
 
-public class DimEntryWidget extends class_4266<DimEntryWidget> {
+public class DimEntryWidget extends Entry<DimEntryWidget> {
    private static final Logger LOGGER = LogUtils.getLogger();
    public final RegistryKey<World> dimension;
    public final DimListWidget parent;
@@ -56,54 +56,50 @@ public class DimEntryWidget extends class_4266<DimEntryWidget> {
       return this.children;
    }
 
-   public void render(@NotNull DrawContext guiGraphics, int mouseX, int mouseY, boolean hovered, float delta) {
+   public void render(@NotNull DrawContext context, int mouseX, int mouseY, boolean hovered, float deltaTicks) {
       int x = this.getX();
       int y = this.getY();
       int rowWidth = this.getWidth();
       MinecraftClient client = MinecraftClient.getInstance();
-      guiGraphics.drawTextWithShadow(client.textRenderer, this.dimensionName.getString(), x + 50 + 3, y, -1);
-      guiGraphics.drawTextWithShadow(client.textRenderer, this.dimension.getValue().toString(), x + 50 + 3, y + 10, -6710887);
+      context.drawTextWithShadow(client.textRenderer, this.dimensionName.getString(), x + 50 + 3, y, -1);
+      context.drawTextWithShadow(client.textRenderer, this.dimension.getValue().toString(), x + 50 + 3, y + 10, -6710887);
       if (this.dimIconPath != null) {
-         guiGraphics.getMatrices().pushMatrix();
-         guiGraphics.getMatrices().translate(x, y);
+         context.getMatrices().pushMatrix();
+         context.getMatrices().translate(x, y);
          int iconLen = 46;
          if (this.entry != null && this.entry.flipped) {
-            guiGraphics.getMatrices().rotateAbout((float)Math.toRadians(180.0), iconLen / 2.0F, iconLen / 2.0F);
+            context.getMatrices().rotateAbout((float)Math.toRadians(180.0), iconLen / 2.0F, iconLen / 2.0F);
          }
 
-         guiGraphics.drawTexture(RenderPipelines.GUI_TEXTURED, this.dimIconPath, 0, 0, 0.0F, 0.0F, iconLen, iconLen, iconLen, iconLen);
-         guiGraphics.getMatrices().popMatrix();
+         context.drawTexture(RenderPipelines.GUI_TEXTURED, this.dimIconPath, 0, 0, 0.0F, 0.0F, iconLen, iconLen, iconLen, iconLen);
+         context.getMatrices().popMatrix();
       }
 
       if (this.entry != null) {
-         guiGraphics.drawTextWithShadow(client.textRenderer, this.getText1(), x + 50 + 3, y + 20, -6710887);
-         guiGraphics.drawTextWithShadow(client.textRenderer, this.getText2(), x + 50 + 3, y + 30, -6710887);
+         context.drawTextWithShadow(client.textRenderer, this.getText1(), x + 50 + 3, y + 20, -6710887);
+         context.drawTextWithShadow(client.textRenderer, this.getText2(), x + 50 + 3, y + 30, -6710887);
          if (this.arrowToPrevious != DimEntryWidget.ArrowType.none) {
-            guiGraphics.getMatrices().pushMatrix();
-            guiGraphics.getMatrices().translate(x + rowWidth - 13, y);
-            guiGraphics.getMatrices().scale(1.5F, 1.5F);
-            guiGraphics.drawTextWithShadow(
+            context.getMatrices().pushMatrix();
+            context.getMatrices().translate(x + rowWidth - 13, y);
+            context.getMatrices().scale(1.5F, 1.5F);
+            context.drawTextWithShadow(
                client.textRenderer, Text.literal("↑"), 0, 0, this.arrowToPrevious == DimEntryWidget.ArrowType.enabled ? -6710887 : -65536
             );
-            guiGraphics.getMatrices().popMatrix();
+            context.getMatrices().popMatrix();
          }
 
          if (this.arrowToNext != DimEntryWidget.ArrowType.none) {
-            guiGraphics.getMatrices().pushMatrix();
-            guiGraphics.getMatrices().translate(x + rowWidth - 13, y + 50 - 14.5F);
-            guiGraphics.getMatrices().scale(1.5F, 1.5F);
-            guiGraphics.drawTextWithShadow(
-               client.textRenderer, Text.literal("↓"), 0, 0, this.arrowToNext == DimEntryWidget.ArrowType.enabled ? -6710887 : -65536
-            );
-            guiGraphics.getMatrices().popMatrix();
+            context.getMatrices().pushMatrix();
+            context.getMatrices().translate(x + rowWidth - 13, y + 50 - 14.5F);
+            context.getMatrices().scale(1.5F, 1.5F);
+            context.drawTextWithShadow(client.textRenderer, Text.literal("↓"), 0, 0, this.arrowToNext == DimEntryWidget.ArrowType.enabled ? -6710887 : -65536);
+            context.getMatrices().popMatrix();
          }
       }
    }
 
    private Text getText1() {
-      return this.entry.scale != 1.0
-         ? Text.translatable("imm_ptl.scale").append(Text.literal(":" + Double.toString(this.entry.scale)))
-         : Text.literal("");
+      return this.entry.scale != 1.0 ? Text.translatable("imm_ptl.scale").append(Text.literal(":" + Double.toString(this.entry.scale))) : Text.literal("");
    }
 
    private Text getText2() {
@@ -114,9 +110,9 @@ public class DimEntryWidget extends class_4266<DimEntryWidget> {
          : Text.literal("");
    }
 
-   public boolean mouseClicked(Click mouseButtonEvent, boolean doubleClick) {
+   public boolean mouseClicked(Click click, boolean doubled) {
       this.selectCallback.accept(this);
-      super.mouseClicked(mouseButtonEvent, doubleClick);
+      super.mouseClicked(click, doubled);
       return true;
    }
 

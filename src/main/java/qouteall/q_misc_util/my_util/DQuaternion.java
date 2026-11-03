@@ -1,10 +1,10 @@
 package qouteall.q_misc_util.my_util;
 
 import java.util.Objects;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Pair;
+import net.minecraft.util.math.Vec3d;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -64,9 +64,7 @@ public class DQuaternion {
    public static DQuaternion rotationByRadians(Vec3d axis, double rotationAngle) {
       double s = Math.sin(rotationAngle / 2.0);
       Vec3d normalizedAxis = axis.normalize();
-      return new DQuaternion(
-         normalizedAxis.getX() * s, normalizedAxis.getY() * s, normalizedAxis.getZ() * s, Math.cos(rotationAngle / 2.0)
-      );
+      return new DQuaternion(normalizedAxis.getX() * s, normalizedAxis.getY() * s, normalizedAxis.getZ() * s, Math.cos(rotationAngle / 2.0));
    }
 
    public Vec3d rotate(Vec3d vec) {

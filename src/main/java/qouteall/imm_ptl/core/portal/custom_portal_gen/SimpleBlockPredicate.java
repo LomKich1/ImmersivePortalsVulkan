@@ -7,17 +7,17 @@ import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.Lifecycle;
 import java.util.Optional;
 import java.util.function.Predicate;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.util.Identifier;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.RegistryOps;
+import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryEntryLookup;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry.class_6883;
+import net.minecraft.registry.RegistryOps;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryEntry.Reference;
+import net.minecraft.registry.tag.TagKey;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,13 +52,13 @@ public class SimpleBlockPredicate implements Predicate<BlockState> {
       if (this.tag != null) {
          return blockState.isIn(this.tag);
       } else {
-         return this.blockHolder != null ? blockState.getBlock() == this.blockHolder.comp_349() : true;
+         return this.blockHolder != null ? blockState.getBlock() == this.blockHolder.value() : true;
       }
    }
 
    public static class AirPredicate extends SimpleBlockPredicate {
       public AirPredicate() {
-         super("minecraft:air", Blocks.field_10124.getRegistryEntry());
+         super("minecraft:air", Blocks.AIR.getRegistryEntry());
       }
 
       @Override
@@ -75,7 +75,7 @@ public class SimpleBlockPredicate implements Predicate<BlockState> {
                return DataResult.error(() -> "SimpleBlockPredicate should be string");
             } else {
                String str = (String)stringValue.result().get();
-               Optional<RegistryEntryLookup<Block>> optionalGetter = registryOps.getEntryLookup(RegistryKeys.field_41254);
+               Optional<RegistryEntryLookup<Block>> optionalGetter = registryOps.getEntryLookup(RegistryKeys.BLOCK);
                if (optionalGetter.isEmpty()) {
                   return DataResult.error(() -> "Missing block registry");
                } else {
@@ -87,7 +87,7 @@ public class SimpleBlockPredicate implements Predicate<BlockState> {
                         return DataResult.error(() -> "Invalid block tag id:" + blockTagIdStr);
                      } else {
                         Identifier resourceLocation = (Identifier)bockTagRl.result().get();
-                        TagKey<Block> tagKey = TagKey.of(RegistryKeys.field_41254, resourceLocation);
+                        TagKey<Block> tagKey = TagKey.of(RegistryKeys.BLOCK, resourceLocation);
                         return DataResult.success(Pair.of(new SimpleBlockPredicate(str, tagKey), ops.empty()), Lifecycle.stable());
                      }
                   } else {
@@ -99,9 +99,9 @@ public class SimpleBlockPredicate implements Predicate<BlockState> {
                         if (resourceLocation.toString().equals("minecraft:air")) {
                            return DataResult.success(Pair.of(new SimpleBlockPredicate.AirPredicate(), ops.empty()), Lifecycle.stable());
                         } else {
-                           Optional<class_6883<Block>> blockRef = getter.getOptional(RegistryKey.of(RegistryKeys.field_41254, resourceLocation));
+                           Optional<Reference<Block>> blockRef = getter.getOptional(RegistryKey.of(RegistryKeys.BLOCK, resourceLocation));
                            if (blockRef.isEmpty()) {
-                              TagKey<Block> tagKey = TagKey.of(RegistryKeys.field_41254, resourceLocation);
+                              TagKey<Block> tagKey = TagKey.of(RegistryKeys.BLOCK, resourceLocation);
                               return DataResult.success(Pair.of(new SimpleBlockPredicate(str, tagKey), ops.empty()), Lifecycle.stable());
                            } else {
                               return DataResult.success(

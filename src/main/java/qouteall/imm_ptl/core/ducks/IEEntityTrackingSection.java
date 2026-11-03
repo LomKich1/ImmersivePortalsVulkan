@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.core.ducks;
 
 import java.util.function.Function;
-import net.minecraft.world.entity.EntityLike;
 import net.minecraft.util.TypeFilter;
+import net.minecraft.world.entity.EntityLike;
 import org.jetbrains.annotations.Nullable;
 
 public interface IEEntityTrackingSection<T extends EntityLike> {

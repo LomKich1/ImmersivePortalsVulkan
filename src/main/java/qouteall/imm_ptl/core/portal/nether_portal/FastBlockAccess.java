@@ -2,15 +2,15 @@ package qouteall.imm_ptl.core.portal.nether_portal;
 
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkManager;
+import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.util.math.ChunkSectionPos;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,7 +64,7 @@ public record FastBlockAccess(ChunkSection[] sections, int lowerCX, int lowerCY,
       int cy = y >> 4;
       int cz = z >> 4;
       ChunkSection section = this.getSection(cx, cy, cz);
-      return section == null ? Blocks.field_10124.getDefaultState() : section.getBlockState(x & 15, y & 15, z & 15);
+      return section == null ? Blocks.AIR.getDefaultState() : section.getBlockState(x & 15, y & 15, z & 15);
    }
 
    @Nullable

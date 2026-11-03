@@ -3,15 +3,15 @@ package qouteall.q_misc_util;
 import java.util.TreeMap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.profiler.Profilers;
-import net.minecraft.client.font.Alignment;
-import net.minecraft.text.Text;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.Alignment;
+import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.MutableText;
-import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.profiler.Profilers;
 import org.jetbrains.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
@@ -77,7 +77,7 @@ public class CustomTextOverlay {
          int guiScaledHeight = minecraft.getWindow().getScaledHeight();
          TextRenderer font = minecraft.inGameHud.getTextRenderer();
          Profilers.get().push("imm_ptl_custom_overlay");
-         multiLineLabelCache.draw(Alignment.field_62010, guiScaledWidth / 2, (int)(guiScaledHeight * 0.75), 9, guiGraphics.getTextConsumer());
+         multiLineLabelCache.draw(Alignment.CENTER, guiScaledWidth / 2, (int)(guiScaledHeight * 0.75), 9, guiGraphics.getTextConsumer());
          guiGraphics.getMatrices().popMatrix();
          Profilers.get().pop();
       }

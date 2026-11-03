@@ -1,15 +1,15 @@
 package qouteall.imm_ptl.core.render;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.client.render.Camera;
-import net.minecraft.util.hit.HitResult.class_240;
-import net.minecraft.world.RaycastContext.class_242;
-import net.minecraft.world.RaycastContext.class_3960;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult.Type;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
+import net.minecraft.world.RaycastContext.FluidHandling;
+import net.minecraft.world.RaycastContext.ShapeType;
 import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.IPCGlobal;
 import qouteall.imm_ptl.core.IPGlobal;
@@ -50,10 +50,7 @@ public class CrossPortalViewRendering {
                Vec3d renderingCameraPos;
                if (isThirdPerson()) {
                   double distance = getThirdPersonMaxDistance();
-                  Vec3d thirdPersonPos = realCameraPos.subtract(physicalPlayerHeadPos)
-                     .normalize()
-                     .multiply(distance)
-                     .add(physicalPlayerHeadPos);
+                  Vec3d thirdPersonPos = realCameraPos.subtract(physicalPlayerHeadPos).normalize().multiply(distance).add(physicalPlayerHeadPos);
                   renderingCameraPos = getThirdPersonCameraPos(thirdPersonPos, portal, hitPos);
                } else {
                   renderingCameraPos = portal.transformPoint(realCameraPos);
@@ -92,8 +89,8 @@ public class CrossPortalViewRendering {
       assert client.getCameraEntity() != null;
 
       BlockHitResult blockHitResult = portal.getDestinationWorld()
-         .raycast(new RaycastContext(rtStart, rtEnd, class_3960.field_23142, class_242.field_1348, client.getCameraEntity()));
-      return blockHitResult.getType() == class_240.field_1332
+         .raycast(new RaycastContext(rtStart, rtEnd, ShapeType.VISUAL, FluidHandling.NONE, client.getCameraEntity()));
+      return blockHitResult.getType() == Type.BLOCK
          ? rtStart.add(rtEnd.subtract(rtStart).normalize().multiply(getThirdPersonMaxDistance()))
          : blockHitResult.getPos();
    }

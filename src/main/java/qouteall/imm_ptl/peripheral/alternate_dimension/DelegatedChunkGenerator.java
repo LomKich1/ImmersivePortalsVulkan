@@ -6,34 +6,34 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.BiomeSource;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.structure.Structure;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.ChunkRegion;
-import net.minecraft.structure.StructureTemplateManager;
-import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.gen.chunk.VerticalBlockSample;
-import net.minecraft.world.gen.StructureAccessor;
-import net.minecraft.world.StructureWorldAccess;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.world.biome.GenerationSettings;
-import net.minecraft.world.HeightLimitView;
-import net.minecraft.util.collection.WeightedPool;
-import net.minecraft.world.gen.chunk.Blender;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryEntryList;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureSet;
-import net.minecraft.world.gen.noise.NoiseConfig;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.structure.StructureTemplateManager;
+import net.minecraft.util.collection.Pool;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ChunkRegion;
+import net.minecraft.world.HeightLimitView;
+import net.minecraft.world.StructureWorldAccess;
+import net.minecraft.world.World;
+import net.minecraft.world.Heightmap.Type;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.GenerationSettings;
+import net.minecraft.world.biome.SpawnSettings.SpawnEntry;
+import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.world.biome.source.BiomeSource;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.gen.StructureAccessor;
+import net.minecraft.world.gen.chunk.Blender;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.chunk.VerticalBlockSample;
 import net.minecraft.world.gen.chunk.placement.StructurePlacementCalculator;
-import net.minecraft.world.Heightmap.class_2903;
-import net.minecraft.world.biome.SpawnSettings.class_1964;
+import net.minecraft.world.gen.noise.NoiseConfig;
+import net.minecraft.world.gen.structure.Structure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.miscellaneous.IPVanillaCopy;
@@ -49,14 +49,12 @@ public abstract class DelegatedChunkGenerator extends ChunkGenerator {
       this.biomeSource_ = biomeSource;
    }
 
-   public void carve(
-      ChunkRegion worldGenRegion, long l, NoiseConfig randomState, BiomeAccess biomeManager, StructureAccessor structureManager, Chunk chunkAccess
-   ) {
-      this.delegate.carve(worldGenRegion, l, randomState, biomeManager, structureManager, chunkAccess);
+   public void carve(ChunkRegion chunkRegion, long seed, NoiseConfig noiseConfig, BiomeAccess biomeAccess, StructureAccessor structureAccessor, Chunk chunk) {
+      this.delegate.carve(chunkRegion, seed, noiseConfig, biomeAccess, structureAccessor, chunk);
    }
 
-   public void buildSurface(ChunkRegion worldGenRegion, StructureAccessor structureManager, NoiseConfig randomState, Chunk chunkAccess) {
-      this.delegate.buildSurface(worldGenRegion, structureManager, randomState, chunkAccess);
+   public void buildSurface(ChunkRegion region, StructureAccessor structures, NoiseConfig noiseConfig, Chunk chunk) {
+      this.delegate.buildSurface(region, structures, noiseConfig, chunk);
    }
 
    public void populateEntities(ChunkRegion region) {
@@ -68,8 +66,8 @@ public abstract class DelegatedChunkGenerator extends ChunkGenerator {
    }
 
    @NotNull
-   public CompletableFuture<Chunk> populateNoise(Blender blender, NoiseConfig randomState, StructureAccessor structureManager, Chunk chunkAccess) {
-      return this.delegate.populateNoise(blender, randomState, structureManager, chunkAccess);
+   public CompletableFuture<Chunk> populateNoise(Blender blender, NoiseConfig noiseConfig, StructureAccessor structureAccessor, Chunk chunk) {
+      return this.delegate.populateNoise(blender, noiseConfig, structureAccessor, chunk);
    }
 
    public int getSeaLevel() {
@@ -80,39 +78,41 @@ public abstract class DelegatedChunkGenerator extends ChunkGenerator {
       return this.delegate.getMinimumY();
    }
 
-   public int getHeight(int i, int j, class_2903 types, HeightLimitView levelHeightAccessor, NoiseConfig randomState) {
-      return this.delegate.getHeight(i, j, types, levelHeightAccessor, randomState);
+   public int getHeight(int x, int z, Type heightmap, HeightLimitView world, NoiseConfig noiseConfig) {
+      return this.delegate.getHeight(x, z, heightmap, world, noiseConfig);
    }
 
-   public VerticalBlockSample getColumnSample(int i, int j, HeightLimitView levelHeightAccessor, NoiseConfig randomState) {
-      return this.delegate.getColumnSample(i, j, levelHeightAccessor, randomState);
+   public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world, NoiseConfig noiseConfig) {
+      return this.delegate.getColumnSample(x, z, world, noiseConfig);
    }
 
-   public void appendDebugHudText(List<String> list, NoiseConfig randomState, BlockPos blockPos) {
-      this.delegate.appendDebugHudText(list, randomState, blockPos);
+   public void appendDebugHudText(List<String> text, NoiseConfig noiseConfig, BlockPos pos) {
+      this.delegate.appendDebugHudText(text, noiseConfig, pos);
    }
 
-   public StructurePlacementCalculator createStructurePlacementCalculator(RegistryWrapper<StructureSet> holderLookup, NoiseConfig randomState, long l) {
-      return super.createStructurePlacementCalculator(holderLookup, randomState, l);
+   public StructurePlacementCalculator createStructurePlacementCalculator(
+      RegistryWrapper<StructureSet> structureSetRegistry, NoiseConfig noiseConfig, long seed
+   ) {
+      return super.createStructurePlacementCalculator(structureSetRegistry, noiseConfig, seed);
    }
 
-   public CompletableFuture<Chunk> populateBiomes(NoiseConfig randomState, Blender blender, StructureAccessor structureManager, Chunk chunkAccess) {
-      return super.populateBiomes(randomState, blender, structureManager, chunkAccess);
+   public CompletableFuture<Chunk> populateBiomes(NoiseConfig noiseConfig, Blender blender, StructureAccessor structureAccessor, Chunk chunk) {
+      return super.populateBiomes(noiseConfig, blender, structureAccessor, chunk);
    }
 
    public void setStructureStarts(
-      DynamicRegistryManager registryAccess,
-      StructurePlacementCalculator chunkGeneratorStructureState,
-      StructureAccessor structureManager,
-      Chunk chunkAccess,
+      DynamicRegistryManager registryManager,
+      StructurePlacementCalculator placementCalculator,
+      StructureAccessor structureAccessor,
+      Chunk chunk,
       StructureTemplateManager structureTemplateManager,
       RegistryKey<World> dimension
    ) {
-      super.setStructureStarts(registryAccess, chunkGeneratorStructureState, structureManager, chunkAccess, structureTemplateManager, dimension);
+      super.setStructureStarts(registryManager, placementCalculator, structureAccessor, chunk, structureTemplateManager, dimension);
    }
 
-   public void generateFeatures(StructureWorldAccess worldGenLevel, Chunk chunkAccess, StructureAccessor structureManager) {
-      this.delegate.generateFeatures(worldGenLevel, chunkAccess, structureManager);
+   public void generateFeatures(StructureWorldAccess world, Chunk chunk, StructureAccessor structureAccessor) {
+      this.delegate.generateFeatures(world, chunk, structureAccessor);
    }
 
    public Optional<RegistryKey<MapCodec<? extends ChunkGenerator>>> getCodecKey() {
@@ -121,36 +121,36 @@ public abstract class DelegatedChunkGenerator extends ChunkGenerator {
 
    @Nullable
    public Pair<BlockPos, RegistryEntry<Structure>> locateStructure(
-      ServerWorld serverLevel, RegistryEntryList<Structure> holderSet, BlockPos blockPos, int i, boolean bl
+      ServerWorld world, RegistryEntryList<Structure> structures, BlockPos center, int radius, boolean skipReferencedStructures
    ) {
-      return this.delegate.locateStructure(serverLevel, holderSet, blockPos, i, bl);
+      return this.delegate.locateStructure(world, structures, center, radius, skipReferencedStructures);
    }
 
-   public int getSpawnHeight(HeightLimitView level) {
-      return this.delegate.getSpawnHeight(level);
+   public int getSpawnHeight(HeightLimitView world) {
+      return this.delegate.getSpawnHeight(world);
    }
 
    public BiomeSource getBiomeSource() {
       return this.delegate.getBiomeSource();
    }
 
-   public WeightedPool<class_1964> getEntitySpawnList(RegistryEntry<Biome> holder, StructureAccessor structureManager, SpawnGroup mobCategory, BlockPos blockPos) {
-      return this.delegate.getEntitySpawnList(holder, structureManager, mobCategory, blockPos);
+   public Pool<SpawnEntry> getEntitySpawnList(RegistryEntry<Biome> biome, StructureAccessor accessor, SpawnGroup group, BlockPos pos) {
+      return this.delegate.getEntitySpawnList(biome, accessor, group, pos);
    }
 
-   public void addStructureReferences(StructureWorldAccess worldGenLevel, StructureAccessor structureManager, Chunk chunkAccess) {
-      this.delegate.addStructureReferences(worldGenLevel, structureManager, chunkAccess);
+   public void addStructureReferences(StructureWorldAccess world, StructureAccessor structureAccessor, Chunk chunk) {
+      this.delegate.addStructureReferences(world, structureAccessor, chunk);
    }
 
-   public int getHeightOnGround(int i, int j, class_2903 types, HeightLimitView levelHeightAccessor, NoiseConfig randomState) {
-      return this.delegate.getHeightOnGround(i, j, types, levelHeightAccessor, randomState);
+   public int getHeightOnGround(int x, int z, Type heightmap, HeightLimitView world, NoiseConfig noiseConfig) {
+      return this.delegate.getHeightOnGround(x, z, heightmap, world, noiseConfig);
    }
 
-   public int getHeightInGround(int i, int j, class_2903 types, HeightLimitView levelHeightAccessor, NoiseConfig randomState) {
-      return this.delegate.getHeightInGround(i, j, types, levelHeightAccessor, randomState);
+   public int getHeightInGround(int x, int z, Type heightmap, HeightLimitView world, NoiseConfig noiseConfig) {
+      return this.delegate.getHeightInGround(x, z, heightmap, world, noiseConfig);
    }
 
-   public GenerationSettings getGenerationSettings(RegistryEntry<Biome> holder) {
-      return this.delegate.getGenerationSettings(holder);
+   public GenerationSettings getGenerationSettings(RegistryEntry<Biome> biomeEntry) {
+      return this.delegate.getGenerationSettings(biomeEntry);
    }
 }

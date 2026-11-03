@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.core.render.renderer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import qouteall.imm_ptl.core.portal.Portal;
@@ -48,7 +48,9 @@ public class RendererDebug extends PortalRenderer {
          if (this.testShouldRenderPortal(portal, modelView)) {
             PortalRendering.pushPortalLayer(portal);
             Framebuffer mainTarget = client.getFramebuffer();
-            RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(mainTarget.getColorAttachment(), -65281, mainTarget.getDepthAttachment(), 1.0);
+            RenderSystem.getDevice()
+               .createCommandEncoder()
+               .clearColorAndDepthTextures(mainTarget.getColorAttachment(), -65281, mainTarget.getDepthAttachment(), 1.0);
             GL11.glDisable(2960);
             this.renderPortalContent(portal);
             PortalRendering.popPortalLayer();

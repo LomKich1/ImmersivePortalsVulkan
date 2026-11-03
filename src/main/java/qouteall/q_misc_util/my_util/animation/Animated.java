@@ -1,7 +1,7 @@
 package qouteall.q_misc_util.my_util.animation;
 
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import qouteall.q_misc_util.my_util.DQuaternion;

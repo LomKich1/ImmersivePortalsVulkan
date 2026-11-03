@@ -1,10 +1,10 @@
 package qouteall.imm_ptl.core.mixin.client.particle;
 
-import net.minecraft.client.render.SubmittableBatch;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Frustum;
+import net.minecraft.client.render.SubmittableBatch;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.particle.ParticleManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

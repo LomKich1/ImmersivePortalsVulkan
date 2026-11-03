@@ -9,12 +9,12 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.CommandEncoder;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.systems.RenderSystem.class_5590;
+import com.mojang.blaze3d.systems.RenderSystem.ShapeIndexBuffer;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat.class_5595;
-import com.mojang.blaze3d.vertex.VertexFormat.class_5596;
+import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
+import com.mojang.blaze3d.vertex.VertexFormat.IndexType;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
@@ -26,23 +26,23 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gl.GlBackend;
-import net.minecraft.client.texture.TextureSetup;
-import net.minecraft.client.gui.render.state.TexturedQuadGuiElementRenderState;
-import net.minecraft.client.gui.render.state.GuiRenderState;
-import net.minecraft.client.render.RawProjectionMatrix;
-import net.minecraft.client.texture.GlTextureView;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.gl.GlBackend;
+import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.render.state.GuiRenderState;
+import net.minecraft.client.gui.render.state.TexturedQuadGuiElementRenderState;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BuiltBuffer;
+import net.minecraft.client.render.RawProjectionMatrix;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.client.render.chunk.ChunkBuilder;
-import net.minecraft.client.render.BuiltBuffer;
+import net.minecraft.client.texture.GlTextureView;
+import net.minecraft.client.texture.TextureSetup;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix4f;
@@ -126,14 +126,14 @@ public class MyRenderHelper {
          VertexFormat format = pipeline.getVertexFormat();
          GpuBuffer vertexBuffer = format.uploadImmediateVertexBuffer(meshData.getBuffer());
          GpuBuffer indexBuffer;
-         class_5595 indexType;
+         IndexType indexType;
          if (meshData.getSortedBuffer() == null) {
-            class_5590 sequentialBuffer = RenderSystem.getSequentialBuffer(meshData.getDrawParameters().comp_752());
-            indexBuffer = sequentialBuffer.getIndexBuffer(meshData.getDrawParameters().comp_751());
+            ShapeIndexBuffer sequentialBuffer = RenderSystem.getSequentialBuffer(meshData.getDrawParameters().mode());
+            indexBuffer = sequentialBuffer.getIndexBuffer(meshData.getDrawParameters().indexCount());
             indexType = sequentialBuffer.getIndexType();
          } else {
             indexBuffer = format.uploadImmediateIndexBuffer(meshData.getSortedBuffer());
-            indexType = meshData.getDrawParameters().comp_753();
+            indexType = meshData.getDrawParameters().indexType();
          }
 
          RenderPass renderPass = RenderSystem.getDevice()
@@ -157,7 +157,7 @@ public class MyRenderHelper {
                extraSetup.accept(renderPass);
             }
 
-            renderPass.drawIndexed(0, 0, meshData.getDrawParameters().comp_751(), 1);
+            renderPass.drawIndexed(0, 0, meshData.getDrawParameters().indexCount(), 1);
          } catch (Throwable var19) {
             if (renderPass != null) {
                try {
@@ -210,9 +210,7 @@ public class MyRenderHelper {
       Portal portal, Framebuffer textureProvider, Matrix4f modelViewMatrix, Matrix4f projectionMatrix, Framebuffer target
    ) {
       writeScreenSize(textureProvider.textureWidth, textureProvider.textureHeight);
-      BuiltBuffer mesh = ViewAreaRenderer.buildPortalViewAreaTrianglesMesh(
-         Vec3d.ZERO, portal, CHelper.getCurrentCameraPos(), RenderStates.getPartialTick()
-      );
+      BuiltBuffer mesh = ViewAreaRenderer.buildPortalViewAreaTrianglesMesh(Vec3d.ZERO, portal, CHelper.getCurrentCameraPos(), RenderStates.getPartialTick());
       drawMesh(IPRenderPipelines.DRAW_FB_IN_AREA, mesh, target, modelViewMatrix, getProjectionBuffer(projectionMatrix), renderPass -> {
          renderPass.bindTexture("DiffuseSampler", textureProvider.getColorAttachmentView(), RenderSystem.getSamplerCache().get(FilterMode.NEAREST));
          renderPass.setUniform("IPScreenSize", screenSizeUniformBuffer);
@@ -229,7 +227,7 @@ public class MyRenderHelper {
 
    @IPVanillaCopy
    public static void renderScreenTriangle(RenderPipeline pipeline, float z, int r, int g, int b, int a, Framebuffer target) {
-      BufferBuilder bufferBuilder = Tessellator.getInstance().begin(class_5596.field_27379, VertexFormats.POSITION_COLOR);
+      BufferBuilder bufferBuilder = Tessellator.getInstance().begin(DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
       bufferBuilder.vertex(1.0F, -1.0F, z).color(r, g, b, a);
       bufferBuilder.vertex(1.0F, 1.0F, z).color(r, g, b, a);
       bufferBuilder.vertex(-1.0F, 1.0F, z).color(r, g, b, a);
@@ -251,7 +249,14 @@ public class MyRenderHelper {
       Framebuffer textureProvider, boolean doUseAlphaBlend, boolean doEnableModifyAlpha, float xMin, float xMax, float yMin, float yMax, Framebuffer target
    ) {
       drawFramebufferWithCoordinatesAndDimensions(
-         textureProvider, doUseAlphaBlend, doEnableModifyAlpha, 0, 0, client.getWindow().getFramebufferWidth(), client.getWindow().getFramebufferHeight(), target
+         textureProvider,
+         doUseAlphaBlend,
+         doEnableModifyAlpha,
+         0,
+         0,
+         client.getWindow().getFramebufferWidth(),
+         client.getWindow().getFramebufferHeight(),
+         target
       );
    }
 
@@ -280,7 +285,14 @@ public class MyRenderHelper {
 
    @IPVanillaCopy
    public static void drawFramebufferWithCoordinatesAndDimensions(
-      Framebuffer textureProvider, boolean doUseAlphaBlend, boolean doEnableModifyAlpha, int x, int y, int viewportWidth, int viewportHeight, Framebuffer target
+      Framebuffer textureProvider,
+      boolean doUseAlphaBlend,
+      boolean doEnableModifyAlpha,
+      int x,
+      int y,
+      int viewportWidth,
+      int viewportHeight,
+      Framebuffer target
    ) {
       CHelper.checkGlError();
       RenderPipeline pipeline = IPRenderPipelines.blitScreen(doUseAlphaBlend, doEnableModifyAlpha);
@@ -344,7 +356,7 @@ public class MyRenderHelper {
       if (ClientWorldLoader.getIsInitialized()) {
          ClientWorldLoader.getClientWorlds().forEach(world -> {
             if (!RenderStates.isDimensionRendered(world.getRegistryKey())) {
-               world.method_2935().getLightingProvider().doLightUpdates();
+               world.getChunkManager().getLightingProvider().doLightUpdates();
             }
          });
       }

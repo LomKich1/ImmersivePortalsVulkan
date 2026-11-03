@@ -3,20 +3,20 @@ package qouteall.imm_ptl.core.api.example;
 import java.util.WeakHashMap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
-import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.gl.SimpleFramebuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.gl.SimpleFramebuffer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.joml.Matrix4f;
 import qouteall.imm_ptl.core.CHelper;
 import qouteall.imm_ptl.core.ClientWorldLoader;
@@ -67,15 +67,14 @@ public class ExampleGuiPortalRendering {
          McRemoteProcedureCall.tellServerToInvoke("qouteall.imm_ptl.core.api.example.ExampleGuiPortalRendering.RemoteCallables.serverRemoveChunkLoader");
       }
 
-      public void render(DrawContext guiGraphics, int mouseX, int mouseY, float delta) {
-         super.render(guiGraphics, mouseX, mouseY, delta);
+      public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+         super.render(context, mouseX, mouseY, deltaTicks);
          double t1 = CHelper.getSmoothCycles(503L);
          double t2 = CHelper.getSmoothCycles(197L);
          Matrix4f cameraTransformation = new Matrix4f();
          cameraTransformation.identity();
          cameraTransformation.mul(DQuaternion.rotationByDegrees(new Vec3d(1.0, 1.0, 1.0).normalize(), t1 * 360.0).toMatrix());
-         Vec3d cameraPosition = this.viewingPosition
-            .add(new Vec3d(Math.cos(t2 * 2.0 * Math.PI), 0.0, Math.sin(t2 * 2.0 * Math.PI)).multiply(30.0));
+         Vec3d cameraPosition = this.viewingPosition.add(new Vec3d(Math.cos(t2 * 2.0 * Math.PI), 0.0, Math.sin(t2 * 2.0 * Math.PI)).multiply(30.0));
          WorldRenderInfo worldRenderInfo = new WorldRenderInfo.Builder()
             .setWorld(ClientWorldLoader.getWorld(this.viewingDimension))
             .setCameraPos(cameraPosition)
@@ -91,20 +90,18 @@ public class ExampleGuiPortalRendering {
          GuiPortalRendering.submitNextFrameRendering(worldRenderInfo, ExampleGuiPortalRendering.frameBuffer);
          int h = this.height;
          int w = this.width;
-         MyRenderHelper.drawFramebufferInGui(
-            guiGraphics, ExampleGuiPortalRendering.frameBuffer, (int)(w * 0.2F), (int)(h * 0.2F), (int)(w * 0.8F), (int)(h * 0.8F)
-         );
-         guiGraphics.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 70, 16777215);
+         MyRenderHelper.drawFramebufferInGui(context, ExampleGuiPortalRendering.frameBuffer, (int)(w * 0.2F), (int)(h * 0.2F), (int)(w * 0.8F), (int)(h * 0.8F));
+         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 70, 16777215);
       }
 
       public boolean shouldPause() {
          return false;
       }
 
-      public boolean keyPressed(KeyInput keyEvent) {
-         if (super.keyPressed(keyEvent)) {
+      public boolean keyPressed(KeyInput input) {
+         if (super.keyPressed(input)) {
             return true;
-         } else if (this.client.options.inventoryKey.matchesKey(keyEvent)) {
+         } else if (this.client.options.inventoryKey.matchesKey(input)) {
             this.close();
             return true;
          } else {

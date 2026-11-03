@@ -140,9 +140,7 @@ public class GeometryUtil {
    }
 
    public static Vec3d selectCoordFromAABB(Box box, boolean xPositive, boolean yPositive, boolean zPositive) {
-      return new Vec3d(
-         xPositive ? box.maxX : box.minX, yPositive ? box.maxY : box.minY, zPositive ? box.maxZ : box.minZ
-      );
+      return new Vec3d(xPositive ? box.maxX : box.minX, yPositive ? box.maxY : box.minY, zPositive ? box.maxZ : box.minZ);
    }
 
    public static ObjectArrayList<Vec2d> getSlicePolygonOfCube(Box box, Plane plane, Vec3d planeX, Vec3d planeY, double scaleX, double scaleY) {

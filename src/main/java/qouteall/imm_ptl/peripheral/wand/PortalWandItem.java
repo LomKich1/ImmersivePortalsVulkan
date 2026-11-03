@@ -6,30 +6,30 @@ import java.util.List;
 import java.util.function.Consumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.VertexConsumerProvider.Immediate;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.component.ComponentType;
 import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ActionResult;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Item.Settings;
+import net.minecraft.item.Item.TooltipContext;
+import net.minecraft.item.ItemGroup.Entries;
 import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.world.World;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.MutableText;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemGroup.class_7704;
-import net.minecraft.item.Item.class_1793;
-import net.minecraft.item.Item.class_9635;
-import net.minecraft.client.render.VertexConsumerProvider.class_4598;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.world.World;
 import qouteall.imm_ptl.core.IPCGlobal;
 import qouteall.imm_ptl.core.IPMcHelper;
 import qouteall.imm_ptl.core.McHelper;
@@ -39,7 +39,7 @@ import qouteall.q_misc_util.platform.Platform;
 
 public class PortalWandItem extends Item {
    public static final PortalWandItem instance = new PortalWandItem(
-      new class_1793().registryKey(RegistryKey.of(RegistryKeys.field_41197, McHelper.newResourceLocation("immersive_portals:portal_wand")))
+      new Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, McHelper.newResourceLocation("immersive_portals:portal_wand")))
    );
    public static final Codec<PortalWandItem.Mode> MODE_CODEC = Codec.STRING.xmap(PortalWandItem.Mode::fromStr, PortalWandItem.Mode::toStr);
    public static final ComponentType<PortalWandItem.Mode> COMPONENT_TYPE = ComponentType.builder().codec(MODE_CODEC).build();
@@ -49,9 +49,7 @@ public class PortalWandItem extends Item {
       Platform.get().registerBuiltIn(Registries.DATA_COMPONENT_TYPE, McHelper.newResourceLocation("iportal:portal_wand_data"), COMPONENT_TYPE);
       Platform.get()
          .onAttackBlock(
-            (player, world, hand, pos, direction) -> (ActionResult)(player.getMainHandStack().getItem() == instance
-               ? ActionResult.FAIL
-               : ActionResult.PASS)
+            (player, world, hand, pos, direction) -> (ActionResult)(player.getMainHandStack().getItem() == instance ? ActionResult.FAIL : ActionResult.PASS)
          );
       BlockManipulationServer.canDoCrossPortalInteractionEvent.register(p -> p.getMainHandStack().getItem() != instance);
    }
@@ -74,7 +72,7 @@ public class PortalWandItem extends Item {
       IPCGlobal.CLIENT_CLEANUP_EVENT.register(ClientPortalWandPortalCopy::reset);
    }
 
-   public static void addIntoCreativeTag(class_7704 entries) {
+   public static void addIntoCreativeTag(Entries entries) {
       ItemStack w1 = new ItemStack(instance);
       w1.set(COMPONENT_TYPE, PortalWandItem.Mode.CREATE_PORTAL);
       entries.add(w1);
@@ -86,7 +84,7 @@ public class PortalWandItem extends Item {
       entries.add(w3);
    }
 
-   public PortalWandItem(class_1793 properties) {
+   public PortalWandItem(Settings properties) {
       super(properties);
    }
 
@@ -109,19 +107,19 @@ public class PortalWandItem extends Item {
       }
    }
 
-   public ActionResult use(World world, PlayerEntity player, Hand hand) {
-      ItemStack itemStack = player.getStackInHand(hand);
+   public ActionResult use(World world, PlayerEntity user, Hand hand) {
+      ItemStack itemStack = user.getStackInHand(hand);
       PortalWandItem.Mode mode = (PortalWandItem.Mode)itemStack.getOrDefault(COMPONENT_TYPE, PortalWandItem.Mode.FALLBACK);
-      if (player.isSneaking() && !world.isClient() && !PortalWandInteraction.isDragging((ServerPlayerEntity)player)) {
+      if (user.isSneaking() && !world.isClient() && !PortalWandInteraction.isDragging((ServerPlayerEntity)user)) {
          PortalWandItem.Mode nextMode = mode.next();
          itemStack.set(COMPONENT_TYPE, nextMode);
          return ActionResult.SUCCESS.withNewHandStack(itemStack);
       } else {
-         if (!player.isSneaking() && world.isClient()) {
+         if (!user.isSneaking() && world.isClient()) {
             this.onUseClient(mode);
          }
 
-         return super.use(world, player, hand);
+         return super.use(world, user, hand);
       }
    }
 
@@ -140,18 +138,24 @@ public class PortalWandItem extends Item {
    }
 
    @Environment(EnvType.CLIENT)
-   public void appendTooltip(ItemStack stack, class_9635 tooltipContext, TooltipDisplayComponent tooltipDisplay, Consumer<Text> tooltip, TooltipType tooltipFlag) {
-      super.appendTooltip(stack, tooltipContext, tooltipDisplay, tooltip, tooltipFlag);
-      tooltip.accept(
+   public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
+      super.appendTooltip(stack, context, displayComponent, textConsumer, type);
+      textConsumer.accept(
          Text.translatable(
             "imm_ptl.wand.item_desc_1",
-            new Object[]{MinecraftClient.getInstance().options.sneakKey.getBoundKeyLocalizedText(), MinecraftClient.getInstance().options.useKey.getBoundKeyLocalizedText()}
+            new Object[]{
+               MinecraftClient.getInstance().options.sneakKey.getBoundKeyLocalizedText(),
+               MinecraftClient.getInstance().options.useKey.getBoundKeyLocalizedText()
+            }
          )
       );
-      tooltip.accept(
+      textConsumer.accept(
          Text.translatable(
             "imm_ptl.wand.item_desc_2",
-            new Object[]{MinecraftClient.getInstance().options.sneakKey.getBoundKeyLocalizedText(), MinecraftClient.getInstance().options.attackKey.getBoundKeyLocalizedText()}
+            new Object[]{
+               MinecraftClient.getInstance().options.sneakKey.getBoundKeyLocalizedText(),
+               MinecraftClient.getInstance().options.attackKey.getBoundKeyLocalizedText()
+            }
          )
       );
    }
@@ -159,7 +163,7 @@ public class PortalWandItem extends Item {
    public Text getName(ItemStack stack) {
       PortalWandItem.Mode mode = (PortalWandItem.Mode)stack.getOrDefault(COMPONENT_TYPE, PortalWandItem.Mode.FALLBACK);
       MutableText baseText = Text.translatable("item.immersive_portals.portal_wand");
-      return baseText.append(Text.literal(" : ")).append(mode.getText().formatted(Formatting.field_1065));
+      return baseText.append(Text.literal(" : ")).append(mode.getText().formatted(Formatting.GOLD));
    }
 
    public static void showSettings(PlayerEntity player) {
@@ -179,7 +183,9 @@ public class PortalWandItem extends Item {
          IPMcHelper.getTextWithCommand(Text.translatable("imm_ptl.wand.no_alignment"), "/imm_ptl_client_debug wand set_cursor_alignment 0")
       );
       player.sendMessage((Text)alignmentSettingTexts.stream().reduce(Text.literal(""), (a, b) -> a.append(" ").append(b)), false);
-      player.sendMessage(Text.translatable("imm_ptl.wand.settings_2", new Object[]{MinecraftClient.getInstance().options.chatKey.getBoundKeyLocalizedText()}), false);
+      player.sendMessage(
+         Text.translatable("imm_ptl.wand.settings_2", new Object[]{MinecraftClient.getInstance().options.chatKey.getBoundKeyLocalizedText()}), false
+      );
    }
 
    @Environment(EnvType.CLIENT)
@@ -198,7 +204,9 @@ public class PortalWandItem extends Item {
    }
 
    @Environment(EnvType.CLIENT)
-   public static void clientRender(ClientPlayerEntity player, ItemStack itemStack, MatrixStack poseStack, class_4598 bufferSource, double camX, double camY, double camZ) {
+   public static void clientRender(
+      ClientPlayerEntity player, ItemStack itemStack, MatrixStack poseStack, Immediate bufferSource, double camX, double camY, double camZ
+   ) {
       if (!instructionInformed) {
          instructionInformed = true;
       }

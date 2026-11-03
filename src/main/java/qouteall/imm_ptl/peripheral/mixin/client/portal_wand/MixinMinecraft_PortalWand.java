@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.peripheral.mixin.client.portal_wand;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,7 +21,7 @@ public class MixinMinecraft_PortalWand {
       method = {"doAttack"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ClientPlayerEntity;getStackInHand(Lnet/minecraft/Hand;)Lnet/minecraft/ItemStack;"
+         target = "Lnet/minecraft/client/network/ClientPlayerEntity;getStackInHand(Lnet/minecraft/util/Hand;)Lnet/minecraft/item/ItemStack;"
       )},
       cancellable = true
    )

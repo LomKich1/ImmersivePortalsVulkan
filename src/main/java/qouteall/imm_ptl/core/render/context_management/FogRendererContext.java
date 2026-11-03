@@ -3,15 +3,15 @@ package qouteall.imm_ptl.core.render.context_management;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.function.Consumer;
-import net.minecraft.util.profiler.Profilers;
-import net.minecraft.world.attribute.EnvironmentAttributeInterpolator;
-import net.minecraft.world.World;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.client.render.fog.FogRenderer;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.profiler.Profilers;
+import net.minecraft.world.World;
+import net.minecraft.world.attribute.EnvironmentAttributeInterpolator;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4f;
 import qouteall.imm_ptl.core.ClientWorldLoader;
@@ -77,7 +77,11 @@ public class FogRendererContext {
          }
 
          Vector4f color = fogColorProbe.applyFog(
-            newCamera, client.options.getClampedViewDistance(), client.getRenderTickCounter(), client.gameRenderer.getSkyDarkness(RenderStates.getPartialTick()), destWorld
+            newCamera,
+            client.options.getClampedViewDistance(),
+            client.getRenderTickCounter(),
+            client.gameRenderer.getSkyDarkness(RenderStates.getPartialTick()),
+            destWorld
          );
          var8 = new Vec3d(color.x, color.y, color.z);
       } finally {

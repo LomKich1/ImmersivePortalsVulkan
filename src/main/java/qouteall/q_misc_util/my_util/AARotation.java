@@ -3,40 +3,40 @@ package qouteall.q_misc_util.my_util;
 import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
 import java.util.Comparator;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.BlockRotation;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import qouteall.q_misc_util.Helper;
 
 public enum AARotation {
-   SOUTH_ROT0(Direction.field_11035, Direction.field_11034),
-   SOUTH_ROT90(Direction.field_11035, Direction.field_11036),
-   SOUTH_ROT180(Direction.field_11035, Direction.field_11039),
-   SOUTH_ROT270(Direction.field_11035, Direction.field_11033),
-   NORTH_ROT0(Direction.field_11043, Direction.field_11039),
-   NORTH_ROT90(Direction.field_11043, Direction.field_11036),
-   NORTH_ROT180(Direction.field_11043, Direction.field_11034),
-   NORTH_ROT270(Direction.field_11043, Direction.field_11033),
-   EAST_ROT0(Direction.field_11034, Direction.field_11043),
-   EAST_ROT90(Direction.field_11034, Direction.field_11036),
-   EAST_ROT180(Direction.field_11034, Direction.field_11035),
-   EAST_ROT270(Direction.field_11034, Direction.field_11033),
-   WEST_ROT0(Direction.field_11039, Direction.field_11035),
-   WEST_ROT90(Direction.field_11039, Direction.field_11036),
-   WEST_ROT180(Direction.field_11039, Direction.field_11043),
-   WEST_ROT270(Direction.field_11039, Direction.field_11033),
-   UP_ROT0(Direction.field_11036, Direction.field_11043),
-   UP_ROT90(Direction.field_11036, Direction.field_11039),
-   UP_ROT180(Direction.field_11036, Direction.field_11035),
-   UP_ROT270(Direction.field_11036, Direction.field_11034),
-   DOWN_ROT0(Direction.field_11033, Direction.field_11035),
-   DOWN_ROT90(Direction.field_11033, Direction.field_11039),
-   DOWN_ROT180(Direction.field_11033, Direction.field_11043),
-   DOWN_ROT270(Direction.field_11033, Direction.field_11034);
+   SOUTH_ROT0(Direction.SOUTH, Direction.EAST),
+   SOUTH_ROT90(Direction.SOUTH, Direction.UP),
+   SOUTH_ROT180(Direction.SOUTH, Direction.WEST),
+   SOUTH_ROT270(Direction.SOUTH, Direction.DOWN),
+   NORTH_ROT0(Direction.NORTH, Direction.WEST),
+   NORTH_ROT90(Direction.NORTH, Direction.UP),
+   NORTH_ROT180(Direction.NORTH, Direction.EAST),
+   NORTH_ROT270(Direction.NORTH, Direction.DOWN),
+   EAST_ROT0(Direction.EAST, Direction.NORTH),
+   EAST_ROT90(Direction.EAST, Direction.UP),
+   EAST_ROT180(Direction.EAST, Direction.SOUTH),
+   EAST_ROT270(Direction.EAST, Direction.DOWN),
+   WEST_ROT0(Direction.WEST, Direction.SOUTH),
+   WEST_ROT90(Direction.WEST, Direction.UP),
+   WEST_ROT180(Direction.WEST, Direction.NORTH),
+   WEST_ROT270(Direction.WEST, Direction.DOWN),
+   UP_ROT0(Direction.UP, Direction.NORTH),
+   UP_ROT90(Direction.UP, Direction.WEST),
+   UP_ROT180(Direction.UP, Direction.SOUTH),
+   UP_ROT270(Direction.UP, Direction.EAST),
+   DOWN_ROT0(Direction.DOWN, Direction.SOUTH),
+   DOWN_ROT90(Direction.DOWN, Direction.WEST),
+   DOWN_ROT180(Direction.DOWN, Direction.NORTH),
+   DOWN_ROT270(Direction.DOWN, Direction.EAST);
 
    public static final AARotation IDENTITY = SOUTH_ROT0;
    public final Direction transformedX;
@@ -124,8 +124,8 @@ public enum AARotation {
    }
 
    public static AARotation get90DegreesRotationAlong(Direction direction) {
-      Direction defaultX = Direction.field_11034;
-      Direction defaultY = Direction.field_11036;
+      Direction defaultX = Direction.EAST;
+      Direction defaultY = Direction.UP;
       Direction newX = rotateDir90DegreesAlong(defaultX, direction);
       Direction newY = rotateDir90DegreesAlong(defaultY, direction);
       return getAARotationFromXY(newX, newY);
@@ -134,20 +134,20 @@ public enum AARotation {
    @Nullable
    public BlockRotation toVanillaRotation() {
       return switch (this) {
-         case SOUTH_ROT0 -> BlockRotation.field_11467;
-         case NORTH_ROT0 -> BlockRotation.field_11464;
-         case EAST_ROT0 -> BlockRotation.field_11465;
-         case WEST_ROT0 -> BlockRotation.field_11463;
+         case SOUTH_ROT0 -> BlockRotation.NONE;
+         case NORTH_ROT0 -> BlockRotation.CLOCKWISE_180;
+         case EAST_ROT0 -> BlockRotation.COUNTERCLOCKWISE_90;
+         case WEST_ROT0 -> BlockRotation.CLOCKWISE_90;
          default -> null;
       };
    }
 
    public static AARotation fromVanillaRotation(BlockRotation vanillaRotation) {
       return switch (vanillaRotation) {
-         case field_11467 -> SOUTH_ROT0;
-         case field_11463 -> WEST_ROT0;
-         case field_11464 -> NORTH_ROT0;
-         case field_11465 -> EAST_ROT0;
+         case NONE -> SOUTH_ROT0;
+         case CLOCKWISE_90 -> WEST_ROT0;
+         case CLOCKWISE_180 -> NORTH_ROT0;
+         case COUNTERCLOCKWISE_90 -> EAST_ROT0;
          default -> throw new MatchException(null, null);
       };
    }

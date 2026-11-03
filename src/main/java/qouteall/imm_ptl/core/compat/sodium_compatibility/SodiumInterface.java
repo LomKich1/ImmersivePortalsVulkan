@@ -7,8 +7,8 @@ package qouteall.imm_ptl.core.compat.sodium_compatibility;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.world.ClientWorld;
 import org.jetbrains.annotations.Nullable;
 

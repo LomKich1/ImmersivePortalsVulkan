@@ -23,8 +23,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtDouble;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.Unit;
+import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import qouteall.q_misc_util.Helper;
@@ -927,7 +927,7 @@ public class Mesh2D {
             Unit unit = this.traverseNearbyTriangles(ti, anotherTi -> {
                if (ti_ < anotherTi && this.triangleIntersects(ti_, anotherTi)) {
                   this.subtractTriangleForOneTriangle(anotherTi, p0x, p0y, p1x, p1y, p2x, p2y);
-                  return Unit.field_17274;
+                  return Unit.INSTANCE;
                } else {
                   return null;
                }
@@ -971,7 +971,7 @@ public class Mesh2D {
                         this.removeTriangle(triangleIndex);
                         this.addTriangle(p0Index, i_, p2Index);
                         this.addTriangle(i_, p1Index, p2Index);
-                        return Unit.field_17274;
+                        return Unit.INSTANCE;
                      }
                   }
 
@@ -1184,7 +1184,7 @@ public class Mesh2D {
             double p2x = this.pointCoords.getDouble(p2Index * 2);
             double p2y = this.pointCoords.getDouble(p2Index * 2 + 1);
             if (GeometryUtil.triangleIntersectsWithAABB(p0x, p0y, p1x, p1y, p2x, p2y, minX, minY, maxX, maxY)) {
-               return Unit.field_17274;
+               return Unit.INSTANCE;
             }
          }
 

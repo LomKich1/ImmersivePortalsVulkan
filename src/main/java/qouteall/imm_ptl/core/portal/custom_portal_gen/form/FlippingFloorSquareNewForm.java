@@ -4,10 +4,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.entity.Entity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.Direction.class_2351;
+import net.minecraft.util.math.Direction.Axis;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.core.portal.custom_portal_gen.PortalGenInfo;
@@ -42,7 +42,7 @@ public class FlippingFloorSquareNewForm extends HeterogeneousForm {
 
    @Override
    public boolean testThisSideShape(ServerWorld fromWorld, BlockPortalShape fromShape) {
-      if (fromShape.axis != class_2351.field_11052) {
+      if (fromShape.axis != Axis.Y) {
          return false;
       } else {
          IntBox box = fromShape.innerAreaBox;

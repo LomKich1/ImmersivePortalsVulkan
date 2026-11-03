@@ -4,15 +4,15 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.text.Text;
 import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.Direction.class_2351;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.portal.custom_portal_gen.CustomPortalGeneration;
 import qouteall.imm_ptl.core.portal.custom_portal_gen.PortalGenInfo;
@@ -54,8 +54,8 @@ public class ConvertConventionalPortalForm extends PortalGenForm {
       } else if (!(triggeringEntity instanceof ServerPlayerEntity player)) {
          Helper.err("Non player entity triggers portal conversion");
          return false;
-      } else if (player.getServerWorld() != toWorld) {
-         Helper.err("The player is not in the correct world " + player.getServerWorld().getRegistryKey().getValue());
+      } else if (player.getEntityWorld() != toWorld) {
+         Helper.err("The player is not in the correct world " + player.getEntityWorld().getRegistryKey().getValue());
          return false;
       } else {
          BlockPos playerCurrentPos = player.getBlockPos().toImmutable();
@@ -96,10 +96,7 @@ public class ConvertConventionalPortalForm extends PortalGenForm {
                         return false;
                      } else {
                         portalGenInfo.generatePlaceholderBlocks();
-                        if (fromShape.axis == class_2351.field_11052
-                           && toShape.axis == class_2351.field_11052
-                           && portalGenInfo.scale == 1.0
-                           && portalGenInfo.rotation == null) {
+                        if (fromShape.axis == Axis.Y && toShape.axis == Axis.Y && portalGenInfo.scale == 1.0 && portalGenInfo.rotation == null) {
                            GeneralBreakablePortal[] portals = FlippingFloorSquareForm.createPortals(
                               fromWorld, toWorld, portalGenInfo.fromShape, portalGenInfo.toShape
                            );
@@ -137,25 +134,25 @@ public class ConvertConventionalPortalForm extends PortalGenForm {
       BlockState blockState = world.getBlockState(pos);
       return predicate.test(blockState)
          ? pos
-         : BlockTraverse.searchInBox(new IntBox(pos.method_10069(-2, -2, -2), pos.method_10069(2, 2, 2)), p -> predicate.test(world.getBlockState(p)) ? p : null);
+         : BlockTraverse.searchInBox(new IntBox(pos.add(-2, -2, -2), pos.add(2, 2, 2)), p -> predicate.test(world.getBlockState(p)) ? p : null);
    }
 
    @Deprecated
    @Nullable
    public static BlockPortalShape convertToPortalShape(IntBox box) {
       BlockPos size = box.getSize();
-      class_2351 axis = null;
+      Axis axis = null;
       if (size.getX() == 1) {
-         axis = class_2351.field_11048;
+         axis = Axis.X;
       } else if (size.getY() == 1) {
-         axis = class_2351.field_11052;
+         axis = Axis.Y;
       } else {
          if (size.getZ() != 1) {
             Helper.err("The box is not flat " + box);
             return null;
          }
 
-         axis = class_2351.field_11051;
+         axis = Axis.Z;
       }
 
       return new BlockPortalShape(box.stream().collect(Collectors.toSet()), axis);

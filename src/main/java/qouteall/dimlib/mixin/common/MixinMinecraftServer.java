@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Executor;
-import net.minecraft.world.World;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.ServerTask;
-import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.level.storage.LevelStorage.class_5143;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ServerTask;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.thread.ReentrantThreadExecutor;
+import net.minecraft.world.World;
+import net.minecraft.world.level.storage.LevelStorage.Session;
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,7 +34,7 @@ public abstract class MixinMinecraftServer extends ReentrantThreadExecutor<Serve
    private Map<RegistryKey<World>, ServerWorld> worlds;
    @Shadow
    @Final
-   protected class_5143 session;
+   protected Session session;
    @Shadow
    @Final
    private Executor workerExecutor;
@@ -112,7 +112,7 @@ public abstract class MixinMinecraftServer extends ReentrantThreadExecutor<Serve
    }
 
    @Override
-   public class_5143 dimlib_getStorageSource() {
+   public Session dimlib_getStorageSource() {
       return this.session;
    }
 

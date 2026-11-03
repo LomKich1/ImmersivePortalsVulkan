@@ -11,25 +11,25 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.world.ClientWorld.Properties;
+import net.minecraft.item.map.MapState;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.Profilers;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.item.map.MapState;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.util.Identifier;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.client.world.ClientWorld.class_5271;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -205,7 +205,7 @@ public class ClientWorldLoader {
       }
 
       LOGGER.info("Client Dynamically Removed Dimension {}", dimension.getValue());
-      if (clientWorld.method_2935().getLoadedChunkCount() > 0) {
+      if (clientWorld.getChunkManager().getLoadedChunkCount() > 0) {
          LOGGER.error("The chunks of that dimension was not cleared before removal");
       }
 
@@ -288,7 +288,12 @@ public class ClientWorldLoader {
          Profilers.get().push("create_world");
          int chunkLoadDistance = 3;
          WorldRenderer worldRenderer = new WorldRenderer(
-            CLIENT, CLIENT.getEntityRenderDispatcher(), CLIENT.getBlockEntityRenderDispatcher(), CLIENT.getBufferBuilders(), CLIENT.gameRenderer.getEntityRenderStates(), CLIENT.gameRenderer.getEntityRenderDispatcher()
+            CLIENT,
+            CLIENT.getEntityRenderDispatcher(),
+            CLIENT.getBlockEntityRenderDispatcher(),
+            CLIENT.getBufferBuilders(),
+            CLIENT.gameRenderer.getEntityRenderStates(),
+            CLIENT.gameRenderer.getEntityRenderDispatcher()
          );
 
          ClientWorld newWorld;
@@ -304,11 +309,11 @@ public class ClientWorldLoader {
                throw new IllegalStateException("Cannot find dimension type for %s in %s".formatted(dimension.getValue(), dimIdToDimTypeId));
             }
 
-            class_5271 currentProperty = (class_5271)((IEWorld)CLIENT.world).ip_getLevelData();
+            Properties currentProperty = (Properties)((IEWorld)CLIENT.world).ip_getLevelData();
             DynamicRegistryManager registryManager = mainNetHandler.getRegistryManager();
             int simulationDistance = CLIENT.world.getSimulationDistance();
-            RegistryEntry<DimensionType> dimensionType = registryManager.get(RegistryKeys.field_41241).getOrThrow(dimensionTypeKey);
-            class_5271 properties = new class_5271(
+            RegistryEntry<DimensionType> dimensionType = registryManager.getOrThrow(RegistryKeys.DIMENSION_TYPE).getOrThrow(dimensionTypeKey);
+            Properties properties = new Properties(
                currentProperty.getDifficulty(), currentProperty.isHardcore(), ((IEClientLevelData)currentProperty).ip_getIsFlat()
             );
             newWorld = new ClientWorld(
@@ -442,7 +447,7 @@ public class ClientWorldLoader {
          assert player != null;
 
          DynamicRegistryManager registryAccess = player.networkHandler.getRegistryManager();
-         Registry<Biome> biomes = registryAccess.get(RegistryKeys.BIOME);
+         Registry<Biome> biomes = registryAccess.getOrThrow(RegistryKeys.BIOME);
 
          for (Entry<String, Integer> entry : idMap.entrySet()) {
             Identifier id = McHelper.newResourceLocation(entry.getKey());

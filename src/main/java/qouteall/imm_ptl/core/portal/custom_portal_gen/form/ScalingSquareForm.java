@@ -4,13 +4,13 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.function.Predicate;
-import net.minecraft.entity.Entity;
 import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.entity.Entity;
 import net.minecraft.registry.Registries;
-import net.minecraft.util.math.BlockPos.class_2339;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.Mutable;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.portal.custom_portal_gen.PortalGenInfo;
 import qouteall.imm_ptl.core.portal.nether_portal.BlockPortalShape;
@@ -37,9 +37,7 @@ public class ScalingSquareForm extends NetherPortalLikeForm {
    public final int fromLength;
    public final int toLength;
 
-   public ScalingSquareForm(
-      Block fromFrameBlock, Block areaBlock, Block toFrameBlock, int fromLength, int toLength, boolean generateFrameIfNotFound
-   ) {
+   public ScalingSquareForm(Block fromFrameBlock, Block areaBlock, Block toFrameBlock, int fromLength, int toLength, boolean generateFrameIfNotFound) {
       super(generateFrameIfNotFound);
       this.fromFrameBlock = fromFrameBlock;
       this.areaBlock = areaBlock;
@@ -69,7 +67,7 @@ public class ScalingSquareForm extends NetherPortalLikeForm {
       FastBlockPortalShape fastTemplate = FastBlockPortalShape.fromBlockPortalShape(template);
       Predicate<BlockState> areaPredicate = this.getAreaPredicate();
       Predicate<BlockState> otherSideFramePredicate = this.getOtherSideFramePredicate();
-      new class_2339();
+      new Mutable();
       return (blockAccess, x, y, z) -> {
          boolean matches = fastTemplate.matchShape(
             x,
@@ -82,7 +80,12 @@ public class ScalingSquareForm extends NetherPortalLikeForm {
             boolean matchToSelf = fromWorld == toWorld && x == fastTemplate.basePosX() && y == fastTemplate.basePosY() && z == fastTemplate.basePosZ();
             if (!matchToSelf) {
                return new PortalGenInfo(
-                  fromWorld.getRegistryKey(), toWorld.getRegistryKey(), fromShape, fastTemplate.withNewBase(x, y, z).toBlockPortalShape(), null, this.getScale()
+                  fromWorld.getRegistryKey(),
+                  toWorld.getRegistryKey(),
+                  fromShape,
+                  fastTemplate.withNewBase(x, y, z).toBlockPortalShape(),
+                  null,
+                  this.getScale()
                );
             }
          }

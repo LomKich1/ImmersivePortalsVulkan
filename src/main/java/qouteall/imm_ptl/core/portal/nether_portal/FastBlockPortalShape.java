@@ -4,12 +4,12 @@ import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.util.math.Direction.class_2351;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction.Axis;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ public record FastBlockPortalShape(
    int basePosX,
    int basePosY,
    int basePosZ,
-   class_2351 axis,
+   Axis axis,
    int[] localAreaBlockCoords,
    int[] localFrameWithoutCornerBlockCoords,
    int[] localFrameCornerBlockCoords,
@@ -29,52 +29,52 @@ public record FastBlockPortalShape(
 ) {
    private static final Logger LOGGER = LogUtils.getLogger();
 
-   public static int toLocalA(class_2351 axis, int x, int y, int z) {
+   public static int toLocalA(Axis axis, int x, int y, int z) {
       return switch (axis) {
-         case field_11048 -> y;
-         case field_11052 -> x;
-         case field_11051 -> x;
+         case X -> y;
+         case Y -> x;
+         case Z -> x;
          default -> throw new MatchException(null, null);
       };
    }
 
-   public static int toLocalB(class_2351 axis, int x, int y, int z) {
+   public static int toLocalB(Axis axis, int x, int y, int z) {
       return switch (axis) {
-         case field_11048 -> z;
-         case field_11052 -> z;
-         case field_11051 -> y;
+         case X -> z;
+         case Y -> z;
+         case Z -> y;
          default -> throw new MatchException(null, null);
       };
    }
 
-   public static int toWorldX(class_2351 axis, int coordOnAxis, int a, int b) {
+   public static int toWorldX(Axis axis, int coordOnAxis, int a, int b) {
       return switch (axis) {
-         case field_11048 -> coordOnAxis;
-         case field_11052 -> a;
-         case field_11051 -> a;
+         case X -> coordOnAxis;
+         case Y -> a;
+         case Z -> a;
          default -> throw new MatchException(null, null);
       };
    }
 
-   public static int toWorldY(class_2351 axis, int coordOnAxis, int a, int b) {
+   public static int toWorldY(Axis axis, int coordOnAxis, int a, int b) {
       return switch (axis) {
-         case field_11048 -> a;
-         case field_11052 -> coordOnAxis;
-         case field_11051 -> b;
+         case X -> a;
+         case Y -> coordOnAxis;
+         case Z -> b;
          default -> throw new MatchException(null, null);
       };
    }
 
-   public static int toWorldZ(class_2351 axis, int coordOnAxis, int a, int b) {
+   public static int toWorldZ(Axis axis, int coordOnAxis, int a, int b) {
       return switch (axis) {
-         case field_11048 -> b;
-         case field_11052 -> b;
-         case field_11051 -> coordOnAxis;
+         case X -> b;
+         case Y -> b;
+         case Z -> coordOnAxis;
          default -> throw new MatchException(null, null);
       };
    }
 
-   public static BlockPos toWorldBlockPos(class_2351 axis, int coordOnAxis, int a, int b) {
+   public static BlockPos toWorldBlockPos(Axis axis, int coordOnAxis, int a, int b) {
       return new BlockPos(toWorldX(axis, coordOnAxis, a, b), toWorldY(axis, coordOnAxis, a, b), toWorldZ(axis, coordOnAxis, a, b));
    }
 
@@ -90,7 +90,7 @@ public record FastBlockPortalShape(
       return ChunkPos.getPackedZ(l);
    }
 
-   public static FastBlockPortalShape create(class_2351 axis, int[] areaBlockCoords, int coordOnAxis) {
+   public static FastBlockPortalShape create(Axis axis, int[] areaBlockCoords, int coordOnAxis) {
       Validate.isTrue(areaBlockCoords.length % 2 == 0);
       Validate.isTrue(areaBlockCoords.length != 0);
       int areaBlockNum = areaBlockCoords.length / 2;
@@ -224,7 +224,7 @@ public record FastBlockPortalShape(
    public static FastBlockPortalShape fromTag(NbtCompound tag) {
       int axisInt = tag.getInt("axis", 0);
       if (axisInt >= 0 && axisInt <= 2) {
-         class_2351 axis = class_2351.values()[axisInt];
+         Axis axis = Axis.values()[axisInt];
          NbtList positions = tag.getListOrEmpty("poses");
          int numNum = positions.size();
          if (numNum != 0 && numNum % 3 == 0) {
@@ -233,15 +233,15 @@ public record FastBlockPortalShape(
             int firstPointY = positions.getInt(1, 0);
             int firstPointZ = positions.getInt(2, 0);
             IntArrayList areaBlockCoords = new IntArrayList();
-            if (axis != class_2351.field_11048) {
+            if (axis != Axis.X) {
                areaBlockCoords.add(firstPointX);
             }
 
-            if (axis != class_2351.field_11052) {
+            if (axis != Axis.Y) {
                areaBlockCoords.add(firstPointY);
             }
 
-            if (axis != class_2351.field_11051) {
+            if (axis != Axis.Z) {
                areaBlockCoords.add(firstPointZ);
             }
 
@@ -256,15 +256,15 @@ public record FastBlockPortalShape(
                   return null;
                }
 
-               if (axis != class_2351.field_11048) {
+               if (axis != Axis.X) {
                   areaBlockCoords.add(x);
                }
 
-               if (axis != class_2351.field_11052) {
+               if (axis != Axis.Y) {
                   areaBlockCoords.add(y);
                }
 
-               if (axis != class_2351.field_11051) {
+               if (axis != Axis.Z) {
                   areaBlockCoords.add(z);
                }
             }

@@ -6,17 +6,17 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
-import net.minecraft.entity.Entity;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.registry.Registries;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.math.Direction.class_2351;
-import net.minecraft.util.math.Direction.class_2352;
+import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.util.math.Direction.AxisDirection;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.core.portal.PortalExtension;
@@ -75,12 +75,12 @@ public class FlippingFloorSquareForm extends PortalGenForm {
       Predicate<BlockState> bottomPredicate = this.bottomBlock;
       if (!areaPredicate.test(fromWorld.getBlockState(startingPos))) {
          return false;
-      } else if (!bottomPredicate.test(fromWorld.getBlockState(startingPos.method_10074()))) {
+      } else if (!bottomPredicate.test(fromWorld.getBlockState(startingPos.down()))) {
          return false;
       } else {
          BlockPortalShape fromShape = BlockPortalShape.findArea(
             startingPos,
-            class_2351.field_11052,
+            Axis.Y,
             blockPos -> areaPredicate.test(fromWorld.getBlockState(blockPos)),
             blockPos -> framePredicate.test(fromWorld.getBlockState(blockPos))
          );
@@ -92,10 +92,10 @@ public class FlippingFloorSquareForm extends PortalGenForm {
             BlockPos areaSize = fromShape.innerAreaBox.getSize();
             BlockPos toPos = cpg.mapPosition(fromShape.innerAreaBox.l, fromWorld, toWorld);
             IntBox placingBox = findPortalPlacement(toWorld, areaSize, toPos);
-            BlockPos offset = placingBox.l.method_10059(fromShape.innerAreaBox.l);
-            BlockPortalShape toShape = fromShape.getShapeWithMovedAnchor(fromShape.anchor.method_10081(offset));
+            BlockPos offset = placingBox.l.subtract(fromShape.innerAreaBox.l);
+            BlockPortalShape toShape = fromShape.getShapeWithMovedAnchor(fromShape.anchor.add(offset));
             fromShape.frameAreaWithoutCorner.forEach(fromWorldPos -> {
-               BlockPos toWorldPos = fromWorldPos.method_10081(offset);
+               BlockPos toWorldPos = fromWorldPos.add(offset);
                toWorld.setBlockState(toWorldPos, fromWorld.getBlockState(fromWorldPos));
                toWorld.setBlockState(toWorldPos.up(), fromWorld.getBlockState(fromWorldPos.up()));
             });
@@ -113,7 +113,7 @@ public class FlippingFloorSquareForm extends PortalGenForm {
       return !areaSizeTest
          ? false
          : fromShape.frameAreaWithoutCorner.stream().allMatch(blockPos -> this.upFrameBlock.test(fromWorld.getBlockState(blockPos.up())))
-            && fromShape.area.stream().allMatch(blockPos -> this.bottomBlock.test(fromWorld.getBlockState(blockPos.method_10074())));
+            && fromShape.area.stream().allMatch(blockPos -> this.bottomBlock.test(fromWorld.getBlockState(blockPos.down())));
    }
 
    public static IntBox findPortalPlacement(ServerWorld toWorld, BlockPos areaSize, BlockPos toPos) {
@@ -133,18 +133,18 @@ public class FlippingFloorSquareForm extends PortalGenForm {
             BlockState blockState = toWorld.getBlockState(pos);
             return !blockState.isOpaqueFullCube() && blockState.getBlock() != PortalPlaceholderBlock.instance && blockState.getFluidState().isEmpty();
          }))
-         .filter(intBox -> intBox.getSurfaceLayer(Direction.field_11033).getMoved(Direction.field_11033.getVector()).stream().allMatch(blockPos -> {
+         .filter(intBox -> intBox.getSurfaceLayer(Direction.DOWN).getMoved(Direction.DOWN.getVector()).stream().allMatch(blockPos -> {
             BlockState blockState = toWorld.getBlockState(blockPos);
             return !blockState.isAir() && blockState.getBlock() != PortalPlaceholderBlock.instance;
          }))
          .findFirst()
          .orElseGet(() -> IntBox.fromBasePointAndSize(toPos, areaSize))
-         .getMoved(Direction.field_11033.getVector());
+         .getMoved(Direction.DOWN.getVector());
    }
 
    public static GeneralBreakablePortal[] createPortals(ServerWorld fromWorld, ServerWorld toWorld, BlockPortalShape fromShape, BlockPortalShape toShape) {
-      GeneralBreakablePortal pa = (GeneralBreakablePortal)GeneralBreakablePortal.ENTITY_TYPE.create(fromWorld, SpawnReason.field_16461);
-      fromShape.initPortalPosAxisShape(pa, class_2352.field_11056);
+      GeneralBreakablePortal pa = (GeneralBreakablePortal)GeneralBreakablePortal.ENTITY_TYPE.create(fromWorld, SpawnReason.TRIGGERED);
+      fromShape.initPortalPosAxisShape(pa, AxisDirection.POSITIVE);
       pa.setDestination(toShape.innerAreaBox.getCenterVec());
       pa.setDestDim(toWorld.getRegistryKey());
       pa.setRotation(DQuaternion.rotationByDegrees(new Vec3d(1.0, 0.0, 0.0), 180.0));

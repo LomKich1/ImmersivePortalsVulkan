@@ -5,19 +5,19 @@ import java.util.List;
 import java.util.UUID;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.util.Util;
-import net.minecraft.world.World;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.entity.Entity.RemovalReason;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.entity.Entity.class_5529;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -66,7 +66,7 @@ public abstract class BreakablePortalEntity extends Portal {
       this.unbreakable = compoundTag.getBoolean("unbreakable", false);
       if (compoundTag.contains("overlayBlockState")) {
          BlockState overlayBlockState = NbtHelper.toBlockState(
-            this.getEntityWorld().createCommandRegistryWrapper(RegistryKeys.field_41254), compoundTag.getCompoundOrEmpty("overlayBlockState")
+            this.getEntityWorld().createCommandRegistryWrapper(RegistryKeys.BLOCK), compoundTag.getCompoundOrEmpty("overlayBlockState")
          );
          if (overlayBlockState.isAir()) {
             this.overlayInfo = null;
@@ -105,10 +105,10 @@ public abstract class BreakablePortalEntity extends Portal {
    private void breakPortalOnThisSide() {
       this.blockPortalShape.area.forEach(blockPos -> {
          if (this.getEntityWorld().getBlockState(blockPos).getBlock() == PortalPlaceholderBlock.instance) {
-            this.getEntityWorld().setBlockState(blockPos, Blocks.field_10124.getDefaultState());
+            this.getEntityWorld().setBlockState(blockPos, Blocks.AIR.getDefaultState());
          }
       });
-      this.remove(class_5529.KILLED);
+      this.remove(RemovalReason.KILLED);
       Helper.log("Broke " + this);
    }
 
@@ -142,7 +142,7 @@ public abstract class BreakablePortalEntity extends Portal {
    private void checkPortalIntegrity() {
       Validate.isTrue(!this.getEntityWorld().isClient());
       if (!this.isPortalValid()) {
-         this.remove(class_5529.KILLED);
+         this.remove(RemovalReason.KILLED);
       } else {
          if (!this.isPortalIntactOnThisSide()) {
             this.markShouldBreak();

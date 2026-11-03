@@ -2,15 +2,15 @@ package qouteall.imm_ptl.peripheral.portal_generation;
 
 import com.mojang.serialization.MapCodec;
 import java.util.function.Predicate;
-import net.minecraft.entity.Entity;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.text.Text;
 import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.AbstractBlock.AbstractBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.block.AbstractBlock.class_4971;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.IPGlobal;
 import qouteall.imm_ptl.core.platform_specific.O_O;
@@ -31,7 +31,7 @@ public class IntrinsicNetherPortalForm extends NetherPortalLikeForm {
    @Override
    public void generateNewFrame(ServerWorld fromWorld, BlockPortalShape fromShape, ServerWorld toWorld, BlockPortalShape toShape) {
       for (BlockPos blockPos : toShape.frameAreaWithCorner) {
-         toWorld.setBlockState(blockPos, Blocks.field_10540.getDefaultState());
+         toWorld.setBlockState(blockPos, Blocks.OBSIDIAN.getDefaultState());
       }
    }
 
@@ -61,7 +61,7 @@ public class IntrinsicNetherPortalForm extends NetherPortalLikeForm {
             return true;
          } else {
             Block block = blockState.getBlock();
-            if (block == Blocks.field_10316) {
+            if (block == Blocks.NETHER_PORTAL) {
                encounteredVanillaPortalBlock = true;
             }
 
@@ -77,7 +77,7 @@ public class IntrinsicNetherPortalForm extends NetherPortalLikeForm {
 
    @Override
    public Predicate<BlockState> getAreaPredicate() {
-      return class_4971::isAir;
+      return AbstractBlockState::isAir;
    }
 
    @Override

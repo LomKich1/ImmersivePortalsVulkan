@@ -12,7 +12,7 @@ public class MixinLinearPalette<T> {
       method = {"writePacket"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/IndexedIterable;getRawId(Ljava/lang/Object;)I"
+         target = "Lnet/minecraft/util/collection/IndexedIterable;getRawId(Ljava/lang/Object;)I"
       )}
    )
    private int onGetId(IndexedIterable<T> idMap, T object) {

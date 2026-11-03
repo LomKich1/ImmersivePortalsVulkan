@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import qouteall.imm_ptl.core.IPGlobal;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.core.portal.Portal;
@@ -23,7 +23,7 @@ public class ChunkVisibility {
    public static final int secondaryPortalLoadingRange = 16;
 
    public static ChunkLoader playerDirectLoader(ServerPlayerEntity player) {
-      return new ChunkLoader(new DimensionalChunkPos(player.getServerWorld().getRegistryKey(), player.getChunkPos()), McHelper.getPlayerLoadDistance(player));
+      return new ChunkLoader(new DimensionalChunkPos(player.getEntityWorld().getRegistryKey(), player.getChunkPos()), McHelper.getPlayerLoadDistance(player));
    }
 
    private static int getDirectLoadingDistance(int renderDistance, double distanceToPortal) {
@@ -109,7 +109,9 @@ public class ChunkVisibility {
       ChunkLoader playerDirectLoader = playerDirectLoader(player);
       func.accept(playerDirectLoader);
 
-      for (Portal portal : getNearbyPortals(player.getServerWorld(), player.getEntityPos(), portalx -> portalx.canBeSpectated(player), visiblePortalRangeChunks, 256)) {
+      for (Portal portal : getNearbyPortals(
+         player.getEntityWorld(), player.getEntityPos(), portalx -> portalx.canBeSpectated(player), visiblePortalRangeChunks, 256
+      )) {
          World destinationWorld = portal.getDestinationWorld();
          if (destinationWorld != null) {
             Vec3d transformedPlayerPos = portal.transformPoint(player.getEntityPos());

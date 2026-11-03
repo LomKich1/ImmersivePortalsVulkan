@@ -1,6 +1,5 @@
 package qouteall.imm_ptl.core.portal;
 
-import com.mojang.datafixers.util.Pair;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -9,19 +8,19 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.world.World;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.Entity.RemovalReason;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Pair;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.entity.Entity.class_5529;
-import net.minecraft.world.RaycastContext.class_242;
-import net.minecraft.world.RaycastContext.class_3960;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
+import net.minecraft.world.World;
+import net.minecraft.world.RaycastContext.FluidHandling;
+import net.minecraft.world.RaycastContext.ShapeType;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.IPGlobal;
 import qouteall.imm_ptl.core.IPMcHelper;
@@ -78,7 +77,7 @@ public class PortalManipulation {
 
    public static <T extends Portal> T createReversePortal(Portal portal, EntityType<T> entityType) {
       World world = portal.getDestinationWorld();
-      T newPortal = (T)entityType.create(world, SpawnReason.field_16461);
+      T newPortal = (T)entityType.create(world, SpawnReason.TRIGGERED);
 
       assert newPortal != null;
 
@@ -115,7 +114,7 @@ public class PortalManipulation {
 
    public static <T extends Portal> T createFlippedPortal(Portal portal, EntityType<T> entityType) {
       World world = portal.getEntityWorld();
-      T newPortal = (T)entityType.create(world, SpawnReason.field_16461);
+      T newPortal = (T)entityType.create(world, SpawnReason.TRIGGERED);
 
       assert newPortal != null;
 
@@ -137,7 +136,7 @@ public class PortalManipulation {
 
    public static Portal copyPortal(Portal portal, EntityType<Portal> entityType) {
       World world = portal.getEntityWorld();
-      Portal newPortal = (Portal)entityType.create(world, SpawnReason.field_16461);
+      Portal newPortal = (Portal)entityType.create(world, SpawnReason.TRIGGERED);
       newPortal.setDestDim(portal.getDestDim());
       newPortal.setPosition(portal.getX(), portal.getY(), portal.getZ());
       newPortal.setDestination(portal.getDestPos());
@@ -187,7 +186,7 @@ public class PortalManipulation {
 
    public static void removeOverlappedPortals(World world, Vec3d pos, Vec3d normal, Predicate<Portal> predicate, Consumer<Portal> informer) {
       getPortalCluster(world, pos, normal, predicate).forEach(e -> {
-         e.remove(class_5529.KILLED);
+         e.remove(RemovalReason.KILLED);
          informer.accept(e);
       });
    }
@@ -205,7 +204,7 @@ public class PortalManipulation {
    public static <T extends Portal> T createOrthodoxPortal(
       EntityType<T> entityType, ServerWorld fromWorld, ServerWorld toWorld, Direction facing, Box portalArea, Vec3d destination
    ) {
-      T portal = (T)entityType.create(fromWorld, SpawnReason.field_16461);
+      T portal = (T)entityType.create(fromWorld, SpawnReason.TRIGGERED);
       PortalAPI.setPortalOrthodoxShape(portal, facing, portalArea);
       portal.setDestination(destination);
       portal.setDestDim(toWorld.getRegistryKey());
@@ -274,7 +273,7 @@ public class PortalManipulation {
       Pair<BlockHitResult, List<Portal>> rayTrace = IPMcHelper.rayTrace(
          entity.getEntityWorld(),
          new RaycastContext(
-            entity.getCameraPosVec(1.0F), entity.getCameraPosVec(1.0F).add(playerLook.multiply(100.0)), class_3960.field_17559, class_242.field_1348, entity
+            entity.getCameraPosVec(1.0F), entity.getCameraPosVec(1.0F).add(playerLook.multiply(100.0)), ShapeType.OUTLINE, FluidHandling.NONE, entity
          ),
          true
       );
@@ -372,7 +371,7 @@ public class PortalManipulation {
    }
 
    @Deprecated
-   public static Optional<Pair<Portal, Vec3d>> raytracePortals(World world, Vec3d from, Vec3d to, boolean includeGlobalPortal) {
+   public static Optional<com.mojang.datafixers.util.Pair<Portal, Vec3d>> raytracePortals(World world, Vec3d from, Vec3d to, boolean includeGlobalPortal) {
       return PortalCommand.raytracePortals(world, from, to, includeGlobalPortal);
    }
 

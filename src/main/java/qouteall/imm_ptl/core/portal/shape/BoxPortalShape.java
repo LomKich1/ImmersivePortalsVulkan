@@ -3,11 +3,11 @@ package qouteall.imm_ptl.core.portal.shape;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.IPGlobal;
 import qouteall.imm_ptl.core.collision.CollisionHelper;
@@ -149,9 +149,7 @@ public final class BoxPortalShape implements PortalShape {
 
    @Environment(EnvType.CLIENT)
    @Override
-   public void renderViewAreaMesh(
-      Vec3d portalOriginRelativeToCamera, UnilateralPortalState portalState, TriangleConsumer vertexOutput, boolean isGlobalPortal
-   ) {
+   public void renderViewAreaMesh(Vec3d portalOriginRelativeToCamera, UnilateralPortalState portalState, TriangleConsumer vertexOutput, boolean isGlobalPortal) {
       Vec3d localHX = portalState.getAxisW().multiply(portalState.width() / 2.0);
       Vec3d localHY = portalState.getAxisH().multiply(portalState.height() / 2.0);
       Vec3d localHZ = portalState.getNormal().multiply(portalState.thickness() / 2.0);

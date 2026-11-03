@@ -4,9 +4,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.function.Predicate;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import qouteall.imm_ptl.core.portal.custom_portal_gen.SimpleBlockPredicate;
 import qouteall.imm_ptl.core.portal.nether_portal.BlockPortalShape;
 
@@ -30,8 +30,8 @@ public class HeterogeneousForm extends NetherPortalLikeForm {
 
    @Override
    public void generateNewFrame(ServerWorld fromWorld, BlockPortalShape fromShape, ServerWorld toWorld, BlockPortalShape toShape) {
-      BlockPos offset = toShape.innerAreaBox.l.method_10059(fromShape.innerAreaBox.l);
-      fromShape.frameAreaWithoutCorner.forEach(blockPos -> toWorld.setBlockState(blockPos.method_10081(offset), fromWorld.getBlockState(blockPos)));
+      BlockPos offset = toShape.innerAreaBox.l.subtract(fromShape.innerAreaBox.l);
+      fromShape.frameAreaWithoutCorner.forEach(blockPos -> toWorld.setBlockState(blockPos.add(offset), fromWorld.getBlockState(blockPos)));
    }
 
    @Override

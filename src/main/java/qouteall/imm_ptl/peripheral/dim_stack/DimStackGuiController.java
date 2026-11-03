@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import net.minecraft.util.Formatting;
-import net.minecraft.world.World;
-import net.minecraft.text.Text;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 import qouteall.imm_ptl.core.portal.global_portals.VerticalConnectingPortal;
 import qouteall.imm_ptl.peripheral.alternate_dimension.AlternateDimensions;
@@ -177,7 +177,7 @@ public class DimStackGuiController {
          .setScreen(
             new NoticeScreen(
                () -> MinecraftClient.getInstance().setScreen(this.view),
-               Text.translatable("imm_ptl.conflicting_dim_stack").formatted(Formatting.field_1061),
+               Text.translatable("imm_ptl.conflicting_dim_stack").formatted(Formatting.RED),
                Text.translatable("imm_ptl.conflicting_dim_stack_detail")
             )
          );
@@ -216,9 +216,7 @@ public class DimStackGuiController {
          MinecraftClient.getInstance()
             .setScreen(
                new NoticeScreen(
-                  () -> MinecraftClient.getInstance().setScreen(this.view),
-                  Text.literal(""),
-                  Text.translatable("imm_ptl.dim_stack_default_updated")
+                  () -> MinecraftClient.getInstance().setScreen(this.view), Text.literal(""), Text.translatable("imm_ptl.dim_stack_default_updated")
                )
             );
       }

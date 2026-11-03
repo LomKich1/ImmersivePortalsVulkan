@@ -2,7 +2,7 @@ package qouteall.imm_ptl.core.render;
 
 import java.util.ArrayList;
 import net.minecraft.util.Util;
-import net.minecraft.util.Util.class_158;
+import net.minecraft.util.Util.OperatingSystem;
 import org.apache.commons.lang3.Validate;
 import org.lwjgl.opengl.GL15;
 
@@ -17,7 +17,7 @@ public class GlQueryObject {
    }
 
    public void performQueryAnySamplePassed(Runnable renderingFunc) {
-      if (Util.getOperatingSystem() == class_158.field_1137) {
+      if (Util.getOperatingSystem() == OperatingSystem.OSX) {
          this.performQuerySampleNumPassed(renderingFunc);
       } else {
          this.performQuery(renderingFunc, 35887);

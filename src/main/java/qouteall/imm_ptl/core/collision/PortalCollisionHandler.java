@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import net.minecraft.util.profiler.Profilers;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.function.BooleanBiFunction;
-import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.profiler.Profilers;
 import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.IPGlobal;
@@ -121,20 +121,18 @@ public class PortalCollisionHandler {
                   GravityChangerInterface.invoker.getGravityDirection(entity)
                );
                Plane innerClipping = collidingPortal.getInnerClipping();
-               Vec3d collided = CollisionHelper.handleCollisionWithShapeProcessor(
-                  entity, boxOtherSide, destinationWorld, transformedAttemptedMove, shape -> {
-                     VoxelShape current = innerClipping == null ? shape : CollisionHelper.clipVoxelShape(shape, innerClipping.pos(), innerClipping.normal());
-                     if (current == null) {
-                        return null;
-                     } else {
-                        if (!indirectCollidingPortals.isEmpty()) {
-                           current = processThisSideCollisionShape(current, indirectCollidingPortals);
-                        }
-
-                        return current;
+               Vec3d collided = CollisionHelper.handleCollisionWithShapeProcessor(entity, boxOtherSide, destinationWorld, transformedAttemptedMove, shape -> {
+                  VoxelShape current = innerClipping == null ? shape : CollisionHelper.clipVoxelShape(shape, innerClipping.pos(), innerClipping.normal());
+                  if (current == null) {
+                     return null;
+                  } else {
+                     if (!indirectCollidingPortals.isEmpty()) {
+                        current = processThisSideCollisionShape(current, indirectCollidingPortals);
                      }
-                  }, transformedGravityDirection, collidingPortal.getScale()
-               );
+
+                     return current;
+                  }
+               }, transformedGravityDirection, collidingPortal.getScale());
                if (!indirectCollidingPortals.isEmpty()) {
                   for (Portal indirectCollidingPortal : indirectCollidingPortals) {
                      collided = handleOtherSideMove(
@@ -163,9 +161,7 @@ public class PortalCollisionHandler {
          .getMovementForPushingEntityOutOfPortal(collidingPortal, collidingPortal.getThisSideState(), entity, attemptedMove);
    }
 
-   private static Vec3d handleThisSideMove(
-      Entity entity, Vec3d attemptedMove, Box originalBoundingBox, List<PortalCollisionEntry> portalCollisions
-   ) {
+   private static Vec3d handleThisSideMove(Entity entity, Vec3d attemptedMove, Box originalBoundingBox, List<PortalCollisionEntry> portalCollisions) {
       Direction gravity = GravityChangerInterface.invoker.getGravityDirection(entity);
       return CollisionHelper.handleCollisionWithShapeProcessor(
          entity,

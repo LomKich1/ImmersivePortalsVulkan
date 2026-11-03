@@ -3,8 +3,8 @@ package qouteall.imm_ptl.core.render;
 import java.util.Comparator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.CHelper;
 import qouteall.imm_ptl.core.IPCGlobal;
@@ -135,9 +135,7 @@ public class FrustumCuller {
 
    public static BoxPredicateF getFlatPortalOuterFrustumCullingFunc(Portal portal, Vec3d cameraPos) {
       Vec3d[] v = getRectPortalFourVerticesCounterClockwise(portal.getThisSideState());
-      Vec3d[] vTransformed = new Vec3d[]{
-         v[0].subtract(cameraPos), v[1].subtract(cameraPos), v[2].subtract(cameraPos), v[3].subtract(cameraPos)
-      };
+      Vec3d[] vTransformed = new Vec3d[]{v[0].subtract(cameraPos), v[1].subtract(cameraPos), v[2].subtract(cameraPos), v[3].subtract(cameraPos)};
       FrustumCuller.Frustum4Planes fourPlanes = getFrustumPlanesFromFourVerticesCounterClockwise(vTransformed);
       Plane portalPlane = new Plane(portal.getOriginPos().subtract(cameraPos), portal.getNormal());
       float portalPlaneX = (float)portalPlane.getEquationX();

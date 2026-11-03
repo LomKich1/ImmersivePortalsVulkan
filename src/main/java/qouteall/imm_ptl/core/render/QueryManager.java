@@ -1,7 +1,7 @@
 package qouteall.imm_ptl.core.render;
 
 import net.minecraft.util.Util;
-import net.minecraft.util.Util.class_158;
+import net.minecraft.util.Util.OperatingSystem;
 import org.lwjgl.opengl.GL15;
 import qouteall.imm_ptl.core.CHelper;
 
@@ -16,7 +16,7 @@ public class QueryManager {
          CHelper.checkGlError();
       }
 
-      if (Util.getOperatingSystem() == class_158.field_1137) {
+      if (Util.getOperatingSystem() == OperatingSystem.OSX) {
          return renderAndGetSampleCountPassed(renderingFunc) > 0;
       } else {
          assert !isQuerying;

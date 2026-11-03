@@ -7,7 +7,7 @@ import com.mojang.blaze3d.pipeline.RenderPipeline.Snippet;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.platform.DestFactor;
 import com.mojang.blaze3d.platform.SourceFactor;
-import com.mojang.blaze3d.vertex.VertexFormat.class_5596;
+import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
 import java.util.HashMap;
 import java.util.Map;
 import net.fabricmc.api.EnvType;
@@ -20,8 +20,8 @@ import net.minecraft.util.Identifier;
 public class IPRenderPipelines {
    public static final String NAMESPACE = "immersive_portals";
    private static final Snippet MATRICES_SNIPPET = RenderPipeline.builder(new Snippet[0])
-      .withUniform("DynamicTransforms", UniformType.field_60031)
-      .withUniform("Projection", UniformType.field_60031)
+      .withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER)
+      .withUniform("Projection", UniformType.UNIFORM_BUFFER)
       .buildSnippet();
    private static final BlendFunction PORTAL_AREA_BLEND = new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
    private static final Map<Integer, RenderPipeline> PORTAL_AREA_VARIANTS = new HashMap<>();
@@ -60,18 +60,18 @@ public class IPRenderPipelines {
       .withVertexShader(id("core/portal_draw_fb_in_area"))
       .withFragmentShader(id("core/portal_draw_fb_in_area"))
       .withSampler("DiffuseSampler")
-      .withUniform("IPScreenSize", UniformType.field_60031)
+      .withUniform("IPScreenSize", UniformType.UNIFORM_BUFFER)
       .withBlend(PORTAL_AREA_BLEND)
       .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
       .withDepthWrite(true)
-      .withVertexFormat(VertexFormats.POSITION_COLOR, class_5596.field_27379)
+      .withVertexFormat(VertexFormats.POSITION_COLOR, DrawMode.TRIANGLES)
       .build();
    public static final RenderPipeline DEBUG_LINE_STRIP = RenderPipeline.builder(new Snippet[]{MATRICES_SNIPPET})
       .withLocation(id("pipeline/debug_line_strip"))
       .withVertexShader("core/position_color")
       .withFragmentShader("core/position_color")
       .withCull(false)
-      .withVertexFormat(VertexFormats.POSITION_COLOR, class_5596.field_29345)
+      .withVertexFormat(VertexFormats.POSITION_COLOR, DrawMode.DEBUG_LINE_STRIP)
       .build();
 
    public static Identifier id(String path) {
@@ -91,7 +91,7 @@ public class IPRenderPipelines {
             .withColorWrite(writeColor, writeColor)
             .withDepthWrite(writeDepth)
             .withDepthTestFunction(depthTest)
-            .withVertexFormat(VertexFormats.POSITION_COLOR, class_5596.field_27379)
+            .withVertexFormat(VertexFormats.POSITION_COLOR, DrawMode.TRIANGLES)
             .build()
       );
    }
@@ -103,7 +103,7 @@ public class IPRenderPipelines {
          .withFragmentShader("core/position_color")
          .withCull(false)
          .withoutBlend()
-         .withVertexFormat(VertexFormats.POSITION_COLOR, class_5596.field_27379);
+         .withVertexFormat(VertexFormats.POSITION_COLOR, DrawMode.TRIANGLES);
    }
 
    private static Builder blit(String name, boolean forceAlphaToOne) {
@@ -115,7 +115,7 @@ public class IPRenderPipelines {
          .withDepthWrite(false)
          .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
          .withCull(false)
-         .withVertexFormat(VertexFormats.EMPTY, class_5596.field_27379);
+         .withVertexFormat(VertexFormats.EMPTY, DrawMode.TRIANGLES);
    }
 
    public static RenderPipeline blitScreen(boolean doUseAlphaBlend, boolean doEnableModifyAlpha) {

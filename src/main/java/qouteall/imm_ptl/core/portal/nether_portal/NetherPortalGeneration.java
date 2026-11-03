@@ -7,19 +7,19 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.Entity.RemovalReason;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.entity.Entity.class_5529;
-import net.minecraft.util.math.Direction.class_2351;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import qouteall.imm_ptl.core.McHelper;
@@ -41,12 +41,12 @@ public class NetherPortalGeneration {
 
    @Nullable
    public static IntBox findAirCubePlacement(
-      ServerWorld toWorld, BlockPos mappedPosInOtherDimension, class_2351 axis, BlockPos neededAreaSize, boolean allowForcePlacement
+      ServerWorld toWorld, BlockPos mappedPosInOtherDimension, Axis axis, BlockPos neededAreaSize, boolean allowForcePlacement
    ) {
       BlockPos randomShift = new BlockPos(toWorld.getRandom().nextBoolean() ? 1 : -1, 0, toWorld.getRandom().nextBoolean() ? 1 : -1);
-      IntBox foundAirCube = axis == class_2351.field_11052
-         ? NetherPortalMatcher.findHorizontalPortalPlacement(neededAreaSize, toWorld, mappedPosInOtherDimension.method_10081(randomShift))
-         : NetherPortalMatcher.findVerticalPortalPlacement(neededAreaSize, toWorld, mappedPosInOtherDimension.method_10081(randomShift));
+      IntBox foundAirCube = axis == Axis.Y
+         ? NetherPortalMatcher.findHorizontalPortalPlacement(neededAreaSize, toWorld, mappedPosInOtherDimension.add(randomShift))
+         : NetherPortalMatcher.findVerticalPortalPlacement(neededAreaSize, toWorld, mappedPosInOtherDimension.add(randomShift));
       if (foundAirCube == null) {
          LOGGER.info("Cannot find normal portal placement");
          foundAirCube = NetherPortalMatcher.findCubeAirAreaAtAnywhere(neededAreaSize, toWorld, mappedPosInOtherDimension, 32);
@@ -68,10 +68,10 @@ public class NetherPortalGeneration {
    }
 
    private static boolean isFloating(ServerWorld toWorld, IntBox foundAirCube) {
-      return foundAirCube.getSurfaceLayer(Direction.field_11033).stream().noneMatch(blockPos -> toWorld.getBlockState(blockPos.method_10074()).isSolid());
+      return foundAirCube.getSurfaceLayer(Direction.DOWN).stream().noneMatch(blockPos -> toWorld.getBlockState(blockPos.down()).isSolid());
    }
 
-   public static void setPortalContentBlock(ServerWorld world, BlockPos pos, class_2351 normalAxis) {
+   public static void setPortalContentBlock(ServerWorld world, BlockPos pos, Axis normalAxis) {
       world.setBlockState(pos, (BlockState)PortalPlaceholderBlock.instance.getDefaultState().with(PortalPlaceholderBlock.AXIS, normalAxis));
    }
 
@@ -92,7 +92,7 @@ public class NetherPortalGeneration {
       RegistryKey<World> toDimension = toWorld.getRegistryKey();
       MinecraftServer server = fromWorld.getServer();
       Vec3d indicatorPos = fromShape.innerAreaBox.getCenterVec();
-      LoadingIndicatorEntity indicatorEntity = (LoadingIndicatorEntity)LoadingIndicatorEntity.entityType.create(fromWorld, SpawnReason.field_16461);
+      LoadingIndicatorEntity indicatorEntity = (LoadingIndicatorEntity)LoadingIndicatorEntity.entityType.create(fromWorld, SpawnReason.TRIGGERED);
       indicatorEntity.isValid = true;
       indicatorEntity.setPosition(indicatorPos.x, indicatorPos.y, indicatorPos.z);
       indicatorEntity.setBox(fromShape.innerAreaBox);
@@ -112,7 +112,7 @@ public class NetherPortalGeneration {
       ChunkLoader chunkLoader = new ChunkLoader(new DimensionalChunkPos(toDimension, new ChunkPos(toPos)), loaderRadius);
       ImmPtlChunkTracking.addGlobalAdditionalChunkLoader(server, chunkLoader);
       Runnable finalizer = () -> {
-         indicatorEntity.remove(class_5529.KILLED);
+         indicatorEntity.remove(RemovalReason.KILLED);
          ImmPtlChunkTracking.removeGlobalAdditionalChunkLoader(server, chunkLoader);
       };
       ServerTaskList.of(server).addTask(() -> {
@@ -166,11 +166,7 @@ public class NetherPortalGeneration {
       } else {
          limitedLogger.log(
             String.format(
-               "Portal Generation Attempted %s %s %s %s",
-               fromWorld.getRegistryKey().getValue(),
-               startingPos.getX(),
-               startingPos.getY(),
-               startingPos.getZ()
+               "Portal Generation Attempted %s %s %s %s", fromWorld.getRegistryKey().getValue(), startingPos.getX(), startingPos.getY(), startingPos.getZ()
             )
          );
          return true;
@@ -180,10 +176,13 @@ public class NetherPortalGeneration {
    public static BlockPortalShape findFrameShape(
       ServerWorld fromWorld, BlockPos startingPos, Predicate<BlockState> thisSideAreaPredicate, Predicate<BlockState> thisSideFramePredicate
    ) {
-      return Arrays.stream(class_2351.values())
+      return Arrays.stream(Axis.values())
          .map(
             axis -> BlockPortalShape.findShapeWithoutRegardingStartingPos(
-               startingPos, axis, pos -> thisSideAreaPredicate.test(fromWorld.getBlockState(pos)), pos -> thisSideFramePredicate.test(fromWorld.getBlockState(pos))
+               startingPos,
+               axis,
+               pos -> thisSideAreaPredicate.test(fromWorld.getBlockState(pos)),
+               pos -> thisSideFramePredicate.test(fromWorld.getBlockState(pos))
             )
          )
          .filter(Objects::nonNull)

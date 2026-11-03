@@ -6,18 +6,18 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 import net.minecraft.command.DefaultPermissions;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.Entity.RemovalReason;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.entity.Entity.class_5529;
-import net.minecraft.server.MinecraftServer;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -124,7 +124,7 @@ public class PortalWandInteraction {
                }
             }
 
-            Portal portal = (Portal)Portal.ENTITY_TYPE.create(McHelper.getServerWorld(firstSideDimension), SpawnReason.field_16461);
+            Portal portal = (Portal)Portal.ENTITY_TYPE.create(McHelper.getServerWorld(firstSideDimension), SpawnReason.TRIGGERED);
             Validate.notNull(portal);
             portal.setOriginPos(firstSideLeftBottom.add(firstSideHorizontalAxis.multiply(0.5)).add(firstSideVerticalAxis.multiply(0.5)));
             portal.setWidth(firstSideWidth);
@@ -132,9 +132,7 @@ public class PortalWandInteraction {
             portal.setAxisW(firstSideHorizontalUnitAxis);
             portal.setAxisH(firstSideVerticalUnitAxis);
             portal.setDestDim(secondSideDimension);
-            portal.setDestination(
-               secondSideLeftBottom.add(secondSideHorizontalAxis.multiply(0.5)).add(secondSideVerticalAxis.multiply(0.5))
-            );
+            portal.setDestination(secondSideLeftBottom.add(secondSideHorizontalAxis.multiply(0.5)).add(secondSideVerticalAxis.multiply(0.5)));
             portal.setScaling(secondSideWidth / firstSideWidth);
             DQuaternion secondSideOrientation = DQuaternion.matrixToQuaternion(
                secondSideHorizontalUnitAxis, secondSideVerticalUnitAxis, secondSideHorizontalUnitAxis.crossProduct(secondSideVerticalUnitAxis)
@@ -232,7 +230,7 @@ public class PortalWandInteraction {
       PortalWandInteraction portalWandInteraction = of(player.server);
       PortalWandInteraction.DraggingSession session = portalWandInteraction.draggingSessionMap.get(player);
       if (session == null || !session.portalId.equals(portalId)) {
-         session = new PortalWandInteraction.DraggingSession(player.getServerWorld().getRegistryKey(), portalId, portal.getPortalState(), draggingInfo);
+         session = new PortalWandInteraction.DraggingSession(player.getEntityWorld().getRegistryKey(), portalId, portal.getPortalState(), draggingInfo);
          portalWandInteraction.draggingSessionMap.put(player, session);
       }
 
@@ -275,7 +273,7 @@ public class PortalWandInteraction {
    private static boolean canPlayerUsePortalWand(ServerPlayerEntity player) {
       return player.getPermissions().hasPermission(DefaultPermissions.GAMEMASTERS)
          || IPGlobal.easeCreativePermission && player.isCreative()
-         || IPConfig.getConfig().portalWandUsableOnSurvivalMode && player.interactionManager.getGameMode() == GameMode.field_9215;
+         || IPConfig.getConfig().portalWandUsableOnSurvivalMode && player.interactionManager.getGameMode() == GameMode.SURVIVAL;
    }
 
    private static void giveCommandStick(ServerPlayerEntity player, String command) {
@@ -393,9 +391,7 @@ public class PortalWandInteraction {
             }
          }
 
-         Vec3d newLockedPosOffset = newOrientation.rotate(
-            new Vec3d((lockedLocalPos.nx() - 0.5) * newWidth, (lockedLocalPos.ny() - 0.5) * newHeight, 0.0)
-         );
+         Vec3d newLockedPosOffset = newOrientation.rotate(new Vec3d((lockedLocalPos.nx() - 0.5) * newWidth, (lockedLocalPos.ny() - 0.5) * newHeight, 0.0));
          Vec3d newOrigin = lockedPos.subtract(newLockedPosOffset);
          UnilateralPortalState newPortalState = new UnilateralPortalState(originalState.dimension(), newOrigin, newOrientation, newWidth, newHeight);
          return new PortalWandInteraction.OneLockDraggingResult(newPortalState, rotation.getRotatingAxis());
@@ -404,9 +400,7 @@ public class PortalWandInteraction {
       }
    }
 
-   private static DQuaternion getOrientationByNormalDiagonalWidthHeight(
-      Vec3d normal, Vec3d diagonal, double width, double height, double sigX, double sigY
-   ) {
+   private static DQuaternion getOrientationByNormalDiagonalWidthHeight(Vec3d normal, Vec3d diagonal, double width, double height, double sigX, double sigY) {
       Vec3d newOffsetN = diagonal.normalize();
       double newOffsetLen = diagonal.length();
       Vec3d sideVecN = normal.crossProduct(newOffsetN).normalize();
@@ -421,7 +415,7 @@ public class PortalWandInteraction {
    }
 
    public static void handleCopyCutPortal(ServerPlayerEntity player, UUID portalId, boolean isCut) {
-      Portal portal = WandUtil.getPortalByUUID(player.getServerWorld(), portalId);
+      Portal portal = WandUtil.getPortalByUUID(player.getEntityWorld(), portalId);
       if (portal == null) {
          player.sendMessage(Text.literal("Cannot find portal " + portalId));
       } else {
@@ -448,17 +442,17 @@ public class PortalWandInteraction {
          );
          copyingSessionMap.put(player, copyingSession);
          if (isCut) {
-            portal.remove(class_5529.KILLED);
+            portal.remove(RemovalReason.KILLED);
             if (flipped != null) {
-               flipped.remove(class_5529.KILLED);
+               flipped.remove(RemovalReason.KILLED);
             }
 
             if (reverse != null) {
-               reverse.remove(class_5529.KILLED);
+               reverse.remove(RemovalReason.KILLED);
             }
 
             if (parallel != null) {
-               parallel.remove(class_5529.KILLED);
+               parallel.remove(RemovalReason.KILLED);
             }
          }
       }
@@ -473,7 +467,7 @@ public class PortalWandInteraction {
          if (player.getEntityPos().squaredDistanceTo(origin) > 4096.0) {
             player.sendMessage(Text.literal("Too far away from the portal"));
          } else {
-            Portal portal = (Portal)Portal.ENTITY_TYPE.create(player.getServerWorld(), SpawnReason.field_16461);
+            Portal portal = (Portal)Portal.ENTITY_TYPE.create(player.getEntityWorld(), SpawnReason.TRIGGERED);
 
             assert portal != null;
 
@@ -482,7 +476,7 @@ public class PortalWandInteraction {
             UnilateralPortalState originalThisSide = originalPortalState.getThisSideState();
             UnilateralPortalState originalOtherSide = originalPortalState.getOtherSideState();
             UnilateralPortalState newThisSide = new UnilateralPortalState(
-               player.getServerWorld().getRegistryKey(), origin, orientation, originalThisSide.width(), originalThisSide.height()
+               player.getEntityWorld().getRegistryKey(), origin, orientation, originalThisSide.width(), originalThisSide.height()
             );
             portal.setPortalState(UnilateralPortalState.combine(newThisSide, originalOtherSide));
             portal.resetAnimationReferenceState(true, false);
@@ -587,7 +581,7 @@ public class PortalWandInteraction {
 
       public static void requestApplyDrag(ServerPlayerEntity player, UUID portalId, Vec3d cursorPos, PortalWandInteraction.DraggingInfo draggingInfo) {
          if (PortalWandInteraction.checkPermission(player)) {
-            if (player.getServerWorld().getEntity(portalId) instanceof Portal portal) {
+            if (player.getEntityWorld().getEntity(portalId) instanceof Portal portal) {
                if (!draggingInfo.isValid()) {
                   player.sendMessage(Text.literal("Invalid dragging info"));
                   PortalWandInteraction.LOGGER.error("Invalid dragging info {}", draggingInfo);

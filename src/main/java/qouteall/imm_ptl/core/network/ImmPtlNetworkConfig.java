@@ -5,17 +5,17 @@ import com.mojang.logging.LogUtils;
 import java.util.function.Consumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.Formatting;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.Text;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.MutableText;
-import net.minecraft.server.network.ServerPlayerConfigurationTask;
-import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.server.network.ServerPlayerConfigurationTask.class_8606;
-import net.minecraft.network.packet.CustomPayload.class_9154;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.CustomPayload.Id;
+import net.minecraft.server.network.ServerPlayerConfigurationTask;
+import net.minecraft.server.network.ServerPlayerConfigurationTask.Key;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -86,8 +86,7 @@ public class ImmPtlNetworkConfig {
          MutableText text = Text.translatable(
                "imm_ptl.mod_patch_version_mismatch",
                new Object[]{
-                  Text.literal(serverVersion.toString()).formatted(Formatting.field_1065),
-                  Text.literal(immPtlVersion.toString()).formatted(Formatting.field_1065)
+                  Text.literal(serverVersion.toString()).formatted(Formatting.GOLD), Text.literal(immPtlVersion.toString()).formatted(Formatting.GOLD)
                }
             )
             .append(IPMcHelper.getDisableWarningText("mod_version_mismatch"));
@@ -104,9 +103,7 @@ public class ImmPtlNetworkConfig {
    }
 
    public record C2SConfigCompletePacket(ImmPtlNetworkConfig.ModVersion versionFromClient, boolean clientTolerantVersionMismatch) implements CustomPayload {
-      public static final class_9154<ImmPtlNetworkConfig.C2SConfigCompletePacket> TYPE = new class_9154(
-         McHelper.newResourceLocation("iportal:configure_complete")
-      );
+      public static final Id<ImmPtlNetworkConfig.C2SConfigCompletePacket> TYPE = new Id(McHelper.newResourceLocation("iportal:configure_complete"));
       public static final PacketCodec<PacketByteBuf, ImmPtlNetworkConfig.C2SConfigCompletePacket> CODEC = PacketCodec.ofStatic(
          (b, p) -> p.write(b), ImmPtlNetworkConfig.C2SConfigCompletePacket::read
       );
@@ -119,7 +116,7 @@ public class ImmPtlNetworkConfig {
 
       public void write(PacketByteBuf buf) {
          this.versionFromClient.write(buf);
-         buf.method_52964(this.clientTolerantVersionMismatch);
+         buf.writeBoolean(this.clientTolerantVersionMismatch);
       }
 
       public void handle(PlatformNetworking.ServerConfigurationContext context) {
@@ -153,20 +150,20 @@ public class ImmPtlNetworkConfig {
       }
 
       @NotNull
-      public class_9154<? extends CustomPayload> getId() {
+      public Id<? extends CustomPayload> getId() {
          return TYPE;
       }
    }
 
    public record ImmPtlConfigurationTask() implements ServerPlayerConfigurationTask {
-      public static final class_8606 TYPE = new class_8606("iportal:config");
+      public static final Key TYPE = new Key("iportal:config");
 
-      public void sendPacket(Consumer<Packet<?>> consumer) {
-         consumer.accept(PlatformNetworking.get().createConfigurationS2CPacket(new ImmPtlNetworkConfig.S2CConfigStartPacket(ImmPtlNetworkConfig.immPtlVersion)));
+      public void sendPacket(Consumer<Packet<?>> sender) {
+         sender.accept(PlatformNetworking.get().createConfigurationS2CPacket(new ImmPtlNetworkConfig.S2CConfigStartPacket(ImmPtlNetworkConfig.immPtlVersion)));
       }
 
       @NotNull
-      public class_8606 getKey() {
+      public Key getKey() {
          return TYPE;
       }
    }
@@ -202,7 +199,7 @@ public class ImmPtlNetworkConfig {
    }
 
    public record S2CConfigStartPacket(ImmPtlNetworkConfig.ModVersion versionFromServer) implements CustomPayload {
-      public static final class_9154<ImmPtlNetworkConfig.S2CConfigStartPacket> TYPE = new class_9154(McHelper.newResourceLocation("iportal:config_packet"));
+      public static final Id<ImmPtlNetworkConfig.S2CConfigStartPacket> TYPE = new Id(McHelper.newResourceLocation("iportal:config_packet"));
       public static final PacketCodec<PacketByteBuf, ImmPtlNetworkConfig.S2CConfigStartPacket> CODEC = PacketCodec.ofStatic(
          (b, p) -> p.write(b), ImmPtlNetworkConfig.S2CConfigStartPacket::read
       );
@@ -226,7 +223,7 @@ public class ImmPtlNetworkConfig {
       }
 
       @NotNull
-      public class_9154<? extends CustomPayload> getId() {
+      public Id<? extends CustomPayload> getId() {
          return TYPE;
       }
    }

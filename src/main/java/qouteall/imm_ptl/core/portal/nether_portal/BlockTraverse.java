@@ -3,7 +3,7 @@ package qouteall.imm_ptl.core.portal.nether_portal;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.class_2339;
+import net.minecraft.util.math.BlockPos.Mutable;
 import qouteall.q_misc_util.my_util.IntBox;
 
 public class BlockTraverse {
@@ -71,7 +71,7 @@ public class BlockTraverse {
    }
 
    public static <T> T searchColumned(int centerX, int centerZ, int range, int startY, int endY, Function<BlockPos, T> func) {
-      class_2339 temp = new class_2339();
+      Mutable temp = new Mutable();
       return searchColumnedRaw(centerX, centerZ, range, startY, endY, (x, y, z) -> {
          temp.set(x, y, z);
          return func.apply(temp);
@@ -94,7 +94,7 @@ public class BlockTraverse {
    }
 
    public static <T> T searchInBox(IntBox box, Function<BlockPos, T> func) {
-      class_2339 temp = new class_2339();
+      Mutable temp = new Mutable();
       return searchInBox(box, (x, y, z) -> {
          temp.set(x, y, z);
          return func.apply(temp);

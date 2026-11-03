@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.core.mixin.client.accessor;
 
 import java.util.Map;
-import net.minecraft.item.map.MapState;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.item.map.MapState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;

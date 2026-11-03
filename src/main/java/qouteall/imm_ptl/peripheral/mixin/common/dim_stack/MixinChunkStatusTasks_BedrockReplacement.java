@@ -1,11 +1,11 @@
 package qouteall.imm_ptl.peripheral.mixin.common.dim_stack;
 
 import java.util.concurrent.CompletableFuture;
+import net.minecraft.util.collection.BoundedRegionArray;
+import net.minecraft.world.chunk.AbstractChunkHolder;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkGenerating;
 import net.minecraft.world.chunk.ChunkGenerationContext;
-import net.minecraft.world.chunk.AbstractChunkHolder;
-import net.minecraft.util.collection.BoundedRegionArray;
 import net.minecraft.world.chunk.ChunkGenerationStep;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,6 +26,6 @@ public class MixinChunkStatusTasks_BedrockReplacement {
       Chunk chunkAccess,
       CallbackInfoReturnable<CompletableFuture<Chunk>> cir
    ) {
-      DimStackManagement.replaceBedrock(worldGenContext.comp_2434(), chunkAccess);
+      DimStackManagement.replaceBedrock(worldGenContext.world(), chunkAccess);
    }
 }

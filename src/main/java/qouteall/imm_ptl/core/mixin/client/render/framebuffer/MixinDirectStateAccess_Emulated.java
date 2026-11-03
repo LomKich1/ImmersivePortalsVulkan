@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import qouteall.imm_ptl.core.render.StencilDepthTextures;
 
 @Mixin(
-   targets = {"net/minecraft/BufferManager.DefaultBufferManager"}
+   targets = {"net/minecraft/client/gl/BufferManager$DefaultBufferManager"}
 )
 public class MixinDirectStateAccess_Emulated {
    @WrapOperation(

@@ -2,8 +2,8 @@ package qouteall.imm_ptl.core.render;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.RenderSetup;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderSetup;
 
 @Environment(EnvType.CLIENT)
 public class IPRenderTypes {

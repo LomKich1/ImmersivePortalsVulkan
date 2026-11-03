@@ -2,30 +2,29 @@ package qouteall.imm_ptl.core.portal;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
+import net.minecraft.entity.Entity.RemovalReason;
+import net.minecraft.entity.EntityType.Builder;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.entity.Entity.class_5529;
-import net.minecraft.entity.EntityType.class_1300;
-import net.minecraft.entity.data.DataTracker.class_9222;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.q_misc_util.my_util.IntBox;
 import qouteall.q_misc_util.platform.Platform;
@@ -33,10 +32,10 @@ import qouteall.q_misc_util.platform.Platform;
 public class LoadingIndicatorEntity extends Entity {
    public static final EntityType<LoadingIndicatorEntity> entityType = Platform.get()
       .forceTrackedVelocityUpdates(
-         class_1300.create(LoadingIndicatorEntity::new, SpawnGroup.field_17715).dimensions(1.0F, 1.0F).makeFireImmune().maxTrackingRange(6).trackingTickInterval(20),
+         Builder.create(LoadingIndicatorEntity::new, SpawnGroup.MISC).dimensions(1.0F, 1.0F).makeFireImmune().maxTrackingRange(6).trackingTickInterval(20),
          true
       )
-      .build(RegistryKey.of(RegistryKeys.field_41266, McHelper.newResourceLocation("immersive_portals", "loading_indicator")));
+      .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, McHelper.newResourceLocation("immersive_portals", "loading_indicator")));
    private static final TrackedData<Text> TEXT = DataTracker.registerData(LoadingIndicatorEntity.class, TrackedDataHandlerRegistry.TEXT_COMPONENT);
    private static final TrackedData<BlockPos> BOX_LOW_POS = DataTracker.registerData(LoadingIndicatorEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
    private static final TrackedData<BlockPos> BOX_HIGH_POS = DataTracker.registerData(LoadingIndicatorEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
@@ -51,7 +50,7 @@ public class LoadingIndicatorEntity extends Entity {
       if (this.getEntityWorld().isClient()) {
          this.tickClient();
       } else if (!this.isValid) {
-         this.remove(class_5529.KILLED);
+         this.remove(RemovalReason.KILLED);
       }
    }
 
@@ -74,31 +73,29 @@ public class LoadingIndicatorEntity extends Entity {
       Random random = this.getEntityWorld().getRandom();
 
       for (int i = 0; i < num; i++) {
-         Vec3d p = new Vec3d(random.nextDouble(), random.nextDouble(), random.nextDouble())
-            .multiply(Vec3d.of(size))
-            .add(Vec3d.of(box.l));
+         Vec3d p = new Vec3d(random.nextDouble(), random.nextDouble(), random.nextDouble()).multiply(Vec3d.of(size)).add(Vec3d.of(box.l));
          double speedMultiplier = 20.0;
          double vx = speedMultiplier * (random.nextFloat() - 0.5) * 0.5;
          double vy = speedMultiplier * (random.nextFloat() - 0.5) * 0.5;
          double vz = speedMultiplier * (random.nextFloat() - 0.5) * 0.5;
-         this.getEntityWorld().addParticleClient(ParticleTypes.field_11214, p.x, p.y, p.z, vx, vy, vz);
+         this.getEntityWorld().addParticleClient(ParticleTypes.PORTAL, p.x, p.y, p.z, vx, vy, vz);
       }
    }
 
-   protected void initDataTracker(class_9222 builder) {
+   protected void initDataTracker(net.minecraft.entity.data.DataTracker.Builder builder) {
       builder.add(TEXT, Text.literal("Loading..."));
       builder.add(BOX_LOW_POS, BlockPos.ORIGIN);
       builder.add(BOX_HIGH_POS, BlockPos.ORIGIN);
    }
 
-   public boolean damage(ServerWorld level, DamageSource source, float amount) {
+   public boolean damage(ServerWorld world, DamageSource source, float amount) {
       return false;
    }
 
-   protected void readCustomData(ReadView input) {
+   protected void readCustomData(ReadView view) {
    }
 
-   protected void writeCustomData(WriteView output) {
+   protected void writeCustomData(WriteView view) {
    }
 
    public void inform(Text str) {

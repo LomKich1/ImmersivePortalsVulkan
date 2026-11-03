@@ -1,12 +1,12 @@
 package qouteall.imm_ptl.core.mixin.client.render;
 
-import net.minecraft.world.attribute.EnvironmentAttributeInterpolator;
-import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.client.render.Camera;
 import net.minecraft.block.enums.CameraSubmersionType;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import net.minecraft.world.attribute.EnvironmentAttributeInterpolator;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -42,7 +42,7 @@ public abstract class MixinCamera implements IECamera {
    public abstract Entity getFocusedEntity();
 
    @Inject(
-      method = {"Lnet/minecraft/Camera;update(Lnet/minecraft/World;Lnet/minecraft/Entity;ZZF)V"},
+      method = {"Lnet/minecraft/client/render/Camera;update(Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;ZZF)V"},
       at = {@At("RETURN")}
    )
    private void onUpdateFinished(World area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float partialTick, CallbackInfo ci) {
@@ -51,19 +51,19 @@ public abstract class MixinCamera implements IECamera {
    }
 
    @Inject(
-      method = {"Lnet/minecraft/Camera;getSubmersionType()Lnet/minecraft/CameraSubmersionType;"},
+      method = {"Lnet/minecraft/client/render/Camera;getSubmersionType()Lnet/minecraft/block/enums/CameraSubmersionType;"},
       at = {@At("HEAD")},
       cancellable = true
    )
    private void getSubmergedFluidState(CallbackInfoReturnable<CameraSubmersionType> cir) {
       if (PortalRendering.isRendering()) {
-         cir.setReturnValue(CameraSubmersionType.field_27888);
+         cir.setReturnValue(CameraSubmersionType.NONE);
          cir.cancel();
       }
    }
 
    @Inject(
-      method = {"Lnet/minecraft/Camera;isThirdPerson()Z"},
+      method = {"Lnet/minecraft/client/render/Camera;isThirdPerson()Z"},
       at = {@At("HEAD")},
       cancellable = true
    )

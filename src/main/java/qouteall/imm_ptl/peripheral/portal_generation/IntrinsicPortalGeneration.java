@@ -4,13 +4,13 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Optional;
 import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.NetherPortal;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.Direction.class_2351;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.NetherPortal;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.IPGlobal;
 import qouteall.imm_ptl.core.McHelper;
@@ -21,27 +21,11 @@ public class IntrinsicPortalGeneration {
    public static final DiligentNetherPortalForm diligentNetherPortalForm = new DiligentNetherPortalForm();
    public static final PortalHelperForm portalHelperForm = new PortalHelperForm();
    public static final CustomPortalGeneration intrinsicToNether = new CustomPortalGeneration(
-      Lists.newArrayList(new RegistryKey[]{World.OVERWORLD}),
-      World.NETHER,
-      8,
-      1,
-      true,
-      intrinsicNetherPortalForm,
-      null,
-      new ArrayList<>(),
-      new ArrayList<>()
+      Lists.newArrayList(new RegistryKey[]{World.OVERWORLD}), World.NETHER, 8, 1, true, intrinsicNetherPortalForm, null, new ArrayList<>(), new ArrayList<>()
    );
    public static final CustomPortalGeneration intrinsicFromNether = intrinsicToNether.getReverse();
    public static final CustomPortalGeneration diligentToNether = new CustomPortalGeneration(
-      Lists.newArrayList(new RegistryKey[]{World.OVERWORLD}),
-      World.NETHER,
-      8,
-      1,
-      true,
-      diligentNetherPortalForm,
-      null,
-      new ArrayList<>(),
-      new ArrayList<>()
+      Lists.newArrayList(new RegistryKey[]{World.OVERWORLD}), World.NETHER, 8, 1, true, diligentNetherPortalForm, null, new ArrayList<>(), new ArrayList<>()
    );
    public static final CustomPortalGeneration diligentFromNether = diligentToNether.getReverse();
    public static final CustomPortalGeneration portalHelper = new CustomPortalGeneration(
@@ -96,7 +80,7 @@ public class IntrinsicPortalGeneration {
          if (!dimensionCorrect) {
             return false;
          } else {
-            Optional<NetherPortal> newPortal = NetherPortal.getNewPortal(world, firePos, class_2351.field_11048);
+            Optional<NetherPortal> newPortal = NetherPortal.getNewPortal(world, firePos, Axis.X);
             if (newPortal.isEmpty()) {
                return false;
             } else {

@@ -4,27 +4,27 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.CommandEncoder;
+import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTexture;
-import net.minecraft.util.profiler.Profilers;
-import com.mojang.blaze3d.systems.ProjectionType;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.InGameOverlayRenderer;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.RawProjectionMatrix;
-import net.minecraft.client.render.state.WorldRenderState;
+import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
 import net.minecraft.client.render.command.RenderDispatcher;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.gui.hud.InGameOverlayRenderer;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.fog.FogRenderer;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.util.memory.ObjectAllocator;
+import net.minecraft.client.render.state.WorldRenderState;
+import net.minecraft.client.util.ObjectAllocator;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.profiler.Profilers;
 import org.joml.Matrix4f;
 import org.joml.Quaternionfc;
 import org.joml.Vector4f;
@@ -129,7 +129,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
       method = {"render"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/GameRenderer;renderWorld(Lnet/minecraft/RenderTickCounter;)V"
+         target = "Lnet/minecraft/client/render/GameRenderer;renderWorld(Lnet/minecraft/client/render/RenderTickCounter;)V"
       )}
    )
    private void onBeforeRenderingCenter(RenderTickCounter deltaTracker, boolean bl, CallbackInfo ci) {
@@ -141,7 +141,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
       method = {"render"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/GameRenderer;renderWorld(Lnet/minecraft/RenderTickCounter;)V",
+         target = "Lnet/minecraft/client/render/GameRenderer;renderWorld(Lnet/minecraft/client/render/RenderTickCounter;)V",
          shift = Shift.AFTER
       )}
    )
@@ -161,7 +161,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
       method = {"render"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/GameRenderer;renderWorld(Lnet/minecraft/RenderTickCounter;)V"
+         target = "Lnet/minecraft/client/render/GameRenderer;renderWorld(Lnet/minecraft/client/render/RenderTickCounter;)V"
       )}
    )
    private void redirectRenderingWorld(GameRenderer gameRenderer, RenderTickCounter deltaTracker) {
@@ -182,7 +182,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
       method = {"renderWorld"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/WorldRenderer;render(Lnet/minecraft/ObjectAllocator;Lnet/minecraft/RenderTickCounter;ZLnet/minecraft/Camera;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V"
+         target = "Lnet/minecraft/client/render/WorldRenderer;render(Lnet/minecraft/client/util/ObjectAllocator;Lnet/minecraft/client/render/RenderTickCounter;ZLnet/minecraft/client/render/Camera;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V"
       )}
    )
    private void wrapRenderLevel(
@@ -208,7 +208,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
    }
 
    @Inject(
-      method = {"Lnet/minecraft/GameRenderer;onResized(II)V"},
+      method = {"Lnet/minecraft/client/render/GameRenderer;onResized(II)V"},
       at = {@At("RETURN")}
    )
    private void onOnResized(int int_1, int int_2, CallbackInfo ci) {
@@ -259,10 +259,12 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
       method = {"renderWorld"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/InGameOverlayRenderer;renderOverlays(ZFLnet/minecraft/OrderedRenderCommandQueue;)V"
+         target = "Lnet/minecraft/client/gui/hud/InGameOverlayRenderer;renderOverlays(ZFLnet/minecraft/client/render/command/OrderedRenderCommandQueue;)V"
       )}
    )
-   private void wrapRenderScreenEffect(InGameOverlayRenderer instance, boolean sleeping, float partialTick, OrderedRenderCommandQueue collector, Operation<Void> original) {
+   private void wrapRenderScreenEffect(
+      InGameOverlayRenderer instance, boolean sleeping, float partialTick, OrderedRenderCommandQueue collector, Operation<Void> original
+   ) {
       if (this.ip_doRenderHand) {
          original.call(new Object[]{instance, sleeping, partialTick, collector});
       }
@@ -272,7 +274,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
       method = {"bobView"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/MatrixStack;translate(FFF)V"
+         target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"
       )},
       index = 0
    )
@@ -284,7 +286,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
       method = {"bobView"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/MatrixStack;translate(FFF)V"
+         target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"
       )},
       index = 1
    )
@@ -296,7 +298,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
       method = {"bobView"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/MatrixStack;translate(FFF)V"
+         target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"
       )},
       index = 2
    )
@@ -308,7 +310,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
       method = {"renderWorld"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/GameRenderer;getBasicProjectionMatrix(F)Lorg/joml/Matrix4f;",
+         target = "Lnet/minecraft/client/render/GameRenderer;getBasicProjectionMatrix(F)Lorg/joml/Matrix4f;",
          ordinal = 0
       )}
    )
@@ -330,7 +332,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
       method = {"renderWorld"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/RawProjectionMatrix;set(Lorg/joml/Matrix4f;)Lcom/mojang/blaze3d/buffers/GpuBufferSlice;"
+         target = "Lnet/minecraft/client/render/RawProjectionMatrix;set(Lorg/joml/Matrix4f;)Lcom/mojang/blaze3d/buffers/GpuBufferSlice;"
       )}
    )
    private GpuBufferSlice wrapUploadProjectionMatrix(RawProjectionMatrix instance, Matrix4f projectionMatrix, Operation<GpuBufferSlice> original) {
@@ -342,7 +344,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
       method = {"renderWorld"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/FogRenderer;applyFog(Lnet/minecraft/Camera;ILnet/minecraft/RenderTickCounter;FLnet/minecraft/ClientWorld;)Lorg/joml/Vector4f;"
+         target = "Lnet/minecraft/client/render/fog/FogRenderer;applyFog(Lnet/minecraft/client/render/Camera;ILnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;"
       )}
    )
    private Vector4f wrapSetupFog(

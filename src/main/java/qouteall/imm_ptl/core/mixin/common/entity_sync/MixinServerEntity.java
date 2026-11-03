@@ -1,10 +1,10 @@
 package qouteall.imm_ptl.core.mixin.common.entity_sync;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.TrackedPosition;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.entity.TrackedPosition;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,7 +34,7 @@ public abstract class MixinServerEntity implements IEEntityTrackerEntry {
    private static Logger LOGGER;
 
    @Inject(
-      method = {"Lnet/minecraft/EntityTrackerEntry;tick()V"},
+      method = {"Lnet/minecraft/server/network/EntityTrackerEntry;tick()V"},
       at = {@At("HEAD")}
    )
    private void onTick(CallbackInfo ci) {
@@ -45,7 +45,7 @@ public abstract class MixinServerEntity implements IEEntityTrackerEntry {
       method = {"stopTracking"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/Packet;)V"
+         target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"
       )}
    )
    private void onSendRemoveEntityPacket(ServerPlayNetworkHandler networkHandler, Packet packet) {
@@ -60,7 +60,7 @@ public abstract class MixinServerEntity implements IEEntityTrackerEntry {
       method = {"startTracking"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/Packet;)V"
+         target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"
       )}
    )
    private void onSendAddEntityPacket(ServerPlayNetworkHandler networkHandler, Packet packet) {

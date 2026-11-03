@@ -2,12 +2,12 @@ package qouteall.imm_ptl.core.mixin.common.collision;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.minecraft.entity.LazyEntityReference;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LazyEntityReference;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.world.World;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -17,7 +17,7 @@ public abstract class MixinProjectile extends MixinEntity {
       method = {"getOwner"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/LazyEntityReference;getEntity(Lnet/minecraft/LazyEntityReference;Lnet/minecraft/World;)Lnet/minecraft/Entity;"
+         target = "Lnet/minecraft/entity/LazyEntityReference;getEntity(Lnet/minecraft/entity/LazyEntityReference;Lnet/minecraft/world/World;)Lnet/minecraft/entity/Entity;"
       )}
    )
    private Entity wrapGetOwnerEntity(LazyEntityReference<Entity> owner, World level, Operation<Entity> original) {

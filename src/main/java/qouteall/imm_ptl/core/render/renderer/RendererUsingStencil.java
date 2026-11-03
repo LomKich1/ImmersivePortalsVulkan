@@ -2,10 +2,10 @@ package qouteall.imm_ptl.core.render.renderer;
 
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.platform.DepthTestFunction;
-import net.minecraft.util.profiler.Profilers;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.profiler.Profilers;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import qouteall.imm_ptl.core.CHelper;
@@ -128,9 +128,7 @@ public class RendererUsingStencil extends PortalRenderer {
       GL11.glStencilOp(7680, 7680, 7682);
       GL11.glStencilMask(255);
       FrontClipping.updateInnerClipping(modelView);
-      ViewAreaRenderer.renderPortalArea(
-         portal, Vec3d.ZERO, modelView, MyRenderHelper.getProjectionMatrix(), true, true, true, true, client.getFramebuffer()
-      );
+      ViewAreaRenderer.renderPortalArea(portal, Vec3d.ZERO, modelView, MyRenderHelper.getProjectionMatrix(), true, true, true, true, client.getFramebuffer());
    }
 
    private void clearDepthOfThePortalViewArea(Portal portal) {
@@ -145,9 +143,7 @@ public class RendererUsingStencil extends PortalRenderer {
       Framebuffer target = client.getFramebuffer();
 
       for (DepthTestFunction depthTest : new DepthTestFunction[]{DepthTestFunction.LESS_DEPTH_TEST, DepthTestFunction.GREATER_DEPTH_TEST}) {
-         ViewAreaRenderer.renderPortalArea(
-            portal, Vec3d.ZERO, modelView, MyRenderHelper.getProjectionMatrix(), false, false, true, true, depthTest, target
-         );
+         ViewAreaRenderer.renderPortalArea(portal, Vec3d.ZERO, modelView, MyRenderHelper.getProjectionMatrix(), false, false, true, true, depthTest, target);
       }
    }
 

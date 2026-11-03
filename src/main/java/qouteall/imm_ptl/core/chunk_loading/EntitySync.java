@@ -2,12 +2,12 @@ package qouteall.imm_ptl.core.chunk_loading;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import net.minecraft.util.profiler.Profilers;
-import net.minecraft.server.world.ChunkLevelManager;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.world.ServerChunkLoadingManager;
-import net.minecraft.server.world.ServerChunkLoadingManager.class_3208;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ChunkLevelManager;
+import net.minecraft.server.world.ServerChunkLoadingManager;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.world.ServerChunkLoadingManager.EntityTracker;
+import net.minecraft.util.profiler.Profilers;
 import qouteall.dimlib.api.DimensionAPI;
 import qouteall.imm_ptl.core.ducks.IEChunkMap;
 import qouteall.imm_ptl.core.ducks.IETrackedEntity;
@@ -23,13 +23,13 @@ public class EntitySync {
 
       for (ServerWorld world : server.getWorlds()) {
          PacketRedirection.withForceRedirect(world, () -> {
-            ServerChunkLoadingManager chunkMap = world.method_14178().chunkLoadingManager;
-            Int2ObjectMap<class_3208> entityTrackerMap = ((IEChunkMap)chunkMap).ip_getEntityTrackerMap();
+            ServerChunkLoadingManager chunkMap = world.getChunkManager().chunkLoadingManager;
+            Int2ObjectMap<EntityTracker> entityTrackerMap = ((IEChunkMap)chunkMap).ip_getEntityTrackerMap();
             ChunkLevelManager distanceManager = chunkMap.getLevelManager();
             ObjectIterator var4 = entityTrackerMap.values().iterator();
 
             while (var4.hasNext()) {
-               class_3208 trackedEntity = (class_3208)var4.next();
+               EntityTracker trackedEntity = (EntityTracker)var4.next();
                IETrackedEntity ieTrackedEntity = (IETrackedEntity)trackedEntity;
                ieTrackedEntity.ip_updateEntityTrackingStatus();
             }
@@ -44,13 +44,13 @@ public class EntitySync {
 
       for (ServerWorld world : server.getWorlds()) {
          PacketRedirection.withForceRedirect(world, () -> {
-            ServerChunkLoadingManager chunkMap = world.method_14178().chunkLoadingManager;
-            Int2ObjectMap<class_3208> entityTrackerMap = ((IEChunkMap)chunkMap).ip_getEntityTrackerMap();
+            ServerChunkLoadingManager chunkMap = world.getChunkManager().chunkLoadingManager;
+            Int2ObjectMap<EntityTracker> entityTrackerMap = ((IEChunkMap)chunkMap).ip_getEntityTrackerMap();
             ChunkLevelManager distanceManager = chunkMap.getLevelManager();
             ObjectIterator var4 = entityTrackerMap.values().iterator();
 
             while (var4.hasNext()) {
-               class_3208 trackedEntity = (class_3208)var4.next();
+               EntityTracker trackedEntity = (EntityTracker)var4.next();
                IETrackedEntity ieTrackedEntity = (IETrackedEntity)trackedEntity;
                long chunkPos = ieTrackedEntity.ip_getEntity().getChunkPos().toLong();
                if (distanceManager.shouldTickEntities(chunkPos)) {

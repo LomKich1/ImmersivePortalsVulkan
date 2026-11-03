@@ -3,12 +3,12 @@ package qouteall.imm_ptl.core.portal.custom_portal_gen.form;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.util.math.Direction.class_2352;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction.AxisDirection;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.McHelper;
@@ -61,16 +61,16 @@ public class OneWayForm extends PortalGenForm {
             return false;
          } else {
             for (BlockPos areaPos : fromShape.area) {
-               fromWorld.setBlockState(areaPos, Blocks.field_10124.getDefaultState());
+               fromWorld.setBlockState(areaPos, Blocks.AIR.getDefaultState());
             }
 
             if (this.breakable) {
                NetherPortalGeneration.fillInPlaceHolderBlocks(fromWorld, fromShape);
             }
 
-            GeneralBreakablePortal portal = (GeneralBreakablePortal)GeneralBreakablePortal.ENTITY_TYPE.create(fromWorld, SpawnReason.field_16461);
+            GeneralBreakablePortal portal = (GeneralBreakablePortal)GeneralBreakablePortal.ENTITY_TYPE.create(fromWorld, SpawnReason.TRIGGERED);
             Validate.notNull(portal);
-            fromShape.initPortalPosAxisShape(portal, class_2352.field_11056);
+            fromShape.initPortalPosAxisShape(portal, AxisDirection.POSITIVE);
             if (triggeringEntity == null) {
                portal.setDestination(portal.getOriginPos().add(0.0, 10.0, 0.0));
                portal.setDestinationDimension(fromWorld.getRegistryKey());

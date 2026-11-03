@@ -8,28 +8,28 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.BiomeSource;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.BlockState;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.ProtoChunk;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.gen.chunk.NoiseChunkGenerator;
-import net.minecraft.world.gen.StructureAccessor;
-import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
-import net.minecraft.world.gen.chunk.Blender;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.world.gen.noise.NoiseConfig;
+import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.math.BlockPos.class_2339;
-import net.minecraft.world.Heightmap.class_2903;
+import net.minecraft.registry.RegistryOps;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.BlockPos.Mutable;
+import net.minecraft.world.Heightmap;
+import net.minecraft.world.Heightmap.Type;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.source.BiomeSource;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.ProtoChunk;
+import net.minecraft.world.gen.StructureAccessor;
+import net.minecraft.world.gen.chunk.Blender;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
+import net.minecraft.world.gen.chunk.NoiseChunkGenerator;
+import net.minecraft.world.gen.noise.NoiseConfig;
 import org.jetbrains.annotations.NotNull;
 import qouteall.q_misc_util.Helper;
 
@@ -41,9 +41,9 @@ public class ErrorTerrainGenerator extends DelegatedChunkGenerator {
    public static final int regionChunkNum = 4;
    public static final int averageY = 64;
    public static final int maxY = 128;
-   private final BlockState air = Blocks.field_10124.getDefaultState();
-   private final BlockState defaultBlock = Blocks.field_10340.getDefaultState();
-   private final BlockState defaultFluid = Blocks.field_10382.getDefaultState();
+   private final BlockState air = Blocks.AIR.getDefaultState();
+   private final BlockState defaultBlock = Blocks.STONE.getDefaultState();
+   private final BlockState defaultFluid = Blocks.WATER.getDefaultState();
    private final LoadingCache<ChunkPos, RegionErrorTerrainGenerator> cache = CacheBuilder.newBuilder()
       .maximumSize(10000L)
       .expireAfterWrite(30L, TimeUnit.SECONDS)
@@ -53,9 +53,12 @@ public class ErrorTerrainGenerator extends DelegatedChunkGenerator {
          }
       });
 
-   public static ErrorTerrainGenerator create(RegistryEntryLookup<Biome> biomeHolderGetter, RegistryEntryLookup<ChunkGeneratorSettings> noiseGeneratorSettingsHolderGetter) {
+   public static ErrorTerrainGenerator create(
+      RegistryEntryLookup<Biome> biomeHolderGetter, RegistryEntryLookup<ChunkGeneratorSettings> noiseGeneratorSettingsHolderGetter
+   ) {
       ChaosBiomeSource chaosBiomeSource = ChaosBiomeSource.createChaosBiomeSource(biomeHolderGetter);
-      ChunkGeneratorSettings skylandSetting = (ChunkGeneratorSettings)noiseGeneratorSettingsHolderGetter.getOrThrow(ChunkGeneratorSettings.FLOATING_ISLANDS).comp_349();
+      ChunkGeneratorSettings skylandSetting = (ChunkGeneratorSettings)noiseGeneratorSettingsHolderGetter.getOrThrow(ChunkGeneratorSettings.FLOATING_ISLANDS)
+         .value();
       NoiseChunkGenerator islandChunkGenerator = new NoiseChunkGenerator(chaosBiomeSource, RegistryEntry.of(skylandSetting));
       return new ErrorTerrainGenerator(chaosBiomeSource, islandChunkGenerator);
    }
@@ -71,8 +74,8 @@ public class ErrorTerrainGenerator extends DelegatedChunkGenerator {
 
    @NotNull
    @Override
-   public CompletableFuture<Chunk> populateNoise(Blender blender, NoiseConfig randomState, StructureAccessor structureManager, Chunk chunkAccess) {
-      ChunkSection[] sectionArray = chunkAccess.getSectionArray();
+   public CompletableFuture<Chunk> populateNoise(Blender blender, NoiseConfig noiseConfig, StructureAccessor structureAccessor, Chunk chunk) {
+      ChunkSection[] sectionArray = chunk.getSectionArray();
       ArrayList<ChunkSection> locked = new ArrayList<>();
 
       for (ChunkSection chunkSection : sectionArray) {
@@ -83,8 +86,8 @@ public class ErrorTerrainGenerator extends DelegatedChunkGenerator {
       }
 
       return CompletableFuture.<Chunk>supplyAsync(() -> {
-         this.doPopulateNoise(chunkAccess);
-         return chunkAccess;
+         this.doPopulateNoise(chunk);
+         return chunk;
       }, Util.getMainWorkerExecutor()).thenApplyAsync(chunkx -> {
          for (ChunkSection chunkSectionx : locked) {
             chunkSectionx.unlock();
@@ -97,9 +100,9 @@ public class ErrorTerrainGenerator extends DelegatedChunkGenerator {
    public void doPopulateNoise(Chunk chunk) {
       ProtoChunk protoChunk = (ProtoChunk)chunk;
       ChunkPos pos = chunk.getPos();
-      Heightmap oceanFloorHeightMap = protoChunk.getHeightmap(class_2903.field_13195);
-      Heightmap surfaceHeightMap = protoChunk.getHeightmap(class_2903.field_13194);
-      new class_2339();
+      Heightmap oceanFloorHeightMap = protoChunk.getHeightmap(Type.OCEAN_FLOOR_WG);
+      Heightmap surfaceHeightMap = protoChunk.getHeightmap(Type.WORLD_SURFACE_WG);
+      new Mutable();
       int regionX = Math.floorDiv(pos.x, 4);
       int regionZ = Math.floorDiv(pos.z, 4);
       RegionErrorTerrainGenerator generator = Helper.noError(() -> (RegionErrorTerrainGenerator)this.cache.get(new ChunkPos(regionX, regionZ)));

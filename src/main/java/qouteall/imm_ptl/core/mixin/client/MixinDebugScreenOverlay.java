@@ -17,7 +17,7 @@ public class MixinDebugScreenOverlay {
       method = {"render"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/DebugHud;drawText(Lnet/minecraft/DrawContext;Ljava/util/List;Z)V"
+         target = "Lnet/minecraft/client/gui/hud/DebugHud;drawText(Lnet/minecraft/client/gui/DrawContext;Ljava/util/List;Z)V"
       )}
    )
    private void onRenderLines(DebugHud instance, DrawContext guiGraphics, List<String> lines, boolean leftAlign, Operation<Void> original) {

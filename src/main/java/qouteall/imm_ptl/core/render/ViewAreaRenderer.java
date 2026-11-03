@@ -2,15 +2,15 @@ package qouteall.imm_ptl.core.render;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
-import com.mojang.blaze3d.vertex.VertexFormat.class_5596;
+import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
 import java.util.Objects;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BuiltBuffer;
+import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import qouteall.imm_ptl.core.CHelper;
 import qouteall.imm_ptl.core.IPGlobal;
@@ -102,31 +102,19 @@ public class ViewAreaRenderer {
 
    public static BuiltBuffer buildPortalViewAreaTrianglesMesh(Vec3d fogColor, Portal portal, Vec3d cameraPos, float partialTick) {
       Tessellator tessellator = Tessellator.getInstance();
-      BufferBuilder bufferBuilder = tessellator.begin(class_5596.field_27379, VertexFormats.POSITION_COLOR);
+      BufferBuilder bufferBuilder = tessellator.begin(DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
       Vec3d originRelativeToCamera = portal.getOriginPos().subtract(cameraPos);
       TriangleConsumer vertexOutput = (p0x, p0y, p0z, p1x, p1y, p1z, p2x, p2y, p2z) -> {
-         bufferBuilder.vertex((float)p0x, (float)p0y, (float)p0z)
-            .color((float)fogColor.x, (float)fogColor.y, (float)fogColor.z, 1.0F);
-         bufferBuilder.vertex((float)p1x, (float)p1y, (float)p1z)
-            .color((float)fogColor.x, (float)fogColor.y, (float)fogColor.z, 1.0F);
-         bufferBuilder.vertex((float)p2x, (float)p2y, (float)p2z)
-            .color((float)fogColor.x, (float)fogColor.y, (float)fogColor.z, 1.0F);
+         bufferBuilder.vertex((float)p0x, (float)p0y, (float)p0z).color((float)fogColor.x, (float)fogColor.y, (float)fogColor.z, 1.0F);
+         bufferBuilder.vertex((float)p1x, (float)p1y, (float)p1z).color((float)fogColor.x, (float)fogColor.y, (float)fogColor.z, 1.0F);
+         bufferBuilder.vertex((float)p2x, (float)p2y, (float)p2z).color((float)fogColor.x, (float)fogColor.y, (float)fogColor.z, 1.0F);
       };
       portal.renderViewAreaMesh(originRelativeToCamera, vertexOutput);
       return Objects.requireNonNull(bufferBuilder.endNullable());
    }
 
    public static void outputTriangle(
-      TriangleConsumer vertexOutput,
-      Vec3d center,
-      Vec3d localXAxis,
-      Vec3d localYAxis,
-      double p0x,
-      double p0y,
-      double p1x,
-      double p1y,
-      double p2x,
-      double p2y
+      TriangleConsumer vertexOutput, Vec3d center, Vec3d localXAxis, Vec3d localYAxis, double p0x, double p0y, double p1x, double p1y, double p2x, double p2y
    ) {
       vertexOutput.accept(
          center.x + p0x * localXAxis.getX() + p0y * localYAxis.getX(),

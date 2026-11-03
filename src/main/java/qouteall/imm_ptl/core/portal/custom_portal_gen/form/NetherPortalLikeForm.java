@@ -1,13 +1,13 @@
 package qouteall.imm_ptl.core.portal.custom_portal_gen.form;
 
 import java.util.function.Predicate;
-import net.minecraft.entity.Entity;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.text.Text;
 import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.IPGlobal;
 import qouteall.imm_ptl.core.portal.Portal;
@@ -45,7 +45,7 @@ public abstract class NetherPortalLikeForm extends PortalGenForm {
          } else {
             if (this.generateFrameIfNotFound) {
                for (BlockPos areaPos : fromShape.area) {
-                  fromWorld.setBlockState(areaPos, Blocks.field_10124.getDefaultState());
+                  fromWorld.setBlockState(areaPos, Blocks.AIR.getDefaultState());
                }
             }
 

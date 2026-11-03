@@ -1,9 +1,9 @@
 package qouteall.imm_ptl.core.mixin.common.collision;
 
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Box;
-import net.minecraft.entity.EntityPose;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import qouteall.imm_ptl.core.ducks.IEEntity;

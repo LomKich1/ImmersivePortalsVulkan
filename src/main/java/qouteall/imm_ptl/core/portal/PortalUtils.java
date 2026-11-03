@@ -10,13 +10,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult.Type;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult.class_240;
-import net.minecraft.world.RaycastContext.class_242;
-import net.minecraft.world.RaycastContext.class_3960;
+import net.minecraft.world.World;
+import net.minecraft.world.RaycastContext.FluidHandling;
+import net.minecraft.world.RaycastContext.ShapeType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.McHelper;
@@ -61,15 +61,13 @@ public class PortalUtils {
    }
 
    @Nullable
-   public static PortalUtils.PortalAwareRaytraceResult portalAwareRayTrace(
-      World world, Vec3d startingPoint, Vec3d direction, double maxDistance, Entity entity
-   ) {
+   public static PortalUtils.PortalAwareRaytraceResult portalAwareRayTrace(World world, Vec3d startingPoint, Vec3d direction, double maxDistance, Entity entity) {
       return portalAwareRayTrace(world, startingPoint, direction, maxDistance, entity, List.of());
    }
 
    @Nullable
    public static PortalUtils.PortalAwareRaytraceResult portalAwareRayTrace(
-      World world, Vec3d startingPoint, Vec3d direction, double maxDistance, Entity entity, class_3960 clipContextBlock
+      World world, Vec3d startingPoint, Vec3d direction, double maxDistance, Entity entity, ShapeType clipContextBlock
    ) {
       return portalAwareRayTrace(world, startingPoint, direction, maxDistance, entity, clipContextBlock, List.of());
    }
@@ -78,7 +76,7 @@ public class PortalUtils {
    public static PortalUtils.PortalAwareRaytraceResult portalAwareRayTrace(
       World world, Vec3d startingPoint, Vec3d direction, double maxDistance, Entity entity, @NotNull List<Portal> portalsPassingThrough
    ) {
-      return portalAwareRayTrace(world, startingPoint, direction, maxDistance, entity, class_3960.field_17559, portalsPassingThrough);
+      return portalAwareRayTrace(world, startingPoint, direction, maxDistance, entity, ShapeType.OUTLINE, portalsPassingThrough);
    }
 
    @Nullable
@@ -88,10 +86,10 @@ public class PortalUtils {
       Vec3d direction,
       double maxDistance,
       Entity entity,
-      class_3960 clipContextBlock,
+      ShapeType clipContextBlock,
       @NotNull List<Portal> portalsPassingThrough
    ) {
-      return portalAwareRayTraceFull(world, startingPoint, direction, maxDistance, entity, clipContextBlock, class_242.field_1348, portalsPassingThrough, 5);
+      return portalAwareRayTraceFull(world, startingPoint, direction, maxDistance, entity, clipContextBlock, FluidHandling.NONE, portalsPassingThrough, 5);
    }
 
    @Nullable
@@ -101,8 +99,8 @@ public class PortalUtils {
       Vec3d direction,
       double maxDistance,
       Entity entity,
-      class_3960 clipContextBlock,
-      class_242 clipContextFluid,
+      ShapeType clipContextBlock,
+      FluidHandling clipContextFluid,
       @NotNull List<Portal> portalsPassingThrough,
       int maxPortalLayer
    ) {
@@ -116,7 +114,7 @@ public class PortalUtils {
          RaycastContext context = new RaycastContext(startingPoint, endingPoint, clipContextBlock, clipContextFluid, entity);
          BlockHitResult blockHitResult = world.raycast(context);
          boolean portalHitFound = portalHit.isPresent();
-         boolean blockHitFound = blockHitResult.getType() == class_240.field_1332;
+         boolean blockHitFound = blockHitResult.getType() == Type.BLOCK;
          boolean shouldContinueRaytraceInsidePortal = false;
          if (portalHitFound && blockHitFound) {
             RayTraceResult rtResult = (RayTraceResult)portalHit.get().getSecond();

@@ -2,11 +2,11 @@ package qouteall.imm_ptl.core.mixin.common.entity_sync;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.entity.Entity;
-import net.minecraft.server.world.ChunkHolder;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerChunkLoadingManager;
-import net.minecraft.server.world.ServerChunkLoadingManager.class_3208;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.world.ServerChunkLoadingManager.EntityTracker;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -24,7 +24,7 @@ import qouteall.imm_ptl.core.teleportation.ServerTeleportationManager;
 public abstract class MixinChunkMap_E implements IEChunkMap {
    @Shadow
    @Final
-   public Int2ObjectMap<class_3208> entityTrackers;
+   public Int2ObjectMap<EntityTracker> entityTrackers;
    @Shadow
    @Final
    private ServerWorld world;
@@ -40,18 +40,18 @@ public abstract class MixinChunkMap_E implements IEChunkMap {
       method = {"loadEntity"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ServerChunkLoadingManager.EntityTracker;updateTrackedStatus(Ljava/util/List;)V"
+         target = "Lnet/minecraft/server/world/ServerChunkLoadingManager$EntityTracker;updateTrackedStatus(Ljava/util/List;)V"
       )}
    )
    private void onAddEntityUpdatePlayers(Entity entity, CallbackInfo ci) {
-      class_3208 trackedEntity = (class_3208)this.entityTrackers.get(entity.getId());
+      EntityTracker trackedEntity = (EntityTracker)this.entityTrackers.get(entity.getId());
       if (trackedEntity != null) {
          ((IETrackedEntity)trackedEntity).ip_updateEntityTrackingStatus();
       }
    }
 
    @Inject(
-      method = {"Lnet/minecraft/ServerChunkLoadingManager;unloadEntity(Lnet/minecraft/Entity;)V"},
+      method = {"Lnet/minecraft/server/world/ServerChunkLoadingManager;unloadEntity(Lnet/minecraft/entity/Entity;)V"},
       at = {@At("HEAD")},
       cancellable = true
    )
@@ -71,7 +71,7 @@ public abstract class MixinChunkMap_E implements IEChunkMap {
    }
 
    @Inject(
-      method = {"Lnet/minecraft/ServerChunkLoadingManager;tickEntityMovement()V"},
+      method = {"Lnet/minecraft/server/world/ServerChunkLoadingManager;tickEntityMovement()V"},
       at = {@At("HEAD")},
       cancellable = true
    )
@@ -97,7 +97,7 @@ public abstract class MixinChunkMap_E implements IEChunkMap {
    }
 
    @Override
-   public Int2ObjectMap<class_3208> ip_getEntityTrackerMap() {
+   public Int2ObjectMap<EntityTracker> ip_getEntityTrackerMap() {
       return this.entityTrackers;
    }
 

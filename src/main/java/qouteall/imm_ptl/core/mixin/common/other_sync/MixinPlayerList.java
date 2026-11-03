@@ -4,19 +4,19 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import java.util.List;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.network.ClientConnection;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.PlayerManager;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerManager;
+import net.minecraft.server.network.ConnectedClientData;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -45,7 +45,7 @@ public class MixinPlayerList {
    private MinecraftServer server;
 
    @Inject(
-      method = {"Lnet/minecraft/PlayerManager;sendWorldInfo(Lnet/minecraft/ServerPlayerEntity;Lnet/minecraft/ServerWorld;)V"},
+      method = {"Lnet/minecraft/server/PlayerManager;sendWorldInfo(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/server/world/ServerWorld;)V"},
       at = {@At("RETURN")}
    )
    private void onSendWorldInfo(ServerPlayerEntity player, ServerWorld world, CallbackInfo ci) {
@@ -60,17 +60,17 @@ public class MixinPlayerList {
    )
    private void onOnPlayerConnect(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData commonListenerCookie, CallbackInfo ci) {
       ImmPtlChunkTracking.immediatelyUpdateForPlayer(player);
-      Helper.LOGGER.info("Player login {} {}", player.getServerWorld().getTime(), player);
+      Helper.LOGGER.info("Player login {} {}", player.getEntityWorld().getTime(), player);
    }
 
    @Inject(
-      method = {"Lnet/minecraft/PlayerManager;sendToDimension(Lnet/minecraft/Packet;Lnet/minecraft/RegistryKey;)V"},
+      method = {"Lnet/minecraft/server/PlayerManager;sendToDimension(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/registry/RegistryKey;)V"},
       at = {@At("HEAD")},
       cancellable = true
    )
    public void sendToDimension(Packet<?> packet, RegistryKey<World> dimension, CallbackInfo ci) {
       for (ServerPlayerEntity player : this.players) {
-         if (player.getServerWorld().getRegistryKey() == dimension) {
+         if (player.getEntityWorld().getRegistryKey() == dimension) {
             PacketRedirection.sendRedirectedMessage(player, dimension, (Packet<ClientPlayPacketListener>)packet);
          }
       }
@@ -82,7 +82,7 @@ public class MixinPlayerList {
       method = {"respawnPlayer"},
       at = {@At(
          value = "INVOKE",
-         target = "Lnet/minecraft/ServerPlayerEntity;copyFrom(Lnet/minecraft/ServerPlayerEntity;Z)V"
+         target = "Lnet/minecraft/server/network/ServerPlayerEntity;copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V"
       )}
    )
    private void onRestoreFrom(ServerPlayerEntity newPlayer, ServerPlayerEntity that, boolean keepEverything) {
@@ -108,7 +108,9 @@ public class MixinPlayerList {
                && ImmPtlChunkTracking.isPlayerWatchingChunkWithinRadius(rec.player, dimension, chunkPos.x, chunkPos.z, (int)distance + 16)) {
                rec.player
                   .networkHandler
-                  .sendPacket(PacketRedirection.createRedirectedMessage(rec.player.getServerWorld().getServer(), dimension, (Packet<ClientPlayPacketListener>)packet));
+                  .sendPacket(
+                     PacketRedirection.createRedirectedMessage(rec.player.getEntityWorld().getServer(), dimension, (Packet<ClientPlayPacketListener>)packet)
+                  );
             }
          }
       }

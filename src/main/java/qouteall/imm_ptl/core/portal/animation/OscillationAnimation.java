@@ -1,8 +1,8 @@
 package qouteall.imm_ptl.core.portal.animation;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;

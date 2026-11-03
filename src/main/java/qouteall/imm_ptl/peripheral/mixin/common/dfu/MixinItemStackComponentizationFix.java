@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Dynamic;
 import java.util.Optional;
 import net.minecraft.datafixer.fix.ItemStackComponentizationFix;
-import net.minecraft.datafixer.fix.ItemStackComponentizationFix.class_9268;
+import net.minecraft.datafixer.fix.ItemStackComponentizationFix.StackData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +22,7 @@ public class MixinItemStackComponentizationFix {
       method = {"fixStack"},
       at = {@At("RETURN")}
    )
-   private static void onFixItemStack(class_9268 itemStackData, Dynamic<?> tag, CallbackInfo ci) {
+   private static void onFixItemStack(StackData itemStackData, Dynamic<?> tag, CallbackInfo ci) {
       if (itemStackData.itemEquals("immersive_portals:command_stick")) {
          Optional<? extends Dynamic<?>> commandTag = itemStackData.getAndRemove("command").result();
          Optional<? extends Dynamic<?>> nameTranslationKeyTag = itemStackData.getAndRemove("nameTranslationKey").result();

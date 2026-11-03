@@ -2,14 +2,14 @@ package qouteall.imm_ptl.core.mixin.common.chunk_sync;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.server.network.ChunkFilter;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ChunkHolder;
+import net.minecraft.server.world.ServerChunkLoadingManager;
+import net.minecraft.server.world.ServerLightingProvider;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.server.world.ChunkHolder;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerLightingProvider;
-import net.minecraft.server.world.ServerChunkLoadingManager;
-import net.minecraft.server.network.ChunkFilter;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -60,7 +60,7 @@ public abstract class MixinChunkMap_C implements IEChunkMap {
    }
 
    @Inject(
-      method = {"sendWatchPackets"},
+      method = {"sendWatchPackets(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/server/network/ChunkFilter;)V"},
       at = {@At("HEAD")},
       cancellable = true
    )
@@ -69,18 +69,16 @@ public abstract class MixinChunkMap_C implements IEChunkMap {
    }
 
    @Inject(
-      method = {"getPlayersWatchingChunk"},
+      method = {"getPlayersWatchingChunk(Lnet/minecraft/util/math/ChunkPos;Z)Ljava/util/List;"},
       at = {@At("HEAD")},
       cancellable = true
    )
    private void onGetPlayers(ChunkPos chunkPos, boolean boundaryOnly, CallbackInfoReturnable<List<ServerPlayerEntity>> cir) {
-      List<ServerPlayerEntity> viewers = ImmPtlChunkTracking.getPlayersViewingChunk(
-         this.world.getRegistryKey(), chunkPos.x, chunkPos.z, boundaryOnly
-      );
+      List<ServerPlayerEntity> viewers = ImmPtlChunkTracking.getPlayersViewingChunk(this.world.getRegistryKey(), chunkPos.x, chunkPos.z, boundaryOnly);
       List<ServerPlayerEntity> result = new ArrayList<>(viewers.size());
 
       for (ServerPlayerEntity viewer : viewers) {
-         if (viewer.getServerWorld() == this.world) {
+         if (viewer.getEntityWorld() == this.world) {
             result.add(viewer);
          }
       }
@@ -91,7 +89,7 @@ public abstract class MixinChunkMap_C implements IEChunkMap {
    @Overwrite
    private void sendToPlayers(ChunkHolder holder, WorldChunk chunk) {
       ImmPtlChunkTracking.onChunkProvidedDeferred(chunk);
-      this.world.method_14178().markForUpdate(holder);
+      this.world.getChunkManager().markForUpdate(holder);
       this.world.getSubscriptionTracker().trackChunk(chunk);
    }
 }
