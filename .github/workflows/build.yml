@@ -12,6 +12,8 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: current
       - name: Remap original jar to yarn names
         run: |
           chmod +x gradlew
