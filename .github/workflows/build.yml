@@ -17,7 +17,7 @@ jobs:
       - name: Remap original jar to yarn names
         run: |
           chmod +x gradlew
-          ./gradlew -p remap dumpRemapped --no-daemon 2>&1 | tee remap.log
+          gradle -p remap dumpRemapped --no-daemon 2>&1 | tee remap.log
           J=$(grep -h '^REMAPPED_JAR=' remap.log | head -1 | cut -d= -f2-)
           echo "remapped: $J"
           mkdir -p out && cp "$J" out/remapped-yarn.jar
