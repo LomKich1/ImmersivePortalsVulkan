@@ -15,7 +15,7 @@ import qouteall.imm_ptl.core.compat.vulkanmod_compatibility.VulkanOffscreenTarge
 @Pseudo
 @Mixin(targets = "net.vulkanmod.vulkan.pass.DefaultMainPass", remap = false)
 public class MixinVulkanModDefaultMainPass {
-   @Inject(method = "rebindMainTarget", at = @At("HEAD"), cancellable = true)
+   @Inject(method = "rebindMainTarget", at = @At("HEAD"), cancellable = true, require = 0)
    private void ip_stayOnPortalTarget(CallbackInfo ci) {
       if (VulkanOffscreenTarget.isActiveTargetOffscreen() && VulkanOffscreenTarget.bindActiveTarget()) {
          ci.cancel();
