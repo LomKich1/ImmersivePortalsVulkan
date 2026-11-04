@@ -155,13 +155,13 @@ public class ClientWorldLoader {
          Vec3d center = portal.transformPoint(playerPos);
          Camera camera = CLIENT.gameRenderer.getCamera();
          Vec3d oldCameraPos = camera.getCameraPos();
-         ((IECamera)camera).portal_setPos(center);
+         ((IECamera)(Object)camera).portal_setPos(center);
          if (newWorld.getTime() % 2L == 0L) {
             newWorld.doRandomBlockDisplayTicks((int)center.x, (int)center.y, (int)center.z);
          }
 
          CLIENT.particleManager.tick();
-         ((IECamera)camera).portal_setPos(oldCameraPos);
+         ((IECamera)(Object)camera).portal_setPos(oldCameraPos);
       });
    }
 
@@ -169,7 +169,7 @@ public class ClientWorldLoader {
       WORLD_RENDERER_MAP.values().forEach(ClientWorldLoader::disposeWorldRenderer);
 
       for (ClientWorld clientWorld : CLIENT_WORLD_MAP.values()) {
-         ((IEClientWorld)clientWorld).ip_resetWorldRendererRef();
+         ((IEClientWorld)(Object)clientWorld).ip_resetWorldRendererRef();
       }
 
       CLIENT_WORLD_MAP.clear();
@@ -182,7 +182,7 @@ public class ClientWorldLoader {
       worldRenderer.setWorld(null);
       if (worldRenderer != CLIENT.worldRenderer) {
          worldRenderer.close();
-         ((IEWorldRenderer)worldRenderer).portal_fullyDispose();
+         ((IEWorldRenderer)(Object)worldRenderer).portal_fullyDispose();
       }
    }
 
@@ -197,7 +197,7 @@ public class ClientWorldLoader {
       WORLD_RENDERER_MAP.remove(dimension);
       Validate.isTrue(CLIENT.worldRenderer != worldRenderer);
       ClientWorld clientWorld = CLIENT_WORLD_MAP.get(dimension);
-      ((IEClientWorld)clientWorld).ip_resetWorldRendererRef();
+      ((IEClientWorld)(Object)clientWorld).ip_resetWorldRendererRef();
       CLIENT_WORLD_MAP.remove(dimension);
       DimensionRenderHelper renderHelper = RENDER_HELPER_MAP.remove(dimension);
       if (renderHelper != null) {
@@ -302,19 +302,19 @@ public class ClientWorldLoader {
 
             assert CLIENT.world != null;
 
-            Map<String, MapState> mapData = ((IEClientLevel_Accessor)CLIENT.world).ip_getMapData();
+            Map<String, MapState> mapData = ((IEClientLevel_Accessor)(Object)CLIENT.world).ip_getMapData();
             Validate.notNull(dimIdToDimTypeId, "dimension type mapping is missing", new Object[0]);
             RegistryKey<DimensionType> dimensionTypeKey = dimIdToDimTypeId.get(dimension);
             if (dimensionTypeKey == null) {
                throw new IllegalStateException("Cannot find dimension type for %s in %s".formatted(dimension.getValue(), dimIdToDimTypeId));
             }
 
-            Properties currentProperty = (Properties)((IEWorld)CLIENT.world).ip_getLevelData();
+            Properties currentProperty = (Properties)((IEWorld)(Object)CLIENT.world).ip_getLevelData();
             DynamicRegistryManager registryManager = mainNetHandler.getRegistryManager();
             int simulationDistance = CLIENT.world.getSimulationDistance();
             RegistryEntry<DimensionType> dimensionType = registryManager.getOrThrow(RegistryKeys.DIMENSION_TYPE).getOrThrow(dimensionTypeKey);
             Properties properties = new Properties(
-               currentProperty.getDifficulty(), currentProperty.isHardcore(), ((IEClientLevelData)currentProperty).ip_getIsFlat()
+               currentProperty.getDifficulty(), currentProperty.isHardcore(), ((IEClientLevelData)(Object)currentProperty).ip_getIsFlat()
             );
             newWorld = new ClientWorld(
                mainNetHandler,
@@ -328,8 +328,8 @@ public class ClientWorldLoader {
                CLIENT.world.getBiomeAccess().seed,
                CLIENT.world.getSeaLevel()
             );
-            ((IEClientLevel_Accessor)newWorld).ip_setMapData(mapData);
-            ((IEClientWorld)newWorld).ip_setTickRateManager(CLIENT.world.getTickManager());
+            ((IEClientLevel_Accessor)(Object)newWorld).ip_setMapData(mapData);
+            ((IEClientWorld)(Object)newWorld).ip_setTickRateManager(CLIENT.world.getTickManager());
             worldRenderer.setWorld(newWorld);
             worldRenderer.reload(CLIENT.getResourceManager());
             CLIENT_WORLD_MAP.put(dimension, newWorld);
@@ -395,9 +395,9 @@ public class ClientWorldLoader {
       WorldRenderer newWorldRenderer = getWorldRenderer(newWorld.getRegistryKey());
       Validate.notNull(newWorldRenderer, "new world renderer is null", new Object[0]);
       CLIENT.world = newWorld;
-      ((IEParticleManager)CLIENT.particleManager).ip_setWorld(newWorld);
-      ((IEMinecraftClient)CLIENT).ip_setWorldRenderer(newWorldRenderer);
-      ((IEClientPlayNetworkHandler)networkHandler).ip_setWorld(newWorld);
+      ((IEParticleManager)(Object)CLIENT.particleManager).ip_setWorld(newWorld);
+      ((IEMinecraftClient)(Object)CLIENT).ip_setWorldRenderer(newWorldRenderer);
+      ((IEClientPlayNetworkHandler)(Object)networkHandler).ip_setWorld(newWorld);
       isWorldSwitched = true;
 
       Object var8;
@@ -411,9 +411,9 @@ public class ClientWorldLoader {
          }
 
          CLIENT.world = originalWorld;
-         ((IEMinecraftClient)CLIENT).ip_setWorldRenderer(originalWorldRenderer);
-         ((IEParticleManager)CLIENT.particleManager).ip_setWorld(originalWorld);
-         ((IEClientPlayNetworkHandler)networkHandler).ip_setWorld(originalNetHandlerWorld);
+         ((IEMinecraftClient)(Object)CLIENT).ip_setWorldRenderer(originalWorldRenderer);
+         ((IEParticleManager)(Object)CLIENT.particleManager).ip_setWorld(originalWorld);
+         ((IEClientPlayNetworkHandler)(Object)networkHandler).ip_setWorld(originalNetHandlerWorld);
          isWorldSwitched = originalIsWorldSwitched;
       }
 

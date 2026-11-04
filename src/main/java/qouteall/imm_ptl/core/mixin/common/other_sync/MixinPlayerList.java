@@ -46,7 +46,7 @@ public class MixinPlayerList {
 
    @Inject(
       method = {"Lnet/minecraft/server/PlayerManager;sendWorldInfo(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/server/world/ServerWorld;)V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onSendWorldInfo(ServerPlayerEntity player, ServerWorld world, CallbackInfo ci) {
       if (!ServerTeleportationManager.of(player.server).isFiringMyChangeDimensionEvent) {
@@ -56,7 +56,7 @@ public class MixinPlayerList {
 
    @Inject(
       method = {"onPlayerConnect"},
-      at = {@At("TAIL")}
+      at = @At("TAIL")
    )
    private void onOnPlayerConnect(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData commonListenerCookie, CallbackInfo ci) {
       ImmPtlChunkTracking.immediatelyUpdateForPlayer(player);
@@ -65,7 +65,7 @@ public class MixinPlayerList {
 
    @Inject(
       method = {"Lnet/minecraft/server/PlayerManager;sendToDimension(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/registry/RegistryKey;)V"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    public void sendToDimension(Packet<?> packet, RegistryKey<World> dimension, CallbackInfo ci) {
@@ -80,10 +80,10 @@ public class MixinPlayerList {
 
    @Redirect(
       method = {"respawnPlayer"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/server/network/ServerPlayerEntity;copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V"
-      )}
+      )
    )
    private void onRestoreFrom(ServerPlayerEntity newPlayer, ServerPlayerEntity that, boolean keepEverything) {
       newPlayer.copyFrom(that, keepEverything);

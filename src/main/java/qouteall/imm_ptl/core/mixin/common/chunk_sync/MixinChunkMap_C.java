@@ -61,7 +61,7 @@ public abstract class MixinChunkMap_C implements IEChunkMap {
 
    @Inject(
       method = {"sendWatchPackets(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/server/network/ChunkFilter;)V"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onUpdateChunkTracking(ServerPlayerEntity serverPlayer, ChunkFilter chunkTrackingView, CallbackInfo ci) {
@@ -70,7 +70,7 @@ public abstract class MixinChunkMap_C implements IEChunkMap {
 
    @Inject(
       method = {"getPlayersWatchingChunk(Lnet/minecraft/util/math/ChunkPos;Z)Ljava/util/List;"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onGetPlayers(ChunkPos chunkPos, boolean boundaryOnly, CallbackInfoReturnable<List<ServerPlayerEntity>> cir) {

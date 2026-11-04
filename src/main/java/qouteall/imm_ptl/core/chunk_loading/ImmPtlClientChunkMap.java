@@ -40,7 +40,7 @@ public class ImmPtlClientChunkMap extends ClientChunkManager {
    private static final Logger LOGGER = LogManager.getLogger();
    protected final Long2ObjectOpenHashMap<WorldChunk> chunkMapForMainThread = new Long2ObjectOpenHashMap();
    protected final Long2ObjectOpenHashMap<WorldChunk> chunkMapForOtherThreads = new Long2ObjectOpenHashMap();
-   public final Thread mainThread = ((IEMinecraftClient)MinecraftClient.getInstance()).ip_getRunningThread();
+   public final Thread mainThread = ((IEMinecraftClient)(Object)MinecraftClient.getInstance()).ip_getRunningThread();
    public static final SignalArged<WorldChunk> clientChunkLoadSignal = new SignalArged<>();
    public static final SignalArged<WorldChunk> clientChunkUnloadSignal = new SignalArged<>();
 

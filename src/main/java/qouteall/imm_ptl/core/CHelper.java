@@ -46,7 +46,7 @@ public class CHelper {
 
    @Nullable
    public static List<Portal> getClientGlobalPortal(World world) {
-      return world instanceof ClientWorld ? ((IEClientWorld)world).ip_getGlobalPortals() : null;
+      return world instanceof ClientWorld ? ((IEClientWorld)(Object)world).ip_getGlobalPortals() : null;
    }
 
    public static Stream<Portal> getClientNearbyPortals(double range) {

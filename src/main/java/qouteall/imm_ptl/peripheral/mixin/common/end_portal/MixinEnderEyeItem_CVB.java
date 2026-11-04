@@ -26,7 +26,7 @@ import qouteall.imm_ptl.core.portal.PortalPlaceholderBlock;
 public class MixinEnderEyeItem_CVB {
    @Inject(
       method = {"Lnet/minecraft/item/EnderEyeItem;useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onUseOnBlock(ItemUsageContext itemUsageContext_1, CallbackInfoReturnable<ActionResult> cir) {

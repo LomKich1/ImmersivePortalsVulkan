@@ -21,7 +21,7 @@ public class MixinParticleEngine implements IEParticleManager {
 
    @Inject(
       method = {"addToBatch"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onBeginExtractingParticles(SubmittableBatch particlesRenderState, Frustum frustum, Camera camera, float partialTick, CallbackInfo ci) {

@@ -16,10 +16,10 @@ public class MixinAbstractContainerMenu {
    @WrapOperation(
       method = {"lambda$stillValid$0", "method_17696"},
       require = 1,
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/entity/player/PlayerEntity;canInteractWithBlockAt(Lnet/minecraft/util/math/BlockPos;D)Z"
-      )}
+      )
    )
    private static boolean wrapDistanceToSqr(
       PlayerEntity player, BlockPos blockPos, double distance, Operation<Boolean> operation, @Local(argsOnly = true) World world

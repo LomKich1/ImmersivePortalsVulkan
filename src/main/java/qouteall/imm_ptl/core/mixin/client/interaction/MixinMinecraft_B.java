@@ -34,10 +34,10 @@ public abstract class MixinMinecraft_B {
 
    @WrapOperation(
       method = {"handleInputEvents"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/MinecraftClient;doAttack()Z"
-      )}
+      )
    )
    private boolean wrapStartAttack(MinecraftClient instance, Operation<Boolean> original) {
       ClientWorld remoteWorld = BlockManipulationClient.getRemotePointedWorld();
@@ -51,10 +51,10 @@ public abstract class MixinMinecraft_B {
 
    @WrapOperation(
       method = {"handleInputEvents"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/MinecraftClient;handleBlockBreaking(Z)V"
-      )}
+      )
    )
    private void wrapContinueAttack(MinecraftClient instance, boolean leftClick, Operation<Void> original) {
       if (BlockManipulationClient.isPointingToPortal()) {
@@ -69,10 +69,10 @@ public abstract class MixinMinecraft_B {
 
    @WrapOperation(
       method = {"handleInputEvents"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/MinecraftClient;doItemUse()V"
-      )}
+      )
    )
    private void wrapStartUseItem(MinecraftClient instance, Operation<Void> original) {
       if (BlockManipulationClient.isPointingToPortal()) {
@@ -87,10 +87,10 @@ public abstract class MixinMinecraft_B {
 
    @WrapOperation(
       method = {"handleInputEvents"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/MinecraftClient;doItemPick()V"
-      )}
+      )
    )
    private void wrapPickBlock(MinecraftClient instance, Operation<Void> original) {
       if (BlockManipulationClient.isPointingToPortal()) {

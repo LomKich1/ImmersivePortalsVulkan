@@ -74,7 +74,7 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
 
    @Inject(
       method = {"<init>"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onInit(MinecraftClient minecraft, ClientConnection connection, ClientConnectionState commonListenerCookie, CallbackInfo ci) {
       this.isReProcessingPassengerPacket = false;
@@ -82,15 +82,15 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
 
    @Inject(
       method = {"Lnet/minecraft/client/network/ClientPlayNetworkHandler;onPlayerPositionLook(Lnet/minecraft/network/packet/s2c/play/PlayerPositionLookS2CPacket;)V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V",
          shift = Shift.AFTER
-      )}
+      )
    )
    private void onProcessingPositionPacket(PlayerPositionLookS2CPacket packet, CallbackInfo ci) {
       if (ImmPtlNetworkConfig.doesServerHaveImmPtl()) {
-         RegistryKey<World> packetDim = ((IEPlayerPositionLookS2CPacket)packet).ip_getPlayerDimension();
+         RegistryKey<World> packetDim = ((IEPlayerPositionLookS2CPacket)(Object)packet).ip_getPlayerDimension();
          ClientPlayerEntity player = MinecraftClient.getInstance().player;
 
          assert player != null;
@@ -124,11 +124,11 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
 
    @Inject(
       method = {"Lnet/minecraft/client/network/ClientPlayNetworkHandler;onEntityPassengersSet(Lnet/minecraft/network/packet/s2c/play/EntityPassengersSetS2CPacket;)V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V",
          shift = Shift.AFTER
-      )},
+      ),
       cancellable = true
    )
    private void onOnEntityPassengersSet(EntityPassengersSetS2CPacket entityPassengersSetS2CPacket_1, CallbackInfo ci) {
@@ -147,10 +147,10 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
 
    @Redirect(
       method = {"Lnet/minecraft/client/network/ClientPlayNetworkHandler;onEntityTrackerUpdate(Lnet/minecraft/network/packet/s2c/play/EntityTrackerUpdateS2CPacket;)V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/world/ClientWorld;getEntityById(I)Lnet/minecraft/entity/Entity;"
-      )}
+      )
    )
    private Entity redirectGetEntityById(ClientWorld clientWorld, int id) {
       Entity entity = clientWorld.getEntityById(id);
@@ -163,7 +163,7 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
 
    @Inject(
       method = {"onWorldTimeUpdate"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onSetTime(WorldTimeUpdateS2CPacket packet, CallbackInfo ci) {
       if (ClientWorldLoader.getIsInitialized()) {
@@ -179,10 +179,10 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
 
    @Redirect(
       method = {"onPlayerActionResponse"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/world/ClientWorld;handlePlayerActionResponse(I)V"
-      )}
+      )
    )
    private void redirectHandleBlockChangedAck(ClientWorld instance, int seqNumber) {
       for (ClientWorld clientWorld : ClientWorldLoader.getClientWorlds()) {
@@ -192,11 +192,11 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
 
    @Inject(
       method = {"onEntitySpawn"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V",
          shift = Shift.AFTER
-      )},
+      ),
       cancellable = true
    )
    private void onHandleAddEntity(EntitySpawnS2CPacket packet, CallbackInfo ci) {
@@ -210,11 +210,11 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
 
    @Inject(
       method = {"onChunkData"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V",
          shift = Shift.AFTER
-      )}
+      )
    )
    private void onHandleLevelChunkWithLight(ChunkDataS2CPacket packet, CallbackInfo ci) {
       if (IPGlobal.chunkPacketDebug) {
@@ -224,11 +224,11 @@ public abstract class MixinClientPacketListener implements IEClientPlayNetworkHa
 
    @Inject(
       method = {"onUnloadChunk"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V",
          shift = Shift.AFTER
-      )}
+      )
    )
    private void onHandleForgetLevelChunk(UnloadChunkS2CPacket packet, CallbackInfo ci) {
       if (IPGlobal.chunkPacketDebug) {

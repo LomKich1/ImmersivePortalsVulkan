@@ -131,8 +131,8 @@ public class ViewAreaRenderer {
 
    @Deprecated
    private static void generateTriangleForNormalShape(TriangleConsumer vertexOutput, Portal portal, Vec3d posInPlayerCoordinate) {
-      double w = Math.min(portal.getWidth(), 23333.0);
-      double h = Math.min(portal.getHeight(), 23333.0);
+      double w = Math.min(portal.getPortalWidth(), 23333.0);
+      double h = Math.min(portal.getPortalHeight(), 23333.0);
       Vec3d localXAxis = portal.getAxisW().multiply(w / 2.0);
       Vec3d localYAxis = portal.getAxisH().multiply(h / 2.0);
       outputFullQuad(vertexOutput, posInPlayerCoordinate, localXAxis, localYAxis);

@@ -14,7 +14,7 @@ public class DimensionRenderHelper {
    public DimensionRenderHelper(World world) {
       this.world = world;
       if (client.world == world) {
-         IEGameRenderer gameRenderer = (IEGameRenderer)client.gameRenderer;
+         IEGameRenderer gameRenderer = (IEGameRenderer)(Object)client.gameRenderer;
          this.lightmapTexture = client.gameRenderer.getLightmapTextureManager();
       } else {
          this.lightmapTexture = new LightmapTextureManager(client.gameRenderer, client);

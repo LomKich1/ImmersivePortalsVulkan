@@ -31,7 +31,7 @@ public class IPPortingLibCompat {
       } else {
          return ClientPlatform.get().hasNativeStencilSupport()
             ? ClientPlatform.get().isStencilEnabled(renderTarget)
-            : ((IEFrameBuffer)renderTarget).ip_getIsStencilBufferEnabled();
+            : ((IEFrameBuffer)(Object)renderTarget).ip_getIsStencilBufferEnabled();
       }
    }
 
@@ -49,7 +49,7 @@ public class IPPortingLibCompat {
       } else if (ClientPlatform.get().hasNativeStencilSupport()) {
          ClientPlatform.get().setStencilEnabled(renderTarget, cond);
       } else {
-         ((IEFrameBuffer)renderTarget).ip_setIsStencilBufferEnabledAndReload(cond);
+         ((IEFrameBuffer)(Object)renderTarget).ip_setIsStencilBufferEnabledAndReload(cond);
       }
    }
 }

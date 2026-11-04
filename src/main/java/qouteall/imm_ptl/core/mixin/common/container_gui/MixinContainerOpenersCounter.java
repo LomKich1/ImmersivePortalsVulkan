@@ -26,7 +26,7 @@ public abstract class MixinContainerOpenersCounter {
 
    @Inject(
       method = {"getViewingUsers"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void getOpenCount(World level, BlockPos pos, CallbackInfoReturnable<List<ContainerUser>> cir) {

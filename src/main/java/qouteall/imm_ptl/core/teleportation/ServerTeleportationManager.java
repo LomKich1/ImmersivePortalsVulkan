@@ -201,7 +201,7 @@ public class ServerTeleportationManager {
    private String validatePlayerTeleportationAndGetReason(ServerPlayerEntity player, RegistryKey<World> dimensionBefore, Vec3d posBefore, Portal portal) {
       if (player.getVehicle() != null) {
          return null;
-      } else if (((IEServerPlayNetworkHandler)player.networkHandler).ip_hasAwaitingTeleport()) {
+      } else if (((IEServerPlayNetworkHandler)(Object)player.networkHandler).ip_hasAwaitingTeleport()) {
          return "has awaiting teleport";
       } else if (!portal.canTeleportEntity(player)) {
          return "portal cannot teleport player";
@@ -283,12 +283,12 @@ public class ServerTeleportationManager {
       this.teleportingEntities.add(player);
       Entity vehicle = player.getVehicle();
       if (vehicle != null) {
-         ((IEServerPlayerEntity)player).ip_stopRidingWithoutTeleportRequest();
+         ((IEServerPlayerEntity)(Object)player).ip_stopRidingWithoutTeleportRequest();
       }
 
       Vec3d oldPos = player.getEntityPos();
       fromWorld.removePlayer(player, RemovalReason.CHANGED_DIMENSION);
-      ((IEEntity)player).ip_unsetRemoved();
+      ((IEEntity)(Object)player).ip_unsetRemoved();
       McHelper.setEyePos(player, newEyePos, newEyePos);
       McHelper.updateBoundingBox(player);
       player.setServerWorld(toWorld);
@@ -298,7 +298,7 @@ public class ServerTeleportationManager {
          Vec3d vehiclePos = player.getEntityPos().add(offset);
          vehicle = this.teleportVehicleAcrossDimensions(vehicle, toWorld.getRegistryKey(), vehiclePos.add(McHelper.getEyeOffset(vehicle)));
          McHelper.setPosAndLastTickPos(vehicle, player.getEntityPos().add(offset), McHelper.lastTickPosOf(player).add(offset));
-         ((IEServerPlayerEntity)player).ip_startRidingWithoutTeleportRequest(vehicle);
+         ((IEServerPlayerEntity)(Object)player).ip_startRidingWithoutTeleportRequest(vehicle);
          McHelper.adjustVehicle(player);
       }
 
@@ -320,7 +320,7 @@ public class ServerTeleportationManager {
       }
 
       O_O.onPlayerTravelOnServer(player, fromWorld, toWorld);
-      ((IEServerPlayerEntity)player).portal_worldChanged(fromWorld, oldPos);
+      ((IEServerPlayerEntity)(Object)player).portal_worldChanged(fromWorld, oldPos);
       Platform.get().onPlayerChangedDimension(player, fromWorld.getRegistryKey(), toWorld.getRegistryKey());
    }
 
@@ -328,7 +328,7 @@ public class ServerTeleportationManager {
       for (ServerWorld world : MiscHelper.getServer().getWorlds()) {
          for (Entity entity : world.iterateEntities()) {
             if (!(entity instanceof ServerPlayerEntity)) {
-               Portal collidingPortal = ((IEEntity)entity).ip_getCollidingPortal();
+               Portal collidingPortal = ((IEEntity)(Object)entity).ip_getCollidingPortal();
                if (collidingPortal != null && collidingPortal.getIsGlobal() && shouldEntityTeleport(collidingPortal, entity)) {
                   this.startTeleportingRegularEntity(collidingPortal, entity);
                }
@@ -430,10 +430,10 @@ public class ServerTeleportationManager {
                }
             } else {
                entity.remove(RemovalReason.CHANGED_DIMENSION);
-               ((IEEntity)entity).ip_unsetRemoved();
+               ((IEEntity)(Object)entity).ip_unsetRemoved();
                McHelper.setEyePos(entity, newEyePos, newEyePos);
                McHelper.updateBoundingBox(entity);
-               ((IEEntity)entity).ip_setWorld(toWorld);
+               ((IEEntity)(Object)entity).ip_setWorld(toWorld);
                toWorld.onDimensionChanged(entity);
                Validate.isTrue(!entity.isRemoved());
                return entity;
@@ -454,7 +454,7 @@ public class ServerTeleportationManager {
       McHelper.updateBoundingBox(newEntity);
       newEntity.setHeadYaw(entity.getHeadYaw());
       entity.remove(RemovalReason.CHANGED_DIMENSION);
-      ((IEEntity)entity).ip_unsetRemoved();
+      ((IEEntity)(Object)entity).ip_unsetRemoved();
       toWorld.onDimensionChanged(newEntity);
       return newEntity;
    }
@@ -531,7 +531,7 @@ public class ServerTeleportationManager {
    }
 
    private void evacuatePlayersFromDimension(ServerWorld world) {
-      for (ServerPlayerEntity player : new ArrayList(MiscHelper.getServer().getPlayerManager().getPlayerList())) {
+      for (ServerPlayerEntity player : new ArrayList<>(MiscHelper.getServer().getPlayerManager().getPlayerList())) {
          if (player.getEntityWorld().getRegistryKey() == world.getRegistryKey()) {
             ServerWorld overWorld = McHelper.getOverWorldOnServer();
             BlockPos spawnPos = overWorld.getSpawnPoint().getPos();

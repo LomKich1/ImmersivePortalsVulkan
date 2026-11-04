@@ -29,7 +29,7 @@ public class ScaleUtils {
          ClientPlayerEntity player = client.player;
          Validate.notNull(player, "Player is null", new Object[0]);
          doScalingForEntity(player, portal);
-         IECamera camera = (IECamera)client.gameRenderer.getCamera();
+         IECamera camera = (IECamera)(Object)client.gameRenderer.getCamera();
          camera.ip_setCameraY((float)(camera.ip_getCameraY() * portal.getScaling()), (float)(camera.ip_getLastCameraY() * portal.getScaling()));
       }
    }

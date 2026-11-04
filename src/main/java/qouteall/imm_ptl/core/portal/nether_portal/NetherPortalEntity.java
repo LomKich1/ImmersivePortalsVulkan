@@ -63,10 +63,10 @@ public class NetherPortalEntity extends BreakablePortalEntity {
       if (IPGlobal.enableNetherPortalEffect) {
          Random random = this.getEntityWorld().getRandom();
 
-         for (int i = 0; i < (int)Math.ceil(this.getWidth() * this.getHeight() / 20.0); i++) {
+         for (int i = 0; i < (int)Math.ceil(this.getPortalWidth() * this.getPortalHeight() / 20.0); i++) {
             if (random.nextInt(10) == 0) {
-               double px = (random.nextDouble() * 2.0 - 1.0) * (this.getWidth() / 2.0);
-               double py = (random.nextDouble() * 2.0 - 1.0) * (this.getHeight() / 2.0);
+               double px = (random.nextDouble() * 2.0 - 1.0) * (this.getPortalWidth() / 2.0);
+               double py = (random.nextDouble() * 2.0 - 1.0) * (this.getPortalHeight() / 2.0);
                Vec3d pos = this.getPointInPlane(px, py);
                double speedMultiplier = 20.0;
                double vx = speedMultiplier * (random.nextFloat() - 0.5) * 0.5;

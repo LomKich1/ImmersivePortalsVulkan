@@ -106,7 +106,7 @@ public class VisibleSectionDiscovery {
             if (Math.abs(cz - cameraSectionPos.getSectionZ()) <= viewDistance) {
                BuiltChunk builtChunk = builtChunks.rawFetch(cx, cy, cz, timeMark);
                if (builtChunk != null) {
-                  IERenderSection ieRenderSection = (IERenderSection)builtChunk;
+                  IERenderSection ieRenderSection = (IERenderSection)(Object)builtChunk;
                   if (ieRenderSection.portal_getMark() != timeMark) {
                      ieRenderSection.portal_setMark(timeMark);
                      if (skipFrustumTest || isVisible(builtChunk)) {

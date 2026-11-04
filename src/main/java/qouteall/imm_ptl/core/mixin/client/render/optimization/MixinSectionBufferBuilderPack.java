@@ -15,10 +15,10 @@ import qouteall.imm_ptl.core.IPGlobal;
 public class MixinSectionBufferBuilderPack {
    @Redirect(
       method = {"<init>"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/util/Util;mapEnum(Ljava/lang/Class;Ljava/util/function/Function;)Ljava/util/Map;"
-      )}
+      )
    )
    private Map<BlockRenderLayer, BufferAllocator> redirectMakeBuffers(Class<BlockRenderLayer> layerClass, Function<BlockRenderLayer, BufferAllocator> original) {
       return !IPGlobal.saveMemoryInBufferPack

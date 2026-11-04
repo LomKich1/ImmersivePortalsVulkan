@@ -386,13 +386,13 @@ public class PortalDebugCommands {
             .executes(
                context -> {
                   ServerWorld world = ((ServerCommandSource)context.getSource()).getWorld();
-                  Iterable<ChunkHolder> chunkHolders = ((IEChunkMap_Accessor)world.getChunkManager().chunkLoadingManager).ip_getVisibleChunkMap().values();
+                  Iterable<ChunkHolder> chunkHolders = ((IEChunkMap_Accessor)(Object)world.getChunkManager().chunkLoadingManager).ip_getVisibleChunkMap().values();
                   Object2IntOpenHashMap<ChunkTicketType> stat = new Object2IntOpenHashMap();
 
                   for (ChunkHolder chunkHolder : chunkHolders) {
                      long chunkPos = chunkHolder.getPos().toLong();
 
-                     for (ChunkTicket ticket : ((IEDistanceManager)ImmPtlChunkTickets.getDistanceManager(world)).portal_getTicketSet(chunkPos)) {
+                     for (ChunkTicket ticket : ((IEDistanceManager)(Object)ImmPtlChunkTickets.getDistanceManager(world)).portal_getTicketSet(chunkPos)) {
                         stat.addTo(ticket.getType(), 1);
                      }
                   }
@@ -533,9 +533,9 @@ public class PortalDebugCommands {
          McHelper.serverLog(player, "no chunk holder");
       } else {
          McHelper.serverLog(player, String.format("chunk holder level:%s %s", chunkHolder.getLevel(), chunk == null ? "" : chunk.getLevelType()));
-         ChunkLevelManager distanceManager = ((IEServerChunkCache)world.getChunkManager()).ip_getDistanceManager();
+         ChunkLevelManager distanceManager = ((IEServerChunkCache)(Object)world.getChunkManager()).ip_getDistanceManager();
 
-         for (ChunkTicket ticket : ((IEDistanceManager)distanceManager).portal_getTicketSet(longChunkPos)) {
+         for (ChunkTicket ticket : ((IEDistanceManager)(Object)distanceManager).portal_getTicketSet(longChunkPos)) {
             McHelper.serverLog(player, getTicketTypeName(ticket.getType()) + " " + ticket);
          }
       }
@@ -548,7 +548,7 @@ public class PortalDebugCommands {
    public static String getServerWorldResourceConsumption(ServerWorld world) {
       StringBuilder subStr = new StringBuilder();
       ImmPtlChunkTickets dimTicketManager = ImmPtlChunkTickets.get(world);
-      EntityLookup<Entity> entityLookup = ((IEWorld)world).portal_getEntityLookup();
+      EntityLookup<Entity> entityLookup = ((IEWorld)(Object)world).portal_getEntityLookup();
       subStr.append(
          String.format(
             "%s:\nImmPtl Tracked Chunks: %s\nImmPtl Loading Ticket:%s\nChunks: %s\nEntities:%s Entity Sections:%s\n",
@@ -556,11 +556,11 @@ public class PortalDebugCommands {
             ImmPtlChunkTracking.getLoadedChunkNum(world.getRegistryKey()),
             dimTicketManager.getLoadedChunkNum(),
             world.getChunkManager().chunkLoadingManager.getLoadedChunkCount(),
-            ((IELevelEntityGetterAdapter)entityLookup).getIndex().size(),
-            ((IELevelEntityGetterAdapter)entityLookup).getCache().sectionCount()
+            ((IELevelEntityGetterAdapter)(Object)entityLookup).getIndex().size(),
+            ((IELevelEntityGetterAdapter)(Object)entityLookup).getCache().sectionCount()
          )
       );
-      ServerEntityManager<Entity> entityManager = ((IEServerWorld)world).ip_getEntityManager();
+      ServerEntityManager<Entity> entityManager = ((IEServerWorld)(Object)world).ip_getEntityManager();
       entityManager.flush();
       subStr.append(String.format("Entity Manager: %s\n", entityManager.getDebugString()));
       subStr.append("\n");
@@ -581,7 +581,7 @@ public class PortalDebugCommands {
       }
 
       poses.sort(Comparator.comparingDouble(c -> Vec3d.of(center.getStartPos()).distanceTo(Vec3d.of(c.getStartPos()))));
-      ServerTaskList.of(world.getServer()).addTask(MyTaskList.chainTasks(poses.stream().map(chunkPos -> () -> {
+      ServerTaskList.of(world.getServer()).addTask(MyTaskList.chainTasks(poses.stream().<MyTaskList.MyTask>map(chunkPos -> () -> {
          eraseChunk(chunkPos, world, downY, upY);
          return true;
       }).iterator()));

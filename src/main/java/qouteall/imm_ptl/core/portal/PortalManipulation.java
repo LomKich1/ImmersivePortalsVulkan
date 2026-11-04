@@ -85,8 +85,8 @@ public class PortalManipulation {
       newPortal.setPosition(portal.getDestPos().x, portal.getDestPos().y, portal.getDestPos().z);
       newPortal.setDestination(portal.getOriginPos());
       newPortal.specificPlayerId = portal.specificPlayerId;
-      newPortal.setWidth(portal.getWidth() * portal.getScaling());
-      newPortal.setHeight(portal.getHeight() * portal.getScaling());
+      newPortal.setWidth(portal.getPortalWidth() * portal.getScaling());
+      newPortal.setHeight(portal.getPortalHeight() * portal.getScaling());
       newPortal.setThickness(portal.getThickness() * portal.getScaling());
       newPortal.setAxisW(portal.getAxisW().multiply(-1.0));
       newPortal.setAxisH(portal.getAxisH());
@@ -122,8 +122,8 @@ public class PortalManipulation {
       newPortal.setPosition(portal.getX(), portal.getY(), portal.getZ());
       newPortal.setDestination(portal.getDestPos());
       newPortal.specificPlayerId = portal.specificPlayerId;
-      newPortal.setWidth(portal.getWidth());
-      newPortal.setHeight(portal.getHeight());
+      newPortal.setWidth(portal.getPortalWidth());
+      newPortal.setHeight(portal.getPortalHeight());
       newPortal.setThickness(portal.getThickness());
       newPortal.setAxisW(portal.getAxisW().multiply(-1.0));
       newPortal.setAxisH(portal.getAxisH());
@@ -141,8 +141,8 @@ public class PortalManipulation {
       newPortal.setPosition(portal.getX(), portal.getY(), portal.getZ());
       newPortal.setDestination(portal.getDestPos());
       newPortal.specificPlayerId = portal.specificPlayerId;
-      newPortal.setWidth(portal.getWidth());
-      newPortal.setHeight(portal.getHeight());
+      newPortal.setWidth(portal.getPortalWidth());
+      newPortal.setHeight(portal.getPortalHeight());
       newPortal.setAxisW(portal.getAxisW());
       newPortal.setAxisH(portal.getAxisH());
       newPortal.setPortalShape(portal.getPortalShape().cloneIfNecessary());

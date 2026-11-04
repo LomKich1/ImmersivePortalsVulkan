@@ -47,7 +47,7 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
       ImmPtlClientChunkMap.clientChunkUnloadSignal.connect(section -> {
          RegistryKey<World> dimension = section.getWorld().getRegistryKey();
          WorldRenderer worldRenderer = ClientWorldLoader.WORLD_RENDERER_MAP.get(dimension);
-         if (worldRenderer != null && ((IEWorldRenderer)worldRenderer).ip_getBuiltChunkStorage() instanceof ImmPtlViewArea immPtlViewArea) {
+         if (worldRenderer != null && ((IEWorldRenderer)(Object)worldRenderer).ip_getBuiltChunkStorage() instanceof ImmPtlViewArea immPtlViewArea) {
             immPtlViewArea.onChunkUnload(section.getPos().x, section.getPos().z);
          }
       });
@@ -55,7 +55,7 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
          if (ClientWorldLoader.getIsInitialized()) {
             for (ClientWorld world : ClientWorldLoader.getClientWorlds()) {
                WorldRenderer worldRenderer = ClientWorldLoader.getWorldRenderer(world.getRegistryKey());
-               if (((IEWorldRenderer)worldRenderer).ip_getBuiltChunkStorage() instanceof ImmPtlViewArea immPtlViewArea) {
+               if (((IEWorldRenderer)(Object)worldRenderer).ip_getBuiltChunkStorage() instanceof ImmPtlViewArea immPtlViewArea) {
                   immPtlViewArea.tick();
                }
             }
@@ -98,7 +98,7 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
       preset.lastActiveTime = System.nanoTime();
       this.chunks = preset.data;
       this.currentPreset = preset;
-      ((IEViewArea)this).ip_setCameraSectionPos(sectionPos);
+      ((IEViewArea)(Object)this).ip_setCameraSectionPos(sectionPos);
       this.worldRenderer.getChunkRenderingDataPreparer().scheduleTerrainUpdate();
       Profilers.get().pop();
    }
@@ -175,7 +175,7 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
       int minSectionY = McHelper.getMinSectionY(this.world);
 
       for (int offsetCY = 0; offsetCY < this.sizeY; offsetCY++) {
-         BuiltChunk builtChunk = new BuiltChunk(this.factory, 0, ChunkSectionPos.asLong(sectionX, offsetCY + minSectionY, sectionZ));
+         BuiltChunk builtChunk = this.factory.new BuiltChunk(0, ChunkSectionPos.asLong(sectionX, offsetCY + minSectionY, sectionZ));
          array[offsetCY] = builtChunk;
       }
 
@@ -287,7 +287,7 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
       ImmPtlViewArea.Column column = (ImmPtlViewArea.Column)this.columnMap.get(sectionPos);
       if (column != null) {
          for (BuiltChunk builtChunk : column.sections) {
-            ((IERenderSection)builtChunk).portal_fullyReset();
+            ((IERenderSection)(Object)builtChunk).portal_fullyReset();
          }
       }
    }
@@ -332,7 +332,7 @@ public class ImmPtlViewArea extends BuiltChunkStorage {
             Helper.err("Null RenderChunk " + pos);
             return null;
          } else {
-            ((IERenderSection)result).portal_setIndex(sectionIndex);
+            ((IERenderSection)(Object)result).portal_setIndex(sectionIndex);
             return result;
          }
       } else {

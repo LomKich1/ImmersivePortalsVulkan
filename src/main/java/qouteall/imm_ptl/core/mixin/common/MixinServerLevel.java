@@ -35,32 +35,32 @@ public abstract class MixinServerLevel implements IEServerWorld {
 
    @Redirect(
       method = {"Lnet/minecraft/server/world/ServerWorld;tick(Ljava/util/function/BooleanSupplier;)V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/server/world/ServerChunkManager;shouldResetIdleTimeout()Z"
-      )}
+      )
    )
    private boolean redirectHasActiveTickets(ServerChunkManager chunkSource) {
-      ServerWorld this_ = (ServerWorld)this;
+      ServerWorld this_ = (ServerWorld)(Object)this;
       return ImmPtlChunkTracking.shouldLoadDimension(this_.getRegistryKey()) ? true : chunkSource.shouldResetIdleTimeout();
    }
 
    @Inject(
       method = {"Lnet/minecraft/server/world/ServerWorld;toString()Ljava/lang/String;"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onToString(CallbackInfoReturnable<String> cir) {
-      ServerWorld this_ = (ServerWorld)this;
+      ServerWorld this_ = (ServerWorld)(Object)this;
       cir.setReturnValue("ServerWorld " + this_.getRegistryKey().getValue() + " " + this.worldProperties.getLevelName());
    }
 
    @Inject(
       method = {"tickEntity"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onTickNonPassenger(Entity entity, CallbackInfo ci) {
-      ((IEEntity)entity).ip_tickCollidingPortal();
+      ((IEEntity)(Object)entity).ip_tickCollidingPortal();
    }
 
    @Override

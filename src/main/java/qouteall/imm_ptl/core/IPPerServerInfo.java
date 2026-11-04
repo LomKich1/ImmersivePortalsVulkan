@@ -19,6 +19,6 @@ public class IPPerServerInfo {
    public final PortalWandInteraction portalWandInteraction = new PortalWandInteraction();
 
    public static IPPerServerInfo of(MinecraftServer server) {
-      return ((IEMinecraftServer)server).ip_getPerServerInfo();
+      return ((IEMinecraftServer)(Object)server).ip_getPerServerInfo();
    }
 }

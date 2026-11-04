@@ -18,11 +18,11 @@ public class MixinServerLevel_Debug {
 
    @Inject(
       method = {"addEntity"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onAddEntity(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-      ServerWorld this_ = (ServerWorld)this;
+      ServerWorld this_ = (ServerWorld)(Object)this;
       if (entity.getEntityWorld() != this_) {
          LOGGER.error("Adding an entity to the wrong dimension {} {}", this, entity);
          cir.setReturnValue(false);

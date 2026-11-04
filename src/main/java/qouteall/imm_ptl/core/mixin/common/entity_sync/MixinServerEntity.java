@@ -35,7 +35,7 @@ public abstract class MixinServerEntity implements IEEntityTrackerEntry {
 
    @Inject(
       method = {"Lnet/minecraft/server/network/EntityTrackerEntry;tick()V"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onTick(CallbackInfo ci) {
       PacketRedirection.validateForceRedirecting();
@@ -43,10 +43,10 @@ public abstract class MixinServerEntity implements IEEntityTrackerEntry {
 
    @Redirect(
       method = {"stopTracking"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"
-      )}
+      )
    )
    private void onSendRemoveEntityPacket(ServerPlayNetworkHandler networkHandler, Packet packet) {
       if (IPGlobal.entityUntrackDebug) {
@@ -58,10 +58,10 @@ public abstract class MixinServerEntity implements IEEntityTrackerEntry {
 
    @Redirect(
       method = {"startTracking"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"
-      )}
+      )
    )
    private void onSendAddEntityPacket(ServerPlayNetworkHandler networkHandler, Packet packet) {
       if (IPGlobal.entityTrackDebug) {
@@ -73,7 +73,7 @@ public abstract class MixinServerEntity implements IEEntityTrackerEntry {
 
    @Inject(
       method = {"tick"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onSendChanges(CallbackInfo ci) {

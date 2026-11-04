@@ -12,9 +12,9 @@ import qouteall.imm_ptl.core.ducks.IEEntity;
 public abstract class MixinPlayer_Collision {
    @Overwrite
    public boolean canChangeIntoPose(EntityPose pose) {
-      LivingEntity this_ = (LivingEntity)this;
+      LivingEntity this_ = (LivingEntity)(Object)this;
       Box box = this_.getDimensions(pose).getBoxAt(this_.getEntityPos());
-      Box activeCollisionBox = ((IEEntity)this_).ip_getActiveCollisionBox(box);
+      Box activeCollisionBox = ((IEEntity)(Object)this_).ip_getActiveCollisionBox(box);
       return activeCollisionBox == null ? true : this_.getEntityWorld().isSpaceEmpty(this_, activeCollisionBox.contract(1.0E-7));
    }
 }

@@ -54,21 +54,21 @@ public abstract class MixinTrackedEntity implements IETrackedEntity {
 
    @Redirect(
       method = {"sendToListeners(Lnet/minecraft/network/packet/Packet;)V", "sendToListenersIf(Lnet/minecraft/network/packet/Packet;Ljava/util/function/Predicate;)V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/server/network/PlayerAssociatedNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"
-      )}
+      )
    )
    private void onSendToOtherNearbyPlayers(PlayerAssociatedNetworkHandler entityTrackingListener, Packet<?> packet) {
-      PacketRedirection.withForceRedirect((ServerWorld)this.entity.getEntityWorld(), () -> entityTrackingListener.sendPacket(packet));
+      PacketRedirection.withForceRedirect((ServerWorld)(Object)this.entity.getEntityWorld(), () -> entityTrackingListener.sendPacket(packet));
    }
 
    @Redirect(
       method = {"sendToSelfAndListeners(Lnet/minecraft/network/packet/Packet;)V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"
-      )}
+      )
    )
    private void onSendToNearbyPlayers(ServerPlayNetworkHandler serverPlayNetworkHandler, Packet packet) {
       PacketRedirection.sendRedirectedPacket(serverPlayNetworkHandler, packet, this.entity.getEntityWorld().getRegistryKey());
@@ -76,7 +76,7 @@ public abstract class MixinTrackedEntity implements IETrackedEntity {
 
    @Inject(
       method = {"updateTrackedStatus(Lnet/minecraft/server/network/ServerPlayerEntity;)V"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onUpdatePlayer(ServerPlayerEntity player, CallbackInfo ci) {
@@ -85,7 +85,7 @@ public abstract class MixinTrackedEntity implements IETrackedEntity {
 
    @Inject(
       method = {"updateTrackedStatus(Ljava/util/List;)V"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onUpdatePlayers(List<ServerPlayerEntity> list, CallbackInfo ci) {
@@ -100,7 +100,7 @@ public abstract class MixinTrackedEntity implements IETrackedEntity {
    @IPVanillaCopy
    @Override
    public void ip_updateEntityTrackingStatus() {
-      IEChunkMap chunkMap = (IEChunkMap)((ServerWorld)this.entity.getEntityWorld()).getChunkManager().chunkLoadingManager;
+      IEChunkMap chunkMap = (IEChunkMap)((ServerWorld)(Object)this.entity.getEntityWorld()).getChunkManager().chunkLoadingManager;
       Object2ObjectOpenHashMap<ServerPlayerEntity, ImmPtlChunkTracking.PlayerWatchRecord> watchRecMap = ImmPtlChunkTracking.getWatchRecordForChunk(
          this.entity.getEntityWorld().getRegistryKey(), this.entity.getChunkPos().x, this.entity.getChunkPos().z
       );
@@ -109,7 +109,7 @@ public abstract class MixinTrackedEntity implements IETrackedEntity {
          ServerPlayerEntity playerx = connection.getPlayer();
          boolean shouldRemove = !watches(this.entity, watchRecMap, effectiveRange, playerx);
          if (shouldRemove) {
-            PacketRedirection.withForceRedirect((ServerWorld)this.entity.getEntityWorld(), () -> this.entry.stopTracking(playerx));
+            PacketRedirection.withForceRedirect((ServerWorld)(Object)this.entity.getEntityWorld(), () -> this.entry.stopTracking(playerx));
          }
 
          return shouldRemove;
@@ -122,7 +122,7 @@ public abstract class MixinTrackedEntity implements IETrackedEntity {
             ServerPlayerEntity player = e.getKey();
             ImmPtlChunkTracking.PlayerWatchRecord rec = e.getValue();
             if (recWatches(this.entity, effectiveRange, rec, player) && this.listeners.add(player.networkHandler)) {
-               PacketRedirection.withForceRedirect((ServerWorld)this.entity.getEntityWorld(), () -> this.entry.startTracking(player));
+               PacketRedirection.withForceRedirect((ServerWorld)(Object)this.entity.getEntityWorld(), () -> this.entry.startTracking(player));
             }
          }
       }
@@ -164,7 +164,7 @@ public abstract class MixinTrackedEntity implements IETrackedEntity {
 
    @Override
    public void ip_resendSpawnPacketToTrackers() {
-      ((IEEntityTrackerEntry)this.entry).ip_updateTrackedEntityPosition();
+      ((IEEntityTrackerEntry)(Object)this.entry).ip_updateTrackedEntityPosition();
       Packet spawnPacket = this.entity.createSpawnPacket(this.entry);
       Packet<ClientPlayPacketListener> redirected = PacketRedirection.createRedirectedMessage(
          this.entity.getEntityWorld().getServer(), this.entity.getEntityWorld().getRegistryKey(), spawnPacket

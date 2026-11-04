@@ -38,21 +38,21 @@ public abstract class MixinChunkMap_E implements IEChunkMap {
 
    @Inject(
       method = {"loadEntity"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/server/world/ServerChunkLoadingManager$EntityTracker;updateTrackedStatus(Ljava/util/List;)V"
-      )}
+      )
    )
    private void onAddEntityUpdatePlayers(Entity entity, CallbackInfo ci) {
-      EntityTracker trackedEntity = (EntityTracker)this.entityTrackers.get(entity.getId());
+      EntityTracker trackedEntity = (EntityTracker)(Object)this.entityTrackers.get(entity.getId());
       if (trackedEntity != null) {
-         ((IETrackedEntity)trackedEntity).ip_updateEntityTrackingStatus();
+         ((IETrackedEntity)(Object)trackedEntity).ip_updateEntityTrackingStatus();
       }
    }
 
    @Inject(
       method = {"Lnet/minecraft/server/world/ServerChunkLoadingManager;unloadEntity(Lnet/minecraft/entity/Entity;)V"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    @IPVanillaCopy
@@ -60,7 +60,7 @@ public abstract class MixinChunkMap_E implements IEChunkMap {
       if (ServerTeleportationManager.of(entity.getEntityWorld().getServer()).isTeleporting(entity)) {
          if (entity instanceof ServerPlayerEntity player) {
             Object tracker = this.entityTrackers.remove(entity.getId());
-            ((IETrackedEntity)tracker).ip_stopTrackingToAllPlayers();
+            ((IETrackedEntity)(Object)tracker).ip_stopTrackingToAllPlayers();
             this.handlePlayerAddedOrRemoved(player, false);
          } else {
             this.entityTrackers.remove(entity.getId());
@@ -72,7 +72,7 @@ public abstract class MixinChunkMap_E implements IEChunkMap {
 
    @Inject(
       method = {"Lnet/minecraft/server/world/ServerChunkLoadingManager;tickEntityMovement()V"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onTickEntityMovement(CallbackInfo ci) {
@@ -86,14 +86,14 @@ public abstract class MixinChunkMap_E implements IEChunkMap {
 
    @Override
    public void ip_onDimensionRemove() {
-      this.entityTrackers.values().forEach(obj -> ((IETrackedEntity)obj).ip_onDimensionRemove());
+      this.entityTrackers.values().forEach(obj -> ((IETrackedEntity)(Object)obj).ip_onDimensionRemove());
    }
 
    @Override
    public void ip_resendSpawnPacketToTrackers(Entity entity) {
       Object tracker = this.entityTrackers.get(entity.getId());
       Validate.notNull(tracker, "entity not yet tracked", new Object[0]);
-      ((IETrackedEntity)tracker).ip_resendSpawnPacketToTrackers();
+      ((IETrackedEntity)(Object)tracker).ip_resendSpawnPacketToTrackers();
    }
 
    @Override

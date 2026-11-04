@@ -14,13 +14,13 @@ import qouteall.imm_ptl.core.render.context_management.RenderStates;
 public class MixinElderGuardianParticleGroup {
    @WrapOperation(
       method = {"render"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Ljava/util/Queue;stream()Ljava/util/stream/Stream;",
          remap = false
-      )}
+      )
    )
    private Stream<ElderGuardianParticle> wrapParticleStream(Queue<ElderGuardianParticle> particles, Operation<Stream<ElderGuardianParticle>> original) {
-      return ((Stream)original.call(new Object[]{particles})).filter(RenderStates::shouldRenderParticle);
+      return original.call(particles).filter(RenderStates::shouldRenderParticle);
    }
 }

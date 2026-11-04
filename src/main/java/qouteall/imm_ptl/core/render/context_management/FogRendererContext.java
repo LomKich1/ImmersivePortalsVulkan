@@ -65,9 +65,9 @@ public class FogRendererContext {
       swappingManager.pushSwapping(newWorldKey);
       client.world = destWorld;
       Camera newCamera = new Camera();
-      ((IECamera)newCamera).ip_resetState(pos, destWorld);
-      ((IECamera)newCamera).portal_setFocusedEntity(client.getCameraEntity());
-      ((IECamera)newCamera).portal_tickAttributeProbe();
+      ((IECamera)(Object)newCamera).ip_resetState(pos, destWorld);
+      ((IECamera)(Object)newCamera).portal_setFocusedEntity(client.getCameraEntity());
+      ((IECamera)(Object)newCamera).portal_tickAttributeProbe();
       GpuBufferSlice oldFog = RenderSystem.getShaderFog();
 
       Vec3d var8;

@@ -31,11 +31,11 @@ public class MixinFrustum implements IEFrustum {
 
    @Inject(
       method = {"<init>(Lnet/minecraft/client/render/Frustum;)V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onFrustumCopy(Frustum other, CallbackInfo ci) {
       if (other instanceof IEFrustum) {
-         MixinFrustum otherFrustum = (MixinFrustum)other;
+         MixinFrustum otherFrustum = (MixinFrustum)(Object)other;
          this.portal_camX = otherFrustum.portal_camX;
          this.portal_camY = otherFrustum.portal_camY;
          this.portal_camZ = otherFrustum.portal_camZ;
@@ -45,7 +45,7 @@ public class MixinFrustum implements IEFrustum {
 
    @Inject(
       method = {"Lnet/minecraft/client/render/Frustum;setPosition(DDD)V"},
-      at = {@At("TAIL")}
+      at = @At("TAIL")
    )
    private void onSetOrigin(double double_1, double double_2, double double_3, CallbackInfo ci) {
       if (!IrisInterface.invoker.isRenderingShadowMap()) {
@@ -62,7 +62,7 @@ public class MixinFrustum implements IEFrustum {
 
    @Inject(
       method = {"intersectAab(DDDDDD)I"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onCubeInFrustum(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, CallbackInfoReturnable<Integer> cir) {
@@ -80,7 +80,7 @@ public class MixinFrustum implements IEFrustum {
 
    @Inject(
       method = {"init"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onCalculateFrustumReturn(Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci) {
       this.recession.normalize();

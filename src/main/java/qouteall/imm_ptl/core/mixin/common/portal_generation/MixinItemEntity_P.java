@@ -25,10 +25,10 @@ public abstract class MixinItemEntity_P {
 
    @Inject(
       method = {"Lnet/minecraft/entity/ItemEntity;tick()V"},
-      at = {@At("TAIL")}
+      at = @At("TAIL")
    )
    private void onItemTickEnded(CallbackInfo ci) {
-      ItemEntity this_ = (ItemEntity)this;
+      ItemEntity this_ = (ItemEntity)(Object)this;
       if (!this_.isRemoved()) {
          if (!this_.getEntityWorld().isClient()) {
             if (this.thrower != null) {

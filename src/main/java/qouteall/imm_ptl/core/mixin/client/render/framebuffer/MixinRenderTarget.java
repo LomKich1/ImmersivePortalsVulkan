@@ -26,7 +26,7 @@ public abstract class MixinRenderTarget implements IEFrameBuffer {
 
    @Inject(
       method = {"<init>(Ljava/lang/String;Z)V", "<init>(Ljava/lang/String;ZZ)V"},
-      at = {@At("RETURN")},
+      at = @At("RETURN"),
       require = 1
    )
    private void onInit(CallbackInfo ci) {
@@ -35,7 +35,7 @@ public abstract class MixinRenderTarget implements IEFrameBuffer {
 
    @Inject(
       method = {"initFbo"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onBeginCreateBuffers(int width, int height, CallbackInfo ci) {
       StencilDepthTextures.creatingStencilDepth = this.isStencilBufferEnabled;
@@ -43,16 +43,16 @@ public abstract class MixinRenderTarget implements IEFrameBuffer {
 
    @Inject(
       method = {"initFbo"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onEndCreateBuffers(int width, int height, CallbackInfo ci) {
       StencilDepthTextures.creatingStencilDepth = false;
-      ClientPlatform.get().onRenderTargetBuffersCreated((Framebuffer)this);
+      ClientPlatform.get().onRenderTargetBuffersCreated((Framebuffer)(Object)this);
    }
 
    @Inject(
       method = {"Lnet/minecraft/client/gl/Framebuffer;copyDepthFrom(Lnet/minecraft/client/gl/Framebuffer;)V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onCopiedDepthFrom(Framebuffer framebuffer, CallbackInfo ci) {
       CHelper.checkGlError();

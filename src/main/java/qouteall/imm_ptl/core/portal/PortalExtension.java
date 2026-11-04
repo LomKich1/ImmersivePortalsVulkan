@@ -113,7 +113,7 @@ public class PortalExtension {
             }
 
             if (this.flippedPortalId != null && this.flippedPortal == null) {
-               Entity e = (Entity)((IEWorld)portal.getEntityWorld()).portal_getEntityLookup().get(this.flippedPortalId);
+               Entity e = (Entity)((IEWorld)(Object)portal.getEntityWorld()).portal_getEntityLookup().get(this.flippedPortalId);
                if (e instanceof Portal p) {
                   this.flippedPortal = p;
                } else {
@@ -131,7 +131,7 @@ public class PortalExtension {
             }
 
             if (this.reversePortalId != null && this.reversePortal == null) {
-               Entity e = (Entity)((IEWorld)portal.getDestWorld()).portal_getEntityLookup().get(this.reversePortalId);
+               Entity e = (Entity)((IEWorld)(Object)portal.getDestWorld()).portal_getEntityLookup().get(this.reversePortalId);
                if (e instanceof Portal p) {
                   this.reversePortal = p;
                } else if (portal.isOtherSideChunkLoaded()) {
@@ -150,7 +150,7 @@ public class PortalExtension {
             }
 
             if (this.parallelPortalId != null && this.parallelPortal == null) {
-               Entity e = (Entity)((IEWorld)portal.getDestWorld()).portal_getEntityLookup().get(this.parallelPortalId);
+               Entity e = (Entity)((IEWorld)(Object)portal.getDestWorld()).portal_getEntityLookup().get(this.parallelPortalId);
                if (e instanceof Portal p) {
                   this.parallelPortal = p;
                } else if (portal.isOtherSideChunkLoaded()) {
@@ -215,7 +215,7 @@ public class PortalExtension {
    private void updateClusterStatusClient(Portal portal) {
       if (this.bindCluster) {
          if (this.flippedPortalId != null) {
-            Entity e = (Entity)((IEWorld)portal.getEntityWorld()).portal_getEntityLookup().get(this.flippedPortalId);
+            Entity e = (Entity)((IEWorld)(Object)portal.getEntityWorld()).portal_getEntityLookup().get(this.flippedPortalId);
             if (e instanceof Portal p) {
                this.flippedPortal = p;
             }
@@ -224,7 +224,7 @@ public class PortalExtension {
          }
 
          if (this.reversePortalId != null) {
-            Entity e = (Entity)((IEWorld)portal.getDestWorld()).portal_getEntityLookup().get(this.reversePortalId);
+            Entity e = (Entity)((IEWorld)(Object)portal.getDestWorld()).portal_getEntityLookup().get(this.reversePortalId);
             if (e instanceof Portal p) {
                this.reversePortal = p;
             }
@@ -233,7 +233,7 @@ public class PortalExtension {
          }
 
          if (this.parallelPortalId != null) {
-            Entity e = (Entity)((IEWorld)portal.getDestWorld()).portal_getEntityLookup().get(this.parallelPortalId);
+            Entity e = (Entity)((IEWorld)(Object)portal.getDestWorld()).portal_getEntityLookup().get(this.parallelPortalId);
             if (e instanceof Portal p) {
                this.parallelPortal = p;
             }
@@ -260,8 +260,8 @@ public class PortalExtension {
          this.flippedPortal.setAxisH(portal.getAxisH());
          this.flippedPortal.setScaling(portal.getScaling());
          this.flippedPortal.setRotation(portal.getRotation());
-         this.flippedPortal.setWidth(portal.getWidth());
-         this.flippedPortal.setHeight(portal.getHeight());
+         this.flippedPortal.setWidth(portal.getPortalWidth());
+         this.flippedPortal.setHeight(portal.getPortalHeight());
          this.flippedPortal.setThickness(portal.getThickness());
          PortalManipulation.copyAdditionalProperties(this.flippedPortal, portal, false);
          this.flippedPortal.animation.defaultAnimation.inverseScale = false;
@@ -290,8 +290,8 @@ public class PortalExtension {
             this.reversePortal.setRotation(null);
          }
 
-         this.reversePortal.setWidth(portal.getWidth() * portal.getScale());
-         this.reversePortal.setHeight(portal.getHeight() * portal.getScale());
+         this.reversePortal.setWidth(portal.getPortalWidth() * portal.getScale());
+         this.reversePortal.setHeight(portal.getPortalHeight() * portal.getScale());
          this.reversePortal.setThickness(portal.getThickness() * portal.getScale());
          PortalManipulation.copyAdditionalProperties(this.reversePortal, portal, false);
          this.reversePortal.animation.defaultAnimation.inverseScale = true;
@@ -320,8 +320,8 @@ public class PortalExtension {
             this.parallelPortal.setRotation(null);
          }
 
-         this.parallelPortal.setWidth(portal.getWidth() * portal.getScale());
-         this.parallelPortal.setHeight(portal.getHeight() * portal.getScale());
+         this.parallelPortal.setWidth(portal.getPortalWidth() * portal.getScale());
+         this.parallelPortal.setHeight(portal.getPortalHeight() * portal.getScale());
          this.parallelPortal.setThickness(portal.getThickness() * portal.getScale());
          PortalManipulation.copyAdditionalProperties(this.parallelPortal, portal, false);
          this.parallelPortal.animation.defaultAnimation.inverseScale = true;

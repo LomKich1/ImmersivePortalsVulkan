@@ -58,7 +58,7 @@ public class PacketRedirection {
    }
 
    public static <T> T withForceRedirectAndGet(ServerWorld world, Supplier<T> func) {
-      if (((IEWorld)world).portal_getThread() != Thread.currentThread()) {
+      if (((IEWorld)(Object)world).portal_getThread() != Thread.currentThread()) {
          LOGGER.error(
             "It's possible that a mod is trying to handle packet in networking thread instead of server thread. This is not thread safe and can cause rare bugs! (ImmPtl is just doing checking, it's not an issue of iPortal)",
             new Throwable()
@@ -112,12 +112,12 @@ public class PacketRedirection {
          if (!(packet instanceof BundleS2CPacket bundlePacket)) {
             int intDimId = PortalAPI.serverDimKeyToInt(server, dimension);
             PacketRedirection.Payload payload = new PacketRedirection.Payload(intDimId, packet);
-            return PlatformNetworking.get().createS2CPacket(payload);
+            return (Packet<ClientPlayPacketListener>)(Packet<?>)PlatformNetworking.get().createS2CPacket(payload);
          } else {
-            List<Packet<ClientPlayPacketListener>> newSubPackets = new ArrayList<>();
+            List<Packet<? super ClientPlayPacketListener>> newSubPackets = new ArrayList<>();
 
             for (Packet<? super ClientPlayPacketListener> subPacket : bundlePacket.getPackets()) {
-               newSubPackets.add(createRedirectedMessage(server, dimension, subPacket));
+               newSubPackets.add(createRedirectedMessage(server, dimension, (Packet<ClientPlayPacketListener>)(Packet<?>)subPacket));
             }
 
             return new BundleS2CPacket(newSubPackets);
@@ -138,9 +138,9 @@ public class PacketRedirection {
       if (forceBundleCallback != null) {
          return func.get();
       } else {
-         Map<ServerCommonNetworkHandler, List<Packet<ClientPlayPacketListener>>> map = new HashMap<>();
+         Map<ServerCommonNetworkHandler, List<Packet<? super ClientPlayPacketListener>>> map = new HashMap<>();
          forceBundle.set((listenerx, packet) -> {
-            List<Packet<ClientPlayPacketListener>> packetsToBundle = map.computeIfAbsent(listenerx, k -> new ArrayList<>());
+            List<Packet<? super ClientPlayPacketListener>> packetsToBundle = map.computeIfAbsent(listenerx, k -> new ArrayList<>());
             if (packet instanceof BundlePacket<?> bundlePacket) {
                for (Packet<?> subPacket : bundlePacket.getPackets()) {
                   packetsToBundle.add((Packet<ClientPlayPacketListener>)subPacket);
@@ -156,9 +156,9 @@ public class PacketRedirection {
          } finally {
             forceBundle.set(null);
 
-            for (Entry<ServerCommonNetworkHandler, List<Packet<ClientPlayPacketListener>>> e : map.entrySet()) {
+            for (Entry<ServerCommonNetworkHandler, List<Packet<? super ClientPlayPacketListener>>> e : map.entrySet()) {
                ServerCommonNetworkHandler listener = e.getKey();
-               List<Packet<ClientPlayPacketListener>> packets = e.getValue();
+               List<Packet<? super ClientPlayPacketListener>> packets = e.getValue();
                listener.sendPacket(new BundleS2CPacket(packets));
             }
          }

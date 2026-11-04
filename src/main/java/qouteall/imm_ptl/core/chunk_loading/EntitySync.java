@@ -24,13 +24,13 @@ public class EntitySync {
       for (ServerWorld world : server.getWorlds()) {
          PacketRedirection.withForceRedirect(world, () -> {
             ServerChunkLoadingManager chunkMap = world.getChunkManager().chunkLoadingManager;
-            Int2ObjectMap<EntityTracker> entityTrackerMap = ((IEChunkMap)chunkMap).ip_getEntityTrackerMap();
+            Int2ObjectMap<EntityTracker> entityTrackerMap = ((IEChunkMap)(Object)chunkMap).ip_getEntityTrackerMap();
             ChunkLevelManager distanceManager = chunkMap.getLevelManager();
             ObjectIterator var4 = entityTrackerMap.values().iterator();
 
             while (var4.hasNext()) {
                EntityTracker trackedEntity = (EntityTracker)var4.next();
-               IETrackedEntity ieTrackedEntity = (IETrackedEntity)trackedEntity;
+               IETrackedEntity ieTrackedEntity = (IETrackedEntity)(Object)trackedEntity;
                ieTrackedEntity.ip_updateEntityTrackingStatus();
             }
          });
@@ -45,13 +45,13 @@ public class EntitySync {
       for (ServerWorld world : server.getWorlds()) {
          PacketRedirection.withForceRedirect(world, () -> {
             ServerChunkLoadingManager chunkMap = world.getChunkManager().chunkLoadingManager;
-            Int2ObjectMap<EntityTracker> entityTrackerMap = ((IEChunkMap)chunkMap).ip_getEntityTrackerMap();
+            Int2ObjectMap<EntityTracker> entityTrackerMap = ((IEChunkMap)(Object)chunkMap).ip_getEntityTrackerMap();
             ChunkLevelManager distanceManager = chunkMap.getLevelManager();
             ObjectIterator var4 = entityTrackerMap.values().iterator();
 
             while (var4.hasNext()) {
                EntityTracker trackedEntity = (EntityTracker)var4.next();
-               IETrackedEntity ieTrackedEntity = (IETrackedEntity)trackedEntity;
+               IETrackedEntity ieTrackedEntity = (IETrackedEntity)(Object)trackedEntity;
                long chunkPos = ieTrackedEntity.ip_getEntity().getChunkPos().toLong();
                if (distanceManager.shouldTickEntities(chunkPos)) {
                   ieTrackedEntity.ip_sendChanges();

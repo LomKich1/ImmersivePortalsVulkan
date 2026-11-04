@@ -65,10 +65,10 @@ public abstract class MixinMinecraft implements IEMinecraftClient {
 
    @WrapOperation(
       method = {"Lnet/minecraft/client/MinecraftClient;run()V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Ljava/lang/Thread;currentThread()Ljava/lang/Thread;"
-      )}
+      )
    )
    private Thread testMixinExtra(Operation<Thread> original) {
       LOGGER.info("[ImmPtl] MixinExtra is working!");
@@ -77,21 +77,21 @@ public abstract class MixinMinecraft implements IEMinecraftClient {
 
    @Inject(
       method = {"tick"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/world/ClientWorld;tickEntities()V"
-      )}
+      )
    )
    private void onBeforeTickingEntities(CallbackInfo ci) {
    }
 
    @Inject(
       method = {"Lnet/minecraft/client/MinecraftClient;tick()V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/world/ClientWorld;tick(Ljava/util/function/BooleanSupplier;)V",
          shift = Shift.AFTER
-      )}
+      )
    )
    private void onAfterClientTick(CallbackInfo ci) {
       Profilers.get().push("imm_ptl_client_tick");
@@ -107,11 +107,11 @@ public abstract class MixinMinecraft implements IEMinecraftClient {
 
    @Inject(
       method = {"Lnet/minecraft/client/MinecraftClient;render(Z)V"},
-      at = {@At(
+      at = @At(
          value = "FIELD",
          target = "Lnet/minecraft/client/MinecraftClient;currentFps:I",
          shift = Shift.AFTER
-      )}
+      )
    )
    private void onSnooperUpdate(boolean tick, CallbackInfo ci) {
       ClientPerformanceMonitor.updateEverySecond(currentFps);
@@ -119,7 +119,7 @@ public abstract class MixinMinecraft implements IEMinecraftClient {
 
    @Inject(
       method = {"Lnet/minecraft/client/MinecraftClient;setWorld(Lnet/minecraft/client/world/ClientWorld;Z)V"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onSetWorld(ClientWorld clientLevel, boolean stopSounds, CallbackInfo ci) {
       ClientDimensionPrewarm.onVanillaLevelSet();
@@ -139,7 +139,7 @@ public abstract class MixinMinecraft implements IEMinecraftClient {
 
    @Inject(
       method = {"Lnet/minecraft/client/MinecraftClient;usesImprovedTransparency()Z"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private static void onIsFabulousGraphicsOrBetter(CallbackInfoReturnable<Boolean> cir) {
@@ -150,7 +150,7 @@ public abstract class MixinMinecraft implements IEMinecraftClient {
 
    @Inject(
       method = {"createInitScreens"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onAddInitialScreens(List<Function<Runnable, Screen>> output, CallbackInfoReturnable<Boolean> cir) {
       IPConfig config = IPConfig.getConfig();

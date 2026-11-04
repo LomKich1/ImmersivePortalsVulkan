@@ -66,7 +66,7 @@ public class MiscHelper {
 
    public static Path getWorldSavingDirectory(MinecraftServer server) {
       Validate.notNull(server);
-      return ((IELevelStorageAccess_Misc)((IEMinecraftServer_Misc)server).ip_getStorageSource()).ip_getLevelPath().path();
+      return ((IELevelStorageAccess_Misc)((IEMinecraftServer_Misc)(Object)server).ip_getStorageSource()).ip_getLevelPath().path();
    }
 
    static {

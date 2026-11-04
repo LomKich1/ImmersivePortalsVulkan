@@ -138,7 +138,7 @@ public class AlternateDimensions {
    }
 
    private static void syncWeatherFromOverworld(ServerWorld world, ServerWorld overworld) {
-      ((IEWorld)world)
+      ((IEWorld)(Object)world)
          .portal_setWeather(
             overworld.getRainGradient(1.0F), overworld.getRainGradient(1.0F), overworld.getThunderGradient(1.0F), overworld.getThunderGradient(1.0F)
          );

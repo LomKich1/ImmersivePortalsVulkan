@@ -1243,8 +1243,8 @@ public class PortalCommand {
                                     portalsToReload.add(extension.reversePortal);
                                  } else {
                                     portal.setOriginPos(newOrigin);
-                                    portal.setWidth(portal.getWidth() * scale);
-                                    portal.setHeight(portal.getHeight() * scale);
+                                    portal.setWidth(portal.getPortalWidth() * scale);
+                                    portal.setHeight(portal.getPortalHeight() * scale);
                                     portalsToReload.add(portal);
                                  }
                               } else {
@@ -1286,7 +1286,7 @@ public class PortalCommand {
                            portal.setHeight(vecNotAlongAxis.length());
                            portal.setDestination(center.add(0.0, 10.0, 0.0));
                            portal.setDestinationDimension(((ServerCommandSource)context.getSource()).getWorld().getRegistryKey());
-                           if (!(portal.getWidth() > 64.0) && !(portal.getHeight() > 64.0)) {
+                           if (!(portal.getPortalWidth() > 64.0) && !(portal.getPortalHeight() > 64.0)) {
                               McHelper.spawnServerEntity(portal);
                               Portal flippedPortal = PortalManipulation.createFlippedPortal(portal, Portal.ENTITY_TYPE);
                               McHelper.spawnServerEntity(flippedPortal);
@@ -1581,8 +1581,8 @@ public class PortalCommand {
       return Text.translatable(
          "imm_ptl.command.make_portal.success",
          new Object[]{
-            Double.toString(portal.getWidth()),
-            Double.toString(portal.getHeight()),
+            Double.toString(portal.getPortalWidth()),
+            Double.toString(portal.getPortalHeight()),
             McHelper.dimensionTypeId(portal.getEntityWorld().getRegistryKey()).toString(),
             portal.getOriginPos().toString(),
             McHelper.dimensionTypeId(portal.getDestDim()).toString(),
@@ -1883,8 +1883,8 @@ public class PortalCommand {
             mesh2D = Mesh2D.createNewFullQuadMesh();
          }
 
-         double halfWidth = portal.getWidth() / 2.0;
-         double halfHeight = portal.getHeight() / 2.0;
+         double halfWidth = portal.getPortalWidth() / 2.0;
+         double halfHeight = portal.getPortalHeight() / 2.0;
          Vec3d axisW = portal.getAxisW();
          Vec3d axisH = portal.getAxisH();
          Plane plane = new Plane(portal.getOriginPos(), portal.getNormal());
@@ -1963,8 +1963,8 @@ public class PortalCommand {
          double lWidth = boundingBox.maxX() - boundingBox.minX();
          double lHeight = boundingBox.maxY() - boundingBox.minY();
          mesh2D.transformPoints(input -> new Vec2d((input.x() - centerLX) / (lWidth / 2.0), (input.y() - centerLY) / (lHeight / 2.0)));
-         double oldHalfWidth = portal.getWidth() / 2.0;
-         double oldHalfHeight = portal.getHeight() / 2.0;
+         double oldHalfWidth = portal.getPortalWidth() / 2.0;
+         double oldHalfHeight = portal.getPortalHeight() / 2.0;
          double newPortalWidth = oldHalfWidth * lWidth;
          double newPortalHeight = oldHalfHeight * lHeight;
          Vec3d centerOffset = portal.getAxisW().multiply(centerLX * oldHalfWidth).add(portal.getAxisH().multiply(centerLY * oldHalfHeight));

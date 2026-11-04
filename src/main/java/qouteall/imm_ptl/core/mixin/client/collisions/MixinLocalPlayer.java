@@ -12,11 +12,11 @@ import qouteall.imm_ptl.core.ducks.IEEntity;
 public class MixinLocalPlayer {
    @Inject(
       method = {"Lnet/minecraft/client/network/ClientPlayerEntity;wouldCollideAt(Lnet/minecraft/util/math/BlockPos;)Z"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onCannotFitAt(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-      if (((IEEntity)this).ip_isRecentlyCollidingWithPortal()) {
+      if (((IEEntity)(Object)this).ip_isRecentlyCollidingWithPortal()) {
          cir.setReturnValue(false);
          cir.cancel();
       }

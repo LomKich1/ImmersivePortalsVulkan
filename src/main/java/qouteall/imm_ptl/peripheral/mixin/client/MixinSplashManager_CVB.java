@@ -19,7 +19,7 @@ public class MixinSplashManager_CVB {
 
    @Inject(
       method = {"apply(Ljava/util/List;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onApply(List<Text> list, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci) {
       List<Text> edited = new ArrayList<>(this.splashTexts);

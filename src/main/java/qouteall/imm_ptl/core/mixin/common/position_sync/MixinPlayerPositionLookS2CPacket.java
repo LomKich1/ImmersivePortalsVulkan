@@ -38,18 +38,18 @@ public class MixinPlayerPositionLookS2CPacket implements IEPlayerPositionLookS2C
 
    @Inject(
       method = {"<clinit>"},
-      at = {@At("TAIL")}
+      at = @At("TAIL")
    )
    private static void onClassInit(CallbackInfo ci) {
       PacketCodec<PacketByteBuf, PlayerPositionLookS2CPacket> vanillaCodec = CODEC;
       CODEC = PacketCodec.ofStatic((buf, packet) -> {
          vanillaCodec.encode(buf, packet);
-         buf.writeRegistryKey(((IEPlayerPositionLookS2CPacket)packet).ip_getPlayerDimension());
+         buf.writeRegistryKey(((IEPlayerPositionLookS2CPacket)(Object)packet).ip_getPlayerDimension());
       }, buf -> {
          PlayerPositionLookS2CPacket packet = (PlayerPositionLookS2CPacket)vanillaCodec.decode(buf);
          if (ImmPtlNetworkConfig.doesServerHaveImmPtl()) {
             RegistryKey<World> dimension = buf.readRegistryKey(RegistryKeys.WORLD);
-            ((IEPlayerPositionLookS2CPacket)packet).ip_setPlayerDimension(dimension);
+            ((IEPlayerPositionLookS2CPacket)(Object)packet).ip_setPlayerDimension(dimension);
          }
 
          return packet;

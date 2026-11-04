@@ -10,11 +10,11 @@ import qouteall.imm_ptl.core.render.ForceMainThreadRebuild;
 public class MixinLevelRenderer_ForceMainThreadRebuild {
    @ModifyVariable(
       method = {"updateChunks"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/option/GameOptions;getChunkBuilderMode()Lnet/minecraft/client/option/SimpleOption;",
          ordinal = 0
-      )},
+      ),
       ordinal = 1,
       require = 0
    )

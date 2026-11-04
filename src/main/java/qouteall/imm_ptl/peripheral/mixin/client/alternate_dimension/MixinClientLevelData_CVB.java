@@ -13,7 +13,7 @@ import qouteall.imm_ptl.peripheral.alternate_dimension.AlternateDimensions;
 public class MixinClientLevelData_CVB {
    @Inject(
       method = {"Lnet/minecraft/client/world/ClientWorld$Properties;getSkyDarknessHeight(Lnet/minecraft/world/HeightLimitView;)D"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onGetSkyDarknessHeight(CallbackInfoReturnable<Double> cir) {

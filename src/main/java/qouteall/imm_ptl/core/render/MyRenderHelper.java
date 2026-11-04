@@ -332,7 +332,7 @@ public class MyRenderHelper {
    }
 
    public static void drawFramebufferInGui(DrawContext guiGraphics, Framebuffer framebuffer, int x0, int y0, int x1, int y1) {
-      GuiRenderState guiRenderState = ((IEGuiGraphics)guiGraphics).ip_getGuiRenderState();
+      GuiRenderState guiRenderState = ((IEGuiGraphics)(Object)guiGraphics).ip_getGuiRenderState();
       guiRenderState.addSimpleElement(
          new TexturedQuadGuiElementRenderState(
             RenderPipelines.GUI_TEXTURED,

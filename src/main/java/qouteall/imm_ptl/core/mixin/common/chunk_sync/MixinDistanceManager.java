@@ -33,7 +33,7 @@ public abstract class MixinDistanceManager implements qouteall.imm_ptl.core.duck
 
    @Inject(
       method = {"Lnet/minecraft/server/world/ChunkLevelManager;handleChunkLeave(Lnet/minecraft/util/math/ChunkSectionPos;Lnet/minecraft/server/network/ServerPlayerEntity;)V"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onHandleChunkLeave(ChunkSectionPos sectionPos, ServerPlayerEntity serverPlayer, CallbackInfo ci) {
       long chunkPos = sectionPos.toChunkPos().toLong();
@@ -42,11 +42,11 @@ public abstract class MixinDistanceManager implements qouteall.imm_ptl.core.duck
 
    @Inject(
       method = {"update"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onRunAllUpdates(ServerChunkLoadingManager chunkManager, CallbackInfoReturnable<Boolean> cir) {
       if (IPConfig.getConfig().enableImmPtlChunkLoading) {
-         ServerWorld world = ((IEChunkMap)chunkManager).ip_getWorld();
+         ServerWorld world = ((IEChunkMap)(Object)chunkManager).ip_getWorld();
          ImmPtlChunkTickets.get(world).flushThrottling(world);
       }
    }

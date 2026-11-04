@@ -264,8 +264,8 @@ public class BlockPortalShape {
          portal.setPortalShapeToDefault();
       } else {
          Mesh2D mesh2D = new Mesh2D();
-         double halfWidth = portal.getWidth() / 2.0;
-         double halfHeight = portal.getHeight() / 2.0;
+         double halfWidth = portal.getPortalWidth() / 2.0;
+         double halfHeight = portal.getPortalHeight() / 2.0;
          Vec3d axisW = portal.getAxisW();
          Vec3d axisH = portal.getAxisH();
          this.area.forEach(part -> {

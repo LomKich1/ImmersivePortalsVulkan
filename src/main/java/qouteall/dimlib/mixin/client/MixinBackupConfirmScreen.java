@@ -37,7 +37,7 @@ public class MixinBackupConfirmScreen extends Screen {
 
    @Inject(
       method = {"<init>(Ljava/lang/Runnable;Lnet/minecraft/client/gui/screen/world/BackupPromptScreen$Callback;Lnet/minecraft/text/Text;Lnet/minecraft/text/Text;Lnet/minecraft/text/Text;Z)V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onInitEnd(Runnable runnable, Callback listener, Text component, Text component2, Text confirmation, boolean bl, CallbackInfo ci) {
       this.dimlib_isExperimentalWarning = Objects.equals(component, Text.translatable("selectWorld.backupQuestion.experimental"));
@@ -45,7 +45,7 @@ public class MixinBackupConfirmScreen extends Screen {
 
    @Inject(
       method = {"init"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onInitEnd(CallbackInfo ci) {
       if (this.dimlib_isExperimentalWarning) {

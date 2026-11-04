@@ -23,18 +23,18 @@ public class MixinServerGamePacketListenerImpl_ChunkSync {
 
    @Inject(
       method = {"<init>"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void ip_attachChunkSender(CallbackInfo ci) {
-      ((IEPlayerChunkSender)this.chunkDataSender).ip_setListener((ServerPlayNetworkHandler)this);
+      ((IEPlayerChunkSender)(Object)this.chunkDataSender).ip_setListener((ServerPlayNetworkHandler)(Object)this);
    }
 
    @Inject(
       method = {"onAcknowledgeChunks"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/server/network/ChunkDataSender;onAcknowledgeChunks(F)V"
-      )}
+      )
    )
    private void redirectOnChunkBatchReceivedByClient(AcknowledgeChunksC2SPacket packet, CallbackInfo ci) {
       ImmPtlChunkTracking.getPlayerInfo(this.player).onChunkBatchReceivedByClient(packet.desiredChunksPerTick());

@@ -87,7 +87,7 @@ public class ImmPtlChunkTickets {
    }
 
    public void flushThrottling(ServerWorld world) {
-      if (Thread.currentThread() != ((IEWorld)world).portal_getThread()) {
+      if (Thread.currentThread() != ((IEWorld)(Object)world).portal_getThread()) {
          LOGGER.error("Called in a non-server-main (or server-world) thread.", new Throwable());
       } else {
          if (enableDebugRateStat) {
@@ -98,7 +98,7 @@ public class ImmPtlChunkTickets {
             LOGGER.error("flushing when invalid {}", world);
          } else if (world.getServer().isRunning()) {
             ChunkLevelManager distanceManager = getDistanceManager(world);
-            Executor mainThreadExecutor = ((IEDistanceManager)distanceManager).ip_getMainThreadExecutor();
+            Executor mainThreadExecutor = ((IEDistanceManager)(Object)distanceManager).ip_getMainThreadExecutor();
             this.waitingForLoading.removeIf(chunkPosx -> {
                ChunkHolder chunkHolder = getChunkHolder(world, chunkPosx);
                if (chunkHolder == null) {
@@ -180,7 +180,7 @@ public class ImmPtlChunkTickets {
    }
 
    private static void removeAllTicketsInWorld(ServerWorld world, ImmPtlChunkTickets dimTicketManager) {
-      ChunkTicketManager ticketStorage = ((IEDistanceManager)getDistanceManager(world)).ip_getTicketStorage();
+      ChunkTicketManager ticketStorage = ((IEDistanceManager)(Object)getDistanceManager(world)).ip_getTicketStorage();
       dimTicketManager.chunkPosToTicketInfo.keySet().forEach(pos -> {
          List<ChunkTicket> tickets = ((qouteall.imm_ptl.core.ducks.IEDistanceManager)getDistanceManager(world)).portal_getTicketSet(pos);
 
@@ -196,11 +196,11 @@ public class ImmPtlChunkTickets {
    }
 
    public static ChunkHolder getChunkHolder(ServerWorld world, long chunkPos) {
-      return ((IEChunkMap)world.getChunkManager().chunkLoadingManager).ip_getChunkHolder(chunkPos);
+      return ((IEChunkMap)(Object)world.getChunkManager().chunkLoadingManager).ip_getChunkHolder(chunkPos);
    }
 
    public static ChunkLevelManager getDistanceManager(ServerWorld world) {
-      return ((IEServerChunkCache)world.getChunkManager()).ip_getDistanceManager();
+      return ((IEServerChunkCache)(Object)world.getChunkManager()).ip_getDistanceManager();
    }
 
    private static void cleanup(MinecraftServer server) {

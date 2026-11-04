@@ -14,10 +14,10 @@ import qouteall.imm_ptl.core.ducks.IEPlayerMoveC2SPacket;
 public class MixinServerBoundMovePlayerPacket {
    @Inject(
       method = {"<init>"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onConstruct(CallbackInfo ci) {
       RegistryKey<World> dimension = MinecraftClient.getInstance().player.getEntityWorld().getRegistryKey();
-      ((IEPlayerMoveC2SPacket)this).ip_setPlayerDimension(dimension);
+      ((IEPlayerMoveC2SPacket)(Object)this).ip_setPlayerDimension(dimension);
    }
 }

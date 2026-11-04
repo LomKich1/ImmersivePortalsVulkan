@@ -53,7 +53,7 @@ public class CommandStickItem extends Item {
          )
          .apply(instance, CommandStickItem.Data::new)
    );
-   public static final ComponentType<CommandStickItem.Data> COMPONENT_TYPE = ComponentType.builder().codec(DATA_CODEC).build();
+   public static final ComponentType<CommandStickItem.Data> COMPONENT_TYPE = ComponentType.<CommandStickItem.Data>builder().codec(DATA_CODEC).build();
    public static final LinkedHashMap<String, CommandStickItem.Data> BUILT_IN_COMMAND_STICK_TYPES = new LinkedHashMap<>();
    public static final CommandStickItem instance = new CommandStickItem(
       new Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, McHelper.newResourceLocation("immersive_portals:command_stick")))

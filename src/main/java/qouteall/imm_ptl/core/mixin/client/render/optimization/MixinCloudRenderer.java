@@ -72,7 +72,7 @@ public abstract class MixinCloudRenderer {
 
    @Inject(
       method = {"renderClouds"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onBeginRenderClouds(
       int color, CloudRenderMode cloudStatus, float cloudHeight, Vec3d cameraPos, long gameTime, float partialTick, CallbackInfo ci
@@ -86,7 +86,7 @@ public abstract class MixinCloudRenderer {
 
    @Inject(
       method = {"renderClouds"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onEndRenderClouds(int color, CloudRenderMode cloudStatus, float cloudHeight, Vec3d cameraPos, long gameTime, float partialTick, CallbackInfo ci) {
       if (RenderStates.getRenderedPortalNum() != 0) {

@@ -24,7 +24,7 @@ public abstract class MixinInterpolationHandler {
 
    @Inject(
       method = {"refreshPositionAndAngles"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onUpdateTrackedPositionAndAngles(Vec3d targetPos, float yaw, float pitch, CallbackInfo ci) {
       if (this.entity instanceof LivingEntity this_) {
@@ -33,7 +33,7 @@ public abstract class MixinInterpolationHandler {
             return;
          }
 
-         Portal collidingPortal = ((IEEntity)this_).ip_getCollidingPortal();
+         Portal collidingPortal = ((IEEntity)(Object)this_).ip_getCollidingPortal();
          if (collidingPortal != null) {
             double dx = this_.getX() - targetPos.x;
             double dy = this_.getY() - targetPos.y;

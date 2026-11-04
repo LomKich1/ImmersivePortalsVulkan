@@ -14,11 +14,11 @@ import qouteall.imm_ptl.core.render.FrontClipping;
 public class MixinGlCommandEncoder {
    @Inject(
       method = {"setupRenderPass"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onTrySetupReturn(RenderPassImpl renderPass, Collection<String> dynamicUniforms, CallbackInfoReturnable<Boolean> cir) {
       if (cir.getReturnValueZ()) {
-         CompiledShaderPipeline pipeline = ((IEGlRenderPass)renderPass).ip_getPipeline();
+         CompiledShaderPipeline pipeline = ((IEGlRenderPass)(Object)renderPass).ip_getPipeline();
          if (pipeline != null) {
             FrontClipping.onProgramBound(pipeline.program());
          }

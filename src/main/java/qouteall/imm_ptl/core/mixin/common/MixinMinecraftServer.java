@@ -17,10 +17,10 @@ public abstract class MixinMinecraftServer implements IEMinecraftServer {
 
    @Inject(
       method = {"Lnet/minecraft/server/MinecraftServer;runServer()V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onServerClose(CallbackInfo ci) {
-      IPGlobal.SERVER_CLEANUP_EVENT.invoker().accept((MinecraftServer)this);
+      IPGlobal.SERVER_CLEANUP_EVENT.invoker().accept((MinecraftServer)(Object)this);
    }
 
    @Override

@@ -74,8 +74,8 @@ public class WorldRenderInfo {
    public static void adjustCameraPos(Camera camera) {
       if (!renderInfoStack.isEmpty()) {
          WorldRenderInfo currWorldRenderInfo = getTopRenderInfo();
-         ((IECamera)camera).portal_setPos(currWorldRenderInfo.cameraPos);
-         ((IECamera)camera).portal_tickAttributeProbe();
+         ((IECamera)(Object)camera).portal_setPos(currWorldRenderInfo.cameraPos);
+         ((IECamera)(Object)camera).portal_tickAttributeProbe();
       }
    }
 

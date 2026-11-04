@@ -50,13 +50,13 @@ public class RendererUsingFrameBuffer extends PortalRenderer {
          if (this.testShouldRenderPortal(portal, modelView)) {
             PortalRendering.pushPortalLayer(portal);
             Framebuffer oldFrameBuffer = client.getFramebuffer();
-            ((IEMinecraftClient)client).ip_setFrameBuffer(this.secondaryFrameBuffer.fb);
+            ((IEMinecraftClient)(Object)client).ip_setFrameBuffer(this.secondaryFrameBuffer.fb);
             RenderSystem.getDevice()
                .createCommandEncoder()
                .clearColorAndDepthTextures(this.secondaryFrameBuffer.fb.getColorAttachment(), -65281, this.secondaryFrameBuffer.fb.getDepthAttachment(), 1.0);
             GL11.glDisable(2960);
             this.renderPortalContent(portal);
-            ((IEMinecraftClient)client).ip_setFrameBuffer(oldFrameBuffer);
+            ((IEMinecraftClient)(Object)client).ip_setFrameBuffer(oldFrameBuffer);
             PortalRendering.popPortalLayer();
             CHelper.enableDepthClamp();
             this.renderSecondBufferIntoMainBuffer(portal, modelView, oldFrameBuffer);

@@ -409,7 +409,7 @@ public class PortalAnimationCommand {
                   .set(
                      new NormalAnimation.Builder()
                         .phases(
-                           ImmutableList.builder()
+                           ImmutableList.<NormalAnimation.Phase>builder()
                               .addAll(thisSideAnimation.phases)
                               .add(new NormalAnimation.Phase.Builder().durationTicks(durationTicks).timingFunction(timingFunction).delta(thisSideDelta).build())
                               .build()
@@ -424,7 +424,7 @@ public class PortalAnimationCommand {
                   .set(
                      new NormalAnimation.Builder()
                         .phases(
-                           ImmutableList.builder()
+                           ImmutableList.<NormalAnimation.Phase>builder()
                               .addAll(otherSideAnimation.phases)
                               .add(
                                  new NormalAnimation.Phase.Builder().durationTicks(durationTicks).timingFunction(timingFunction).delta(otherSideDelta).build()
@@ -502,7 +502,7 @@ public class PortalAnimationCommand {
                NormalAnimation.Phase lastOtherSidePhase = otherSidePhases.get(otherSidePhases.size() - 1);
                DeltaUnilateralPortalState lastOtherSidePhaseDelta = lastOtherSidePhase.delta().purgeFPError();
                if (loopCount > 1 && !lastThisSidePhaseDelta.isIdentity() || !lastOtherSidePhaseDelta.isIdentity()) {
-                  thisSidePhases = ImmutableList.builder()
+                  thisSidePhases = ImmutableList.<NormalAnimation.Phase>builder()
                      .addAll(thisSidePhases)
                      .add(
                         new NormalAnimation.Phase.Builder()
@@ -512,7 +512,7 @@ public class PortalAnimationCommand {
                            .build()
                      )
                      .build();
-                  otherSidePhases = ImmutableList.builder()
+                  otherSidePhases = ImmutableList.<NormalAnimation.Phase>builder()
                      .addAll(otherSidePhases)
                      .add(
                         new NormalAnimation.Phase.Builder()

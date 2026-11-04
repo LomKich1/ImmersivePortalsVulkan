@@ -13,7 +13,7 @@ import qouteall.imm_ptl.core.render.CrossPortalEntityRenderer;
 public class MixinEntityRenderDispatcher {
    @Inject(
       method = {"Lnet/minecraft/client/render/entity/EntityRenderManager;shouldRender(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/Frustum;DDD)Z"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onShouldRenderEntity(Entity entity_1, Frustum frustum_1, double double_1, double double_2, double double_3, CallbackInfoReturnable<Boolean> cir) {

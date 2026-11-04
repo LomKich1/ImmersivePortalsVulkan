@@ -64,7 +64,7 @@ public class PacketRedirectionClient {
          return this.packet.getPacketType();
       }
 
-      public void handle(ClientPlayPacketListener listener) {
+      public void apply(ClientPlayPacketListener listener) {
          try {
             PacketRedirectionClient.handleRedirectedPacket(this.dimensionIntId, this.packet, listener);
          } catch (Exception var3) {

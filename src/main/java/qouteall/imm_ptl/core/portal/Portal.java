@@ -672,7 +672,7 @@ public class Portal extends Entity implements PortalLike, IPEntityEventListenabl
       Validate.isTrue(!this.getEntityWorld().isClient());
       NbtCompound compoundTag = new NbtCompound();
       this.addAdditionalSaveData(compoundTag);
-      return PlatformNetworking.get()
+      return (Packet<ClientPlayPacketListener>)(Packet<?>)PlatformNetworking.get()
          .createS2CPacket(
             new ImmPtlNetworking.PortalSyncPacket(
                this.getId(),
@@ -1047,11 +1047,11 @@ public class Portal extends Entity implements PortalLike, IPEntityEventListenabl
          .translate(-originPos.x, -originPos.y, -originPos.z);
    }
 
-   public double getWidth() {
+   public double getPortalWidth() {
       return this.width;
    }
 
-   public double getHeight() {
+   public double getPortalHeight() {
       return this.height;
    }
 

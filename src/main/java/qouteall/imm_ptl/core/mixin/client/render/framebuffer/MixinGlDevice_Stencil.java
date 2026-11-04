@@ -18,10 +18,10 @@ import qouteall.imm_ptl.core.render.StencilDepthTextures;
 public class MixinGlDevice_Stencil {
    @ModifyArgs(
       method = {"createTexture(Ljava/lang/String;ILcom/mojang/blaze3d/textures/TextureFormat;IIII)Lcom/mojang/blaze3d/textures/GpuTexture;", "createTexture(Ljava/lang/String;ILcom/mojang/blaze3d/textures/TextureFormat;IIIIZ)Lcom/mojang/blaze3d/textures/GpuTexture;"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lcom/mojang/blaze3d/opengl/GlStateManager;_texImage2D(IIIIIIIILjava/nio/ByteBuffer;)V"
-      )},
+      ),
       require = 1
    )
    private void modifyTexImage2D(Args args) {
@@ -34,7 +34,7 @@ public class MixinGlDevice_Stencil {
 
    @Inject(
       method = {"createTexture(Ljava/lang/String;ILcom/mojang/blaze3d/textures/TextureFormat;IIII)Lcom/mojang/blaze3d/textures/GpuTexture;"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onCreatedTexture(
       String label, int usage, TextureFormat format, int width, int height, int depthOrLayers, int mipLevels, CallbackInfoReturnable<GpuTexture> cir

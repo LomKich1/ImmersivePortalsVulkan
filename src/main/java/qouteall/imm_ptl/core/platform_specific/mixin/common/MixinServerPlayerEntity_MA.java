@@ -18,10 +18,10 @@ import qouteall.imm_ptl.core.portal.custom_portal_gen.CustomPortalGenManager;
 public class MixinServerPlayerEntity_MA {
    @Inject(
       method = {"teleportTo(Lnet/minecraft/world/TeleportTarget;)Lnet/minecraft/server/network/ServerPlayerEntity;"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onChangeDimensionByVanilla(TeleportTarget dimensionTransition, CallbackInfoReturnable<ServerPlayerEntity> cir) {
-      ServerPlayerEntity this_ = (ServerPlayerEntity)this;
+      ServerPlayerEntity this_ = (ServerPlayerEntity)(Object)this;
       if (dimensionTransition.world() != this_.getEntityWorld()) {
          onBeforeDimensionTravel(this_);
       }
@@ -29,7 +29,7 @@ public class MixinServerPlayerEntity_MA {
 
    @Inject(
       method = {"teleport(Lnet/minecraft/server/world/ServerWorld;DDDLjava/util/Set;FFZ)Z"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onTeleported(
       ServerWorld targetWorld,
@@ -42,7 +42,7 @@ public class MixinServerPlayerEntity_MA {
       boolean setCamera,
       CallbackInfoReturnable<Boolean> cir
    ) {
-      ServerPlayerEntity this_ = (ServerPlayerEntity)this;
+      ServerPlayerEntity this_ = (ServerPlayerEntity)(Object)this;
       if (this_.getEntityWorld() != targetWorld) {
          onBeforeDimensionTravel(this_);
       }

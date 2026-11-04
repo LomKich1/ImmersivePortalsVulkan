@@ -76,56 +76,56 @@ import qouteall.q_misc_util.platform.ClientPlatform;
 @Environment(EnvType.CLIENT)
 public class ClientDebugCommand {
    public static <S> void register(CommandDispatcher<S> dispatcher, ClientPlatform.ClientCommandSupport<S> support) {
-      LiteralArgumentBuilder<S> builder = (LiteralArgumentBuilder<S>)((LiteralArgumentBuilder)LiteralArgumentBuilder.literal("imm_ptl_client_debug")
+      LiteralArgumentBuilder<S> builder = (LiteralArgumentBuilder<S>)((LiteralArgumentBuilder)LiteralArgumentBuilder.<S>literal("imm_ptl_client_debug")
             .requires(commandSource -> true))
          .then(
-            LiteralArgumentBuilder.literal("set_max_portal_layer")
+            LiteralArgumentBuilder.<S>literal("set_max_portal_layer")
                .then(
                   RequiredArgumentBuilder.argument("argMaxPortalLayer", IntegerArgumentType.integer())
                      .executes(context -> setMaxPortalLayer(IntegerArgumentType.getInteger(context, "argMaxPortalLayer")))
                )
          );
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("list_portals").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("list_portals").executes(context -> {
          ClientDebugCommand.RemoteCallables.doListPortals();
          return 0;
       }));
       builder = (LiteralArgumentBuilder<S>)builder.then(
-         LiteralArgumentBuilder.literal("is_client_chunk_loaded")
+         LiteralArgumentBuilder.<S>literal("is_client_chunk_loaded")
             .then(
                RequiredArgumentBuilder.argument("chunkX", IntegerArgumentType.integer())
                   .then(RequiredArgumentBuilder.argument("chunkZ", IntegerArgumentType.integer()).executes(ClientDebugCommand::isClientChunkLoaded))
             )
       );
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("report_player_status").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("report_player_status").executes(context -> {
          ClientDebugCommand.RemoteCallables.reportClientPlayerStatus();
          return 0;
       }));
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("client_remote_ticking_enable").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("client_remote_ticking_enable").executes(context -> {
          IPCGlobal.isClientRemoteTickingEnabled = true;
          return 0;
       }));
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("client_remote_ticking_disable").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("client_remote_ticking_disable").executes(context -> {
          IPCGlobal.isClientRemoteTickingEnabled = false;
          return 0;
       }));
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("advanced_frustum_culling_enable").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("advanced_frustum_culling_enable").executes(context -> {
          IPCGlobal.doUseAdvancedFrustumCulling = true;
          return 0;
       }));
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("advanced_frustum_culling_disable").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("advanced_frustum_culling_disable").executes(context -> {
          IPCGlobal.doUseAdvancedFrustumCulling = false;
          return 0;
       }));
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("report_resource_consumption").executes(context1 -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("report_resource_consumption").executes(context1 -> {
          ClientDebugCommand.RemoteCallables.reportResourceConsumption();
          return 0;
       }));
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("get_player_colliding_portal_client").executes(context -> {
-         Portal collidingPortal = ((IEEntity)MinecraftClient.getInstance().player).ip_getCollidingPortal();
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("get_player_colliding_portal_client").executes(context -> {
+         Portal collidingPortal = ((IEEntity)(Object)MinecraftClient.getInstance().player).ip_getCollidingPortal();
          CHelper.printChat(collidingPortal != null ? collidingPortal.toString() : "null");
          return 0;
       }));
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("report_rendering").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("report_rendering").executes(context -> {
          StringBuilder sb = new StringBuilder();
 
          for (List<WeakReference<Portal>> rendering : RenderStates.lastPortalRenderInfos) {
@@ -140,9 +140,9 @@ public class ClientDebugCommand {
          CHelper.printChat(sb.toString());
          return 0;
       }));
-      builder.then(LiteralArgumentBuilder.literal("report_loaded_portals").executes(context -> {
+      builder.then(LiteralArgumentBuilder.<S>literal("report_loaded_portals").executes(context -> {
          for (ClientWorld world : ClientWorldLoader.getClientWorlds()) {
-            EntityList entityList = ((IEClientWorld)world).ip_getEntityList();
+            EntityList entityList = ((IEClientWorld)(Object)world).ip_getEntityList();
             entityList.forEach(e -> {
                if (e instanceof Portal portal) {
                   CHelper.printChat(portal.toString());
@@ -152,32 +152,32 @@ public class ClientDebugCommand {
 
          return 0;
       }));
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("vanilla_chunk_culling_enable").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("vanilla_chunk_culling_enable").executes(context -> {
          MinecraftClient.getInstance().chunkCullingEnabled = true;
          return 0;
       }));
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("vanilla_chunk_culling_disable").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("vanilla_chunk_culling_disable").executes(context -> {
          MinecraftClient.getInstance().chunkCullingEnabled = false;
          return 0;
       }));
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("render_mode_normal").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("render_mode_normal").executes(context -> {
          IPGlobal.renderMode = IPGlobal.RenderMode.normal;
          return 0;
       }));
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("render_mode_compatibility").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("render_mode_compatibility").executes(context -> {
          IPGlobal.renderMode = IPGlobal.RenderMode.compatibility;
          return 0;
       }));
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("render_mode_debug").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("render_mode_debug").executes(context -> {
          IPGlobal.renderMode = IPGlobal.RenderMode.debug;
          return 0;
       }));
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal("render_mode_none").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("render_mode_none").executes(context -> {
          IPGlobal.renderMode = IPGlobal.RenderMode.none;
          return 0;
       }));
       builder.then(
-         LiteralArgumentBuilder.literal("check_client_light")
+         LiteralArgumentBuilder.<S>literal("check_client_light")
             .executes(
                context -> {
                   MinecraftClient client = MinecraftClient.getInstance();
@@ -191,7 +191,7 @@ public class ClientDebugCommand {
                }
             )
       );
-      builder.then(LiteralArgumentBuilder.literal("report_client_entities").executes(context -> {
+      builder.then(LiteralArgumentBuilder.<S>literal("report_client_entities").executes(context -> {
          ClientWorld world = MinecraftClient.getInstance().world;
          CHelper.printChat("client entity manager:");
 
@@ -200,12 +200,12 @@ public class ClientDebugCommand {
          }
 
          CHelper.printChat("client entity list:");
-         EntityList entityList = ((IEClientWorld)world).ip_getEntityList();
+         EntityList entityList = ((IEClientWorld)(Object)world).ip_getEntityList();
          entityList.forEach(e -> CHelper.printChat(e.toString()));
          return 0;
       }));
       builder.then(
-         LiteralArgumentBuilder.literal("check_server_light")
+         LiteralArgumentBuilder.<S>literal("check_server_light")
             .executes(
                context -> {
                   MinecraftServer server = MiscHelper.getServer();
@@ -220,7 +220,7 @@ public class ClientDebugCommand {
                }
             )
       );
-      builder.then(LiteralArgumentBuilder.literal("update_server_light").executes(context -> {
+      builder.then(LiteralArgumentBuilder.<S>literal("update_server_light").executes(context -> {
          MinecraftServer server = MiscHelper.getServer();
          server.execute(() -> {
             ServerPlayerEntity player = (ServerPlayerEntity)server.getPlayerManager().getPlayerList().get(0);
@@ -230,7 +230,7 @@ public class ClientDebugCommand {
          return 0;
       }));
       builder.then(
-         LiteralArgumentBuilder.literal("report_rebuild_status")
+         LiteralArgumentBuilder.<S>literal("report_rebuild_status")
             .executes(
                context -> {
                   MinecraftClient.getInstance()
@@ -238,7 +238,7 @@ public class ClientDebugCommand {
                         () -> ClientWorldLoader.getClientWorlds()
                            .forEach(
                               world -> {
-                                 ImmPtlViewArea builtChunkStorage = (ImmPtlViewArea)((IEWorldRenderer)ClientWorldLoader.getWorldRenderer(world.getRegistryKey()))
+                                 ImmPtlViewArea builtChunkStorage = (ImmPtlViewArea)((IEWorldRenderer)(Object)ClientWorldLoader.getWorldRenderer(world.getRegistryKey()))
                                     .ip_getBuiltChunkStorage();
                                  CHelper.printChat(world.getRegistryKey().getValue().toString() + builtChunkStorage.getDebugString());
                               }
@@ -249,7 +249,7 @@ public class ClientDebugCommand {
             )
       );
       builder.then(
-         LiteralArgumentBuilder.literal("report_client_light_status")
+         LiteralArgumentBuilder.<S>literal("report_client_light_status")
             .executes(
                context -> {
                   MinecraftClient.getInstance()
@@ -285,37 +285,37 @@ public class ClientDebugCommand {
                }
             )
       );
-      builder.then(LiteralArgumentBuilder.literal("reload_world_renderer").executes(context -> {
+      builder.then(LiteralArgumentBuilder.<S>literal("reload_world_renderer").executes(context -> {
          MinecraftClient.getInstance().execute(() -> {
             ClientWorldLoader.disposeRenderHelpers();
             MinecraftClient.getInstance().worldRenderer.reload();
          });
          return 0;
       }));
-      builder.then(LiteralArgumentBuilder.literal("config").executes(context -> {
+      builder.then(LiteralArgumentBuilder.<S>literal("config").executes(context -> {
          MinecraftClient client = MinecraftClient.getInstance();
          IPGlobal.CLIENT_TASK_LIST.addTask(MyTaskList.oneShotTask(() -> client.setScreen(IPConfigGUI.createClothConfigScreen(null))));
          return 0;
       }));
-      builder.then(LiteralArgumentBuilder.literal("disable_warning").executes(context -> {
+      builder.then(LiteralArgumentBuilder.<S>literal("disable_warning").executes(context -> {
          disableWarning();
          support.sendFeedback((S)context.getSource(), Text.translatable("imm_ptl.warning_disabled"));
          return 0;
       }));
       builder.then(
-         LiteralArgumentBuilder.literal("disable_warning_for")
+         LiteralArgumentBuilder.<S>literal("disable_warning_for")
             .then(RequiredArgumentBuilder.argument("warningKey", StringArgumentType.string()).executes(context -> {
                disableWarningFor(StringArgumentType.getString(context, "warningKey"));
                support.sendFeedback((S)context.getSource(), Text.translatable("imm_ptl.warning_disabled"));
                return 0;
             }))
       );
-      builder.then(LiteralArgumentBuilder.literal("disable_update_check").executes(context -> {
+      builder.then(LiteralArgumentBuilder.<S>literal("disable_update_check").executes(context -> {
          disableUpdateCheck();
          support.sendFeedback((S)context.getSource(), Text.translatable("imm_ptl.update_check_disabled"));
          return 0;
       }));
-      builder.then(LiteralArgumentBuilder.literal("view_portal_data").executes(context -> {
+      builder.then(LiteralArgumentBuilder.<S>literal("view_portal_data").executes(context -> {
          MinecraftClient client = MinecraftClient.getInstance();
          Pair<Portal, Vec3d> pair = PortalCommand.getPlayerPointingPortalRaw(client.player, 0.0F, 50.0, true).orElse(null);
          if (pair != null) {
@@ -332,7 +332,7 @@ public class ClientDebugCommand {
       }));
       if (O_O.isDevEnv()) {
          builder.then(
-            LiteralArgumentBuilder.literal("tp_on_client_side")
+            LiteralArgumentBuilder.<S>literal("tp_on_client_side")
                .then(
                   RequiredArgumentBuilder.argument("dim_id", StringArgumentType.string())
                      .then(
@@ -355,21 +355,21 @@ public class ClientDebugCommand {
          );
       }
 
-      builder.then(LiteralArgumentBuilder.literal("show_mod_id_list").executes(context -> {
+      builder.then(LiteralArgumentBuilder.<S>literal("show_mod_id_list").executes(context -> {
          List<String> loadedModIds = O_O.getLoadedModIds();
          String str = String.join("\n", loadedModIds);
          support.sendFeedback((S)context.getSource(), Text.literal(str));
          return 0;
       }));
       builder.then(
-         LiteralArgumentBuilder.literal("force_main_thread_chunk_rebuild")
+         LiteralArgumentBuilder.<S>literal("force_main_thread_chunk_rebuild")
             .then(RequiredArgumentBuilder.argument("frameCount", IntegerArgumentType.integer(0, 10000)).executes(context -> {
                int frameCount = IntegerArgumentType.getInteger(context, "frameCount");
                ForceMainThreadRebuild.forceMainThreadRebuildFor(frameCount);
                return 0;
             }))
       );
-      LiteralArgumentBuilder<S> wandBuilder = LiteralArgumentBuilder.literal("wand");
+      LiteralArgumentBuilder<S> wandBuilder = LiteralArgumentBuilder.<S>literal("wand");
       registerPortalWandCommands(wandBuilder, support);
       builder.then(wandBuilder);
       registerSwitchCommand(builder, "front_clipping", cond -> IPCGlobal.useFrontClipping = cond);
@@ -402,11 +402,11 @@ public class ClientDebugCommand {
       registerSwitchCommand(builder, "teleportation_debug", cond -> IPGlobal.teleportationDebugEnabled = cond);
       registerSwitchCommand(builder, "debug_text_to_top", cond -> IPGlobal.moveDebugTextToTop = cond);
       registerSwitchCommand(builder, "box_portal_special_iteration", cond -> IPGlobal.boxPortalSpecialIteration = cond);
-      builder.then(LiteralArgumentBuilder.literal("print_class_path").executes(context -> {
+      builder.then(LiteralArgumentBuilder.<S>literal("print_class_path").executes(context -> {
          printClassPath();
          return 0;
       }));
-      builder.then(LiteralArgumentBuilder.literal("test_invalid_rpc").executes(context -> {
+      builder.then(LiteralArgumentBuilder.<S>literal("test_invalid_rpc").executes(context -> {
          McRemoteProcedureCall.tellServerToInvoke("aaa.bbb.WrongClassRemoteCallable.method");
          return 0;
       }));
@@ -415,7 +415,7 @@ public class ClientDebugCommand {
 
    private static <S> void registerPortalWandCommands(LiteralArgumentBuilder<S> builder, ClientPlatform.ClientCommandSupport<S> support) {
       builder.then(
-         LiteralArgumentBuilder.literal("set_cursor_alignment")
+         LiteralArgumentBuilder.<S>literal("set_cursor_alignment")
             .then(RequiredArgumentBuilder.argument("alignment", IntegerArgumentType.integer(0)).executes(context -> {
                int alignment = IntegerArgumentType.getInteger(context, "alignment");
                IPConfig config = IPConfig.getConfig();
@@ -437,11 +437,11 @@ public class ClientDebugCommand {
    }
 
    private static <S> void registerSwitchCommand(LiteralArgumentBuilder<S> builder, String name, Consumer<Boolean> setFunction) {
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal(name + "_enable").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal(name + "_enable").executes(context -> {
          setFunction.accept(true);
          return 0;
       }));
-      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.literal(name + "_disable").executes(context -> {
+      builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal(name + "_disable").executes(context -> {
          setFunction.accept(false);
          return 0;
       }));
@@ -560,7 +560,7 @@ public class ClientDebugCommand {
             .forEach(
                (dimension, worldRenderer) -> str.append(
                   String.format(
-                     "%s %s\n", dimension.getValue(), ((ImmPtlViewArea)((IEWorldRenderer)worldRenderer).ip_getBuiltChunkStorage()).getManagedSectionNum()
+                     "%s %s\n", dimension.getValue(), ((ImmPtlViewArea)((IEWorldRenderer)(Object)worldRenderer).ip_getBuiltChunkStorage()).getManagedSectionNum()
                   )
                )
             );

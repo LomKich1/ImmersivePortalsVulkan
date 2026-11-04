@@ -21,7 +21,7 @@ public class MixinClientboundCustomPayloadPacket implements IECustomPayloadPacke
 
    @Inject(
       method = {"apply(Lnet/minecraft/network/listener/ClientCommonPacketListener;)V"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onHandle(ClientCommonPacketListener clientCommonPacketListener, CallbackInfo ci) {

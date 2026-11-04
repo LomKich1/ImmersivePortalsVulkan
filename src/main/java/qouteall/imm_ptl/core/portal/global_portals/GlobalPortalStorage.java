@@ -272,7 +272,7 @@ public class GlobalPortalStorage extends PersistentState {
    @Environment(EnvType.CLIENT)
    public static void receiveGlobalPortalSync(RegistryKey<World> dimension, NbtCompound compoundTag) {
       ClientWorld world = ClientWorldLoader.getWorld(dimension);
-      List<Portal> oldGlobalPortals = ((IEClientWorld)world).ip_getGlobalPortals();
+      List<Portal> oldGlobalPortals = ((IEClientWorld)(Object)world).ip_getGlobalPortals();
       if (oldGlobalPortals != null) {
          for (Portal p : oldGlobalPortals) {
             p.remove(RemovalReason.KILLED);
@@ -288,7 +288,7 @@ public class GlobalPortalStorage extends PersistentState {
          ClientWorldLoader.getWorld(p.getDestDim());
       }
 
-      ((IEClientWorld)world).ip_setGlobalPortals(newPortals);
+      ((IEClientWorld)(Object)world).ip_setGlobalPortals(newPortals);
       LOGGER.info("Global Portals Updated {}", dimension.getValue());
    }
 

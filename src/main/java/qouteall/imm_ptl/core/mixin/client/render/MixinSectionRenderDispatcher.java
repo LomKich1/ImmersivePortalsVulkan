@@ -19,10 +19,10 @@ public class MixinSectionRenderDispatcher {
 
    @Redirect(
       method = {"<init>"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/BufferBuilderStorage;getBlockBufferBuildersPool()Lnet/minecraft/client/render/chunk/BlockBufferBuilderPool;"
-      )}
+      )
    )
    private BlockBufferBuilderPool redirectSectionBufferBuilderPool(BufferBuilderStorage instance) {
       if (ClientWorldLoader.getIsCreatingClientWorld() && !SodiumInterface.invoker.isSodiumPresent()) {

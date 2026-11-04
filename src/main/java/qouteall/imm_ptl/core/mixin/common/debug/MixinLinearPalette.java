@@ -10,10 +10,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class MixinLinearPalette<T> {
    @Redirect(
       method = {"writePacket"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/util/collection/IndexedIterable;getRawId(Ljava/lang/Object;)I"
-      )}
+      )
    )
    private int onGetId(IndexedIterable<T> idMap, T object) {
       int id = idMap.getRawId(object);

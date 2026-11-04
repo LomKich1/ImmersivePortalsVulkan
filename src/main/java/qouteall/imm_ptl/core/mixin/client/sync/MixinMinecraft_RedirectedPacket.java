@@ -20,11 +20,11 @@ public abstract class MixinMinecraft_RedirectedPacket extends ReentrantThreadExe
 
    @Inject(
       method = {"Lnet/minecraft/client/MinecraftClient;createTask(Ljava/lang/Runnable;)Ljava/lang/Runnable;"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onCreateTask(Runnable runnable, CallbackInfoReturnable<Runnable> cir) {
-      MinecraftClient this_ = (MinecraftClient)this;
+      MinecraftClient this_ = (MinecraftClient)(Object)this;
       RegistryKey<World> redirectedDimension = PacketRedirectionClient.clientTaskRedirection.get();
       if (redirectedDimension != null) {
          Runnable newRunnable = () -> ClientWorldLoader.withSwitchedWorldFailSoft(redirectedDimension, runnable);

@@ -12,10 +12,10 @@ import qouteall.imm_ptl.core.render.context_management.WorldRenderInfo;
 public class MixinSkyRenderer {
    @Redirect(
       method = {"isSkyDark"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/network/ClientPlayerEntity;getCameraPosVec(F)Lnet/minecraft/util/math/Vec3d;"
-      )}
+      )
    )
    private Vec3d redirectGetEyePositionInSkyRendering(ClientPlayerEntity player, float partialTicks) {
       return WorldRenderInfo.isRendering() ? WorldRenderInfo.getCameraPos() : player.getCameraPosVec(partialTicks);

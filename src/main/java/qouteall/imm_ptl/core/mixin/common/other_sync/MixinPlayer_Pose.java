@@ -11,12 +11,12 @@ import qouteall.imm_ptl.core.ducks.IEEntity;
 public class MixinPlayer_Pose {
    @Inject(
       method = {"updatePose"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onUpdatePlayerPose(CallbackInfo ci) {
-      PlayerEntity this_ = (PlayerEntity)this;
-      if (!this_.getEntityWorld().isClient() && ((IEEntity)this_).ip_isRecentlyCollidingWithPortal()) {
+      PlayerEntity this_ = (PlayerEntity)(Object)this;
+      if (!this_.getEntityWorld().isClient() && ((IEEntity)(Object)this_).ip_isRecentlyCollidingWithPortal()) {
          ci.cancel();
       }
    }

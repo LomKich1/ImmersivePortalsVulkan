@@ -12,11 +12,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinParticleGroup {
    @Inject(
       method = {"tickParticle"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onTickParticle(Particle particle, CallbackInfo ci) {
-      if (((IEParticle)particle).portal_getWorld() != MinecraftClient.getInstance().world) {
+      if (((IEParticle)(Object)particle).portal_getWorld() != MinecraftClient.getInstance().world) {
          ci.cancel();
       }
    }

@@ -100,7 +100,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @Inject(
       method = {"render"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onFarBeforeRendering(RenderTickCounter deltaTracker, boolean renderWorldIn, CallbackInfo ci) {
       Profilers.get().push("ip_pre_total_render");
@@ -127,10 +127,10 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @Inject(
       method = {"render"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/GameRenderer;renderWorld(Lnet/minecraft/client/render/RenderTickCounter;)V"
-      )}
+      )
    )
    private void onBeforeRenderingCenter(RenderTickCounter deltaTracker, boolean bl, CallbackInfo ci) {
       PortalRenderer.switchToCorrectRenderer();
@@ -139,11 +139,11 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @Inject(
       method = {"render"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/GameRenderer;renderWorld(Lnet/minecraft/client/render/RenderTickCounter;)V",
          shift = Shift.AFTER
-      )}
+      )
    )
    private void onAfterRenderingCenter(RenderTickCounter deltaTracker, boolean bl, CallbackInfo ci) {
       IPCGlobal.renderer.finishRendering();
@@ -159,10 +159,10 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @Redirect(
       method = {"render"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/GameRenderer;renderWorld(Lnet/minecraft/client/render/RenderTickCounter;)V"
-      )}
+      )
    )
    private void redirectRenderingWorld(GameRenderer gameRenderer, RenderTickCounter deltaTracker) {
       if (!CrossPortalViewRendering.renderCrossPortalView()) {
@@ -172,7 +172,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @Inject(
       method = {"renderWorld"},
-      at = {@At("TAIL")}
+      at = @At("TAIL")
    )
    private void onRenderCenterEnded(RenderTickCounter deltaTracker, CallbackInfo ci) {
       IPCGlobal.renderer.onHandRenderingEnded();
@@ -180,10 +180,10 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @WrapOperation(
       method = {"renderWorld"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/WorldRenderer;render(Lnet/minecraft/client/util/ObjectAllocator;Lnet/minecraft/client/render/RenderTickCounter;ZLnet/minecraft/client/render/Camera;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V"
-      )}
+      )
    )
    private void wrapRenderLevel(
       WorldRenderer instance,
@@ -209,7 +209,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @Inject(
       method = {"Lnet/minecraft/client/render/GameRenderer;onResized(II)V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onOnResized(int int_1, int int_2, CallbackInfo ci) {
       if (ClientWorldLoader.getIsInitialized()) {
@@ -223,7 +223,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @Inject(
       method = {"renderHand"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onRenderHandBegins(float partialTick, boolean sleeping, Matrix4f modelView, CallbackInfo ci) {
@@ -236,7 +236,7 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @Inject(
       method = {"renderHand"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onRenderHandEnds(float partialTick, boolean sleeping, Matrix4f modelView, CallbackInfo ci) {
       portal_isRenderingHand = false;
@@ -244,10 +244,10 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @WrapOperation(
       method = {"renderWorld"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearDepthTexture(Lcom/mojang/blaze3d/textures/GpuTexture;D)V"
-      )}
+      )
    )
    private void wrapClearDepthForHand(CommandEncoder encoder, GpuTexture depthTexture, double depth, Operation<Void> original) {
       if (this.ip_doRenderHand) {
@@ -257,10 +257,10 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @WrapOperation(
       method = {"renderWorld"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/gui/hud/InGameOverlayRenderer;renderOverlays(ZFLnet/minecraft/client/render/command/OrderedRenderCommandQueue;)V"
-      )}
+      )
    )
    private void wrapRenderScreenEffect(
       InGameOverlayRenderer instance, boolean sleeping, float partialTick, OrderedRenderCommandQueue collector, Operation<Void> original
@@ -272,10 +272,10 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @ModifyArg(
       method = {"bobView"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"
-      )},
+      ),
       index = 0
    )
    private float modifyBobViewTranslateX(float f) {
@@ -284,10 +284,10 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @ModifyArg(
       method = {"bobView"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"
-      )},
+      ),
       index = 1
    )
    private float modifyBobViewTranslateY(float f) {
@@ -296,10 +296,10 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @ModifyArg(
       method = {"bobView"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"
-      )},
+      ),
       index = 2
    )
    private float modifyBobViewTranslateZ(float f) {
@@ -308,11 +308,11 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @Redirect(
       method = {"renderWorld"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/GameRenderer;getBasicProjectionMatrix(F)Lorg/joml/Matrix4f;",
          ordinal = 0
-      )}
+      )
    )
    private Matrix4f redirectGetBasicProjectionMatrix(GameRenderer instance, float fov) {
       if (PortalRendering.isRendering()) {
@@ -330,10 +330,10 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @WrapOperation(
       method = {"renderWorld"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/RawProjectionMatrix;set(Lorg/joml/Matrix4f;)Lcom/mojang/blaze3d/buffers/GpuBufferSlice;"
-      )}
+      )
    )
    private GpuBufferSlice wrapUploadProjectionMatrix(RawProjectionMatrix instance, Matrix4f projectionMatrix, Operation<GpuBufferSlice> original) {
       RenderStates.projectionMatrix = new Matrix4f(projectionMatrix);
@@ -342,10 +342,10 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @WrapOperation(
       method = {"renderWorld"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/fog/FogRenderer;applyFog(Lnet/minecraft/client/render/Camera;ILnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;"
-      )}
+      )
    )
    private Vector4f wrapSetupFog(
       FogRenderer instance,
@@ -363,11 +363,11 @@ public abstract class MixinGameRenderer implements IEGameRenderer {
 
    @WrapOperation(
       method = {"renderWorld"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lorg/joml/Matrix4f;rotation(Lorg/joml/Quaternionfc;)Lorg/joml/Matrix4f;",
          remap = false
-      )}
+      )
    )
    private Matrix4f wrapCameraTransformation(Matrix4f instance, Quaternionfc quat, Operation<Matrix4f> original) {
       Matrix4f r = (Matrix4f)original.call(new Object[]{instance, quat});

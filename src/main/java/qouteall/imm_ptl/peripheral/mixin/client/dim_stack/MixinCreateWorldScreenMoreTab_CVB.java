@@ -16,12 +16,12 @@ import qouteall.imm_ptl.peripheral.ducks.IECreateWorldScreen;
 public class MixinCreateWorldScreenMoreTab_CVB {
    @Inject(
       method = {"<init>"},
-      at = {@At("RETURN")},
+      at = @At("RETURN"),
       locals = LocalCapture.CAPTURE_FAILHARD
    )
    private void onInitEnd(CreateWorldScreen createWorldScreen, CallbackInfo ci, Adder rowHelper) {
       rowHelper.add(
-         ButtonWidget.builder(Text.translatable("imm_ptl.altius_screen_button"), button -> ((IECreateWorldScreen)createWorldScreen).ip_openDimStackScreen())
+         ButtonWidget.builder(Text.translatable("imm_ptl.altius_screen_button"), button -> ((IECreateWorldScreen)(Object)createWorldScreen).ip_openDimStackScreen())
             .width(210)
             .build()
       );

@@ -92,15 +92,15 @@ public abstract class MixinServerGamePacketListenerImpl implements IEServerPlayN
 
    @Inject(
       method = {"Lnet/minecraft/server/network/ServerPlayNetworkHandler;onPlayerMove(Lnet/minecraft/network/packet/c2s/play/PlayerMoveC2SPacket;)V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          shift = Shift.AFTER,
          target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/server/world/ServerWorld;)V"
-      )},
+      ),
       cancellable = true
    )
    private void onProcessMovePacket(PlayerMoveC2SPacket packet, CallbackInfo ci) {
-      RegistryKey<World> packetDimension = ((IEPlayerMoveC2SPacket)packet).ip_getPlayerDimension();
+      RegistryKey<World> packetDimension = ((IEPlayerMoveC2SPacket)(Object)packet).ip_getPlayerDimension();
       if (packetDimension == null) {
          LOGGER.error("Player move packet is missing dimension info. Maybe the player client doesn't install iPortal");
          ServerTaskList.of(this.player.server).addTask(() -> {
@@ -164,14 +164,14 @@ public abstract class MixinServerGamePacketListenerImpl implements IEServerPlayN
          this.requestedTeleportPos = this.player.getEntityPos();
          this.ip_dimOfAwaitingPosition = this.player.getEntityWorld().getRegistryKey();
          PlayerPositionLookS2CPacket lookPacket = PlayerPositionLookS2CPacket.of(this.requestedTeleportId, posMoveRot, relativeAttrs);
-         ((IEPlayerPositionLookS2CPacket)lookPacket).ip_setPlayerDimension(this.player.getEntityWorld().getRegistryKey());
+         ((IEPlayerPositionLookS2CPacket)(Object)lookPacket).ip_setPlayerDimension(this.player.getEntityWorld().getRegistryKey());
          this.player.networkHandler.sendPacket(lookPacket);
       }
    }
 
    @Inject(
       method = {"isEntityNotCollidingWithBlocks"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    @IPVanillaCopy
@@ -179,12 +179,12 @@ public abstract class MixinServerGamePacketListenerImpl implements IEServerPlayN
       WorldView level, Entity entity, Box playerBB, double newX, double newY, double newZ, CallbackInfoReturnable<Boolean> cir
    ) {
       if (IPGlobal.crossPortalCollision) {
-         Box activePlayerBB = ((IEEntity)entity).ip_getActiveCollisionBox(playerBB);
+         Box activePlayerBB = ((IEEntity)(Object)entity).ip_getActiveCollisionBox(playerBB);
          if (activePlayerBB == null) {
             cir.setReturnValue(false);
          } else {
             Box newBB = entity.getBoundingBox().offset(newX - entity.getX(), newY - entity.getY(), newZ - entity.getZ());
-            Box activeNewBB = ((IEEntity)entity).ip_getActiveCollisionBox(newBB);
+            Box activeNewBB = ((IEEntity)(Object)entity).ip_getActiveCollisionBox(newBB);
             if (activeNewBB == null) {
                cir.setReturnValue(false);
             } else {
@@ -206,20 +206,20 @@ public abstract class MixinServerGamePacketListenerImpl implements IEServerPlayN
 
    @Inject(
       method = {"tick"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onTick(CallbackInfo ci) {
-      if (((IEEntity)this.player).ip_isRecentlyCollidingWithPortal()) {
+      if (((IEEntity)(Object)this.player).ip_isRecentlyCollidingWithPortal()) {
          this.floating = false;
       }
    }
 
    @Inject(
       method = {"onTeleportConfirm"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/server/network/ServerPlayerEntity;updatePositionAndAngles(DDDFF)V"
-      )}
+      )
    )
    private void onHandleAcceptTeleportPacket(TeleportConfirmC2SPacket packet, CallbackInfo ci) {
       if (this.ip_dimOfAwaitingPosition == null) {
@@ -241,11 +241,11 @@ public abstract class MixinServerGamePacketListenerImpl implements IEServerPlayN
 
    @Inject(
       method = {"onClientCommand"},
-      at = {@At(
+      at = @At(
          value = "FIELD",
          target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;requestedTeleportPos:Lnet/minecraft/util/math/Vec3d;",
          opcode = 181
-      )}
+      )
    )
    private void onTeleportPlayerCancelSleeping(ClientCommandC2SPacket packet, CallbackInfo ci) {
       this.ip_dimOfAwaitingPosition = this.player.getEntityWorld().getRegistryKey();

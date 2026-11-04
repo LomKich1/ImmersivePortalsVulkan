@@ -24,20 +24,20 @@ public abstract class MixinMinecraftServer_DimStack_CVB {
 
    @Inject(
       method = {"Lnet/minecraft/server/MinecraftServer;createWorlds()V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/server/MinecraftServer;setupSpawn(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/level/ServerWorldProperties;ZZLnet/minecraft/world/chunk/ChunkLoadProgress;)V"
-      )}
+      )
    )
    private void onBeforeSetupSpawn(CallbackInfo ci) {
-      DimStackManagement.onServerEarlyInit((MinecraftServer)this);
+      DimStackManagement.onServerEarlyInit((MinecraftServer)(Object)this);
    }
 
    @Inject(
       method = {"Lnet/minecraft/server/MinecraftServer;createWorlds()V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onCreateWorldsFinishes(CallbackInfo ci) {
-      DimStackManagement.onServerCreatedWorlds((MinecraftServer)this);
+      DimStackManagement.onServerCreatedWorlds((MinecraftServer)(Object)this);
    }
 }

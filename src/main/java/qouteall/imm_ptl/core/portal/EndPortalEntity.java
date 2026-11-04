@@ -73,8 +73,8 @@ public class EndPortalEntity extends Portal {
          doCreateEndPlatform(endDim);
          EnderDragonFight dragonFight = endDim.getEnderDragonFight();
          if (dragonFight != null) {
-            if (((IEEndDragonFight)dragonFight).ip_getNeedsStateScanning()) {
-               ((IEEndDragonFight)dragonFight).ip_scanState();
+            if (((IEEndDragonFight)(Object)dragonFight).ip_getNeedsStateScanning()) {
+               ((IEEndDragonFight)(Object)dragonFight).ip_scanState();
             }
          }
       }
@@ -232,7 +232,7 @@ public class EndPortalEntity extends Portal {
                double mul = 0.5;
                player.setVelocity(player.getVelocity().x * mul, player.getVelocity().y * mul, player.getVelocity().z * mul);
             }
-         } else if (this.getNormal().y > 0.5 && ((IEEntity)player).ip_getCollidingPortal() == this) {
+         } else if (this.getNormal().y > 0.5 && ((IEEntity)(Object)player).ip_getCollidingPortal() == this) {
             Vec3d cameraPosVec = player.getCameraPosVec(1.0F);
             double dist = this.getDistanceToNearestPointInPortal(cameraPosVec);
             if (dist < 1.0) {

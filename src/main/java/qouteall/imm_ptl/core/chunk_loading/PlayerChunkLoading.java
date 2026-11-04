@@ -86,7 +86,7 @@ public class PlayerChunkLoading {
                         return true;
                      } else {
                         ServerChunkLoadingManager chunkMap = world.getChunkManager().chunkLoadingManager;
-                        ChunkHolder chunkHolder = ((IEChunkMap)chunkMap).ip_getChunkHolder(record.chunkPos);
+                        ChunkHolder chunkHolder = ((IEChunkMap)(Object)chunkMap).ip_getChunkHolder(record.chunkPos);
                         if (chunkHolder == null) {
                            return false;
                         } else {

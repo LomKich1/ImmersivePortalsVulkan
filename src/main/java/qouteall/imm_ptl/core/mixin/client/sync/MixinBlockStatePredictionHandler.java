@@ -17,12 +17,12 @@ public class MixinBlockStatePredictionHandler {
 
    @Inject(
       method = {"incrementSequence"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onStartPredictingEnd(CallbackInfoReturnable<PendingUpdateManager> cir) {
       for (ClientWorld clientWorld : ClientWorldLoader.getClientWorlds()) {
-         PendingUpdateManager handler = ((IEClientWorld)clientWorld).ip_getBlockStatePredictionHandler();
-         ((IEBlockStatePredictionHandler)handler).ip_setCurrentSequenceNumber(this.sequence);
+         PendingUpdateManager handler = ((IEClientWorld)(Object)clientWorld).ip_getBlockStatePredictionHandler();
+         ((IEBlockStatePredictionHandler)(Object)handler).ip_setCurrentSequenceNumber(this.sequence);
       }
    }
 }

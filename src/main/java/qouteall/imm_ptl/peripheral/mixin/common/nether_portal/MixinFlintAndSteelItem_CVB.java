@@ -27,7 +27,7 @@ import qouteall.imm_ptl.peripheral.portal_generation.IntrinsicPortalGeneration;
 public class MixinFlintAndSteelItem_CVB {
    @Inject(
       method = {"Lnet/minecraft/item/FlintAndSteelItem;useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onUseFlintAndSteel(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {

@@ -61,18 +61,18 @@ public abstract class MixinMinecraftServer extends ReentrantThreadExecutor<Serve
 
    @Inject(
       method = {"Lnet/minecraft/server/MinecraftServer;createWorlds()V"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onBeforeCreateWorlds(CallbackInfo ci) {
       Validate.isTrue(!this.ip_canDirectlyRegisterDimension, "invalid server initialization status", new Object[0]);
       this.ip_canDirectlyRegisterDimension = true;
-      DimensionAPI.SERVER_DIMENSIONS_LOAD_EVENT.invoker().run((MinecraftServer)this);
+      DimensionAPI.SERVER_DIMENSIONS_LOAD_EVENT.invoker().run((MinecraftServer)(Object)this);
       this.ip_canDirectlyRegisterDimension = false;
    }
 
    @Inject(
       method = {"Lnet/minecraft/server/MinecraftServer;createWorlds()V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onFinishedLoadingAllWorlds(CallbackInfo ci) {
       this.ip_finishedCreatingWorlds = true;

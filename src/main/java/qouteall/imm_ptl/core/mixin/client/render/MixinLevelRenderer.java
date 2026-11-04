@@ -150,7 +150,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Inject(
       method = {"renderBlockLayers"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onPrepareChunkRenders(Matrix4fc modelView, double camX, double camY, double camZ, CallbackInfoReturnable<SectionRenderState> cir) {
       this.ip_nestedRenderSerialAtPrepare = MyGameRenderer.nestedRenderSerial;
@@ -208,7 +208,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
                int sliceIndex = infoIndex;
                drawsPerLayer.get(layer)
                   .add(
-                     new RenderObject(
+                     new RenderObject<GpuBufferSlice[]>(
                         0,
                         buffers.getVertexBuffer(),
                         indexBuffer,
@@ -228,10 +228,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @WrapOperation(
       method = {"lambda$addMainPass$1", "method_62214"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/SectionRenderState;renderSection(Lnet/minecraft/client/render/BlockRenderLayerGroup;Lnet/minecraft/client/gl/GpuSampler;)V"
-      )},
+      ),
       require = 1
    )
    private void wrapRenderSectionLayerGroup(
@@ -293,10 +293,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Inject(
       method = {"lambda$addMainPass$1", "method_62214"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/TexturedRenderLayers;getItemTranslucentCull()Lnet/minecraft/client/render/RenderLayer;"
-      )},
+      ),
       require = 1
    )
    private void onMyBeforeTranslucentRendering(CallbackInfo ci, @Local(argsOnly = true) Matrix4f modelView) {
@@ -309,12 +309,12 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Inject(
       method = {"lambda$addMainPass$1", "method_62214"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;drawCurrentLayer()V",
          ordinal = 0,
          shift = Shift.AFTER
-      )},
+      ),
       require = 1
    )
    @IPVanillaCopy
@@ -324,10 +324,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @WrapOperation(
       method = {"lambda$addMainPass$1", "method_62214"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/WorldRenderer;collectGizmos()V"
-      )},
+      ),
       require = 1
    )
    private void wrapFinalizeGizmoCollection(WorldRenderer instance, Operation<Void> original) {
@@ -338,10 +338,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @WrapOperation(
       method = {"lambda$addMainPass$1", "method_62214"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/gizmo/GizmoDrawerImpl;draw(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/render/state/CameraRenderState;Lorg/joml/Matrix4f;)V"
-      )},
+      ),
       require = 1
    )
    private void wrapRenderGizmos(
@@ -359,10 +359,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @WrapOperation(
       method = {"render"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/debug/DebugRenderer;render(Lnet/minecraft/client/render/Frustum;DDDF)V"
-      )}
+      )
    )
    private void wrapEmitDebugGizmos(DebugRenderer instance, Frustum frustum, double x, double y, double z, float partialTick, Operation<Void> original) {
       if (!WorldRenderInfo.isRendering()) {
@@ -372,10 +372,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @WrapOperation(
       method = {"render"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/debug/GameTestDebugRenderer;render()V"
-      )}
+      )
    )
    private void wrapEmitGameTestGizmos(GameTestDebugRenderer instance, Operation<Void> original) {
       if (!WorldRenderInfo.isRendering()) {
@@ -385,7 +385,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Inject(
       method = {"renderLateDebug"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onAddLateDebugPass(CallbackInfo ci) {
@@ -396,7 +396,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Inject(
       method = {"render"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onAfterTranslucentRendering(
       ObjectAllocator resourceAllocator,
@@ -417,11 +417,11 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @WrapOperation(
       method = {"render"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/FramePass;setRenderer(Ljava/lang/Runnable;)V",
          ordinal = 0
-      )}
+      )
    )
    private void wrapClearPass(FramePass pass, Runnable runnable, Operation<Void> original) {
       original.call(new Object[]{pass, (Runnable)() -> {
@@ -433,10 +433,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Redirect(
       method = {"render"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/world/ClientWorld;runQueuedChunkUpdates()V"
-      )}
+      )
    )
    private void redirectRunQueuedChunkUpdates(ClientWorld world) {
       ClientWorldLoader.withSwitchedWorld(world, world::runQueuedChunkUpdates);
@@ -444,7 +444,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Inject(
       method = {"renderSky(Lnet/minecraft/client/render/FrameGraphBuilder;Lnet/minecraft/client/render/Camera;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", "addSkyPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/client/Camera;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Matrix4f;)V"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true,
       require = 1
    )
@@ -456,10 +456,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @WrapOperation(
       method = {"renderSky(Lnet/minecraft/client/render/FrameGraphBuilder;Lnet/minecraft/client/render/Camera;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", "addSkyPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/client/Camera;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Matrix4f;)V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/FramePass;setRenderer(Ljava/lang/Runnable;)V"
-      )},
+      ),
       require = 1
    )
    private void wrapSkyPass(FramePass pass, Runnable runnable, Operation<Void> original) {
@@ -475,10 +475,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @WrapOperation(
       method = {"lambda$addWeatherPass$4", "method_62216"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/WeatherRendering;renderPrecipitation(Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/client/render/state/WeatherRenderState;)V"
-      )},
+      ),
       require = 1
    )
    private void wrapRenderWeather(
@@ -498,7 +498,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Inject(
       method = {"updateCamera"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onSetupTerrainBegin(Camera camera, Frustum frustum, boolean spectator, CallbackInfo ci) {
@@ -509,7 +509,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
       if (this.ip_allowOverrideTerrainSetup() && WorldRenderInfo.isRendering()) {
          Profilers.get().push("ip_terrain_setup");
          VisibleSectionDiscovery.discoverVisibleSections(
-            this.world, (ImmPtlViewArea)this.chunks, camera, new Frustum(frustum).coverBoxAroundSetPosition(8), this.builtChunks
+            this.world, (ImmPtlViewArea)(Object)this.chunks, camera, new Frustum(frustum).coverBoxAroundSetPosition(8), this.builtChunks
          );
          Profilers.get().pop();
          ci.cancel();
@@ -522,7 +522,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Inject(
       method = {"updateCamera"},
-      at = {@At("RETURN")},
+      at = @At("RETURN"),
       cancellable = true
    )
    private void onSetupTerrainEnd(Camera camera, Frustum frustum, boolean spectator, CallbackInfo ci) {
@@ -531,13 +531,13 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
             MyGameRenderer.vanillaTerrainSetupOverride--;
             Profilers.get().push("ip_terrain_setup");
             VisibleSectionDiscovery.discoverVisibleSections(
-               this.world, (ImmPtlViewArea)this.chunks, camera, new Frustum(frustum).coverBoxAroundSetPosition(8), this.builtChunks
+               this.world, (ImmPtlViewArea)(Object)this.chunks, camera, new Frustum(frustum).coverBoxAroundSetPosition(8), this.builtChunks
             );
             Profilers.get().pop();
          } else if (IPGlobal.alwaysOverrideTerrainSetup) {
             Profilers.get().push("ip_terrain_setup_debug");
             VisibleSectionDiscovery.discoverVisibleSections(
-               this.world, (ImmPtlViewArea)this.chunks, camera, new Frustum(frustum).coverBoxAroundSetPosition(8), this.builtChunks
+               this.world, (ImmPtlViewArea)(Object)this.chunks, camera, new Frustum(frustum).coverBoxAroundSetPosition(8), this.builtChunks
             );
             Profilers.get().pop();
          }
@@ -546,7 +546,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @ModifyVariable(
       method = {"updateCamera"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       argsOnly = true,
       ordinal = 0
    )
@@ -556,10 +556,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Redirect(
       method = {"reload()V"},
-      at = {@At(
+      at = @At(
          value = "NEW",
          target = "(Lnet/minecraft/client/render/chunk/ChunkBuilder;Lnet/minecraft/world/World;ILnet/minecraft/client/render/WorldRenderer;)Lnet/minecraft/client/render/BuiltChunkStorage;"
-      )}
+      )
    )
    private BuiltChunkStorage redirectConstructingBuildChunkStorage(ChunkBuilder chunkBuilder_1, World world_1, int int_1, WorldRenderer worldRenderer_1) {
       return (BuiltChunkStorage)(IPCGlobal.useHackedChunkRenderDispatcher
@@ -569,7 +569,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Inject(
       method = {"fillEntityRenderStates"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onBeginExtractingEntities(Camera camera, Frustum frustum, RenderTickCounter deltaTracker, WorldRenderState levelRenderState, CallbackInfo ci) {
       CrossPortalEntityRenderer.onBeginExtractingEntities();
@@ -577,10 +577,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @WrapOperation(
       method = {"fillEntityRenderStates"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/entity/EntityRenderManager;shouldRender(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/Frustum;DDD)Z"
-      )}
+      )
    )
    private boolean wrapShouldRenderForDeferring(
       EntityRenderManager dispatcher,
@@ -603,10 +603,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @WrapOperation(
       method = {"fillEntityRenderStates"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/entity/Entity;hasPassengerDeep(Lnet/minecraft/entity/Entity;)Z"
-      )}
+      )
    )
    private boolean wrapHasIndirectPassengerForDeferring(Entity entity, Entity passenger, Operation<Boolean> original) {
       return CrossPortalEntityRenderer.isLastDeferredEntity(entity) ? false : (Boolean)original.call(new Object[]{entity, passenger});
@@ -626,7 +626,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Inject(
       method = {"reload()V"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onReloadStarted(CallbackInfo ci) {
@@ -638,10 +638,10 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Inject(
       method = {"reload()V"},
-      at = {@At("TAIL")}
+      at = @At("TAIL")
    )
    private void onReloadFinished(CallbackInfo ci) {
-      WorldRenderer this_ = (WorldRenderer)this;
+      WorldRenderer this_ = (WorldRenderer)(Object)this;
       if (!ClientWorldLoader.getIsCreatingClientWorld()) {
          Validate.isTrue(MinecraftClient.getInstance().worldRenderer == this_);
          ClientWorldLoader._onWorldRendererReloaded();
@@ -650,7 +650,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    @Inject(
       method = {"isRenderingReady"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onIsChunkCompiled(BlockPos blockPos, CallbackInfoReturnable<Boolean> cir) {

@@ -20,11 +20,11 @@ import qouteall.imm_ptl.peripheral.wand.PortalWandItem;
 public class MixinLevelRenderer_PortalWand {
    @Inject(
       method = {"lambda$addMainPass$1", "method_62214"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/gizmo/GizmoDrawerImpl;draw(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/render/state/CameraRenderState;Lorg/joml/Matrix4f;)V",
          shift = Shift.AFTER
-      )},
+      ),
       require = 1
    )
    private void onRender(

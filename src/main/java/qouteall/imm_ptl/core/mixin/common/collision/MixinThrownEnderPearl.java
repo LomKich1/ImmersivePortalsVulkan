@@ -15,13 +15,13 @@ import qouteall.q_misc_util.Helper;
 public class MixinThrownEnderPearl {
    @Inject(
       method = {"onCollision"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/entity/projectile/thrown/EnderPearlEntity;discard()V"
-      )}
+      )
    )
    private void onOnHitDiscard(HitResult result, CallbackInfo ci) {
-      EnderPearlEntity this_ = (EnderPearlEntity)this;
+      EnderPearlEntity this_ = (EnderPearlEntity)(Object)this;
       if (this_.getOwner() instanceof ServerPlayerEntity serverPlayer
          && serverPlayer.networkHandler.isConnectionOpen()
          && serverPlayer.getEntityWorld() != this_.getEntityWorld()
