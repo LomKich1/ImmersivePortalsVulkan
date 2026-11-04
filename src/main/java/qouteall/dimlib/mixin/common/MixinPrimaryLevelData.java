@@ -13,7 +13,7 @@ import qouteall.dimlib.config.DimLibConfig;
 public class MixinPrimaryLevelData {
    @Inject(
       method = {"getLifecycle"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onWorldGenSettingsLifecycle(CallbackInfoReturnable<Lifecycle> cir) {

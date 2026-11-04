@@ -14,7 +14,7 @@ import qouteall.imm_ptl.core.chunk_loading.ImmPtlChunkTracking;
 public class MixinPlayerManager_MA {
    @Inject(
       method = {"respawnPlayer"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onPlayerRespawn(ServerPlayerEntity oldPlayer, boolean bl, RemovalReason removalReason, CallbackInfoReturnable<ServerPlayerEntity> cir) {
       ImmPtlChunkTracking.removePlayerFromChunkTrackersAndEntityTrackers(oldPlayer);
@@ -22,7 +22,7 @@ public class MixinPlayerManager_MA {
 
    @Inject(
       method = {"remove"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onPlayerDisconnect(ServerPlayerEntity player, CallbackInfo ci) {
       ImmPtlChunkTracking.removePlayerFromChunkTrackersAndEntityTrackers(player);

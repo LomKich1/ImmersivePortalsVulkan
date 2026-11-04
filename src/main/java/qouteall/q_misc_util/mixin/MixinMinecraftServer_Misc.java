@@ -43,7 +43,7 @@ public abstract class MixinMinecraftServer_Misc extends ReentrantThreadExecutor 
 
    @Inject(
       method = {"<init>"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onConstruct(
       Thread thread,
@@ -56,15 +56,15 @@ public abstract class MixinMinecraftServer_Misc extends ReentrantThreadExecutor 
       ChunkLoadProgress levelLoadListener,
       CallbackInfo ci
    ) {
-      MiscGlobals.refMinecraftServer = new WeakReference<>((MinecraftServer)this);
+      MiscGlobals.refMinecraftServer = new WeakReference<>((MinecraftServer)(Object)this);
    }
 
    @Inject(
       method = {"createWorlds"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onWorldsCreated(CallbackInfo ci) {
-      DimensionIntId.onServerStarted((MinecraftServer)this);
+      DimensionIntId.onServerStarted((MinecraftServer)(Object)this);
    }
 
    @Override

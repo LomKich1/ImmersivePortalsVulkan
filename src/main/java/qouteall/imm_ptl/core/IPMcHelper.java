@@ -130,7 +130,7 @@ public class IPMcHelper {
             if (hitResult.getPos().squaredDistanceTo(start) < intersection.squaredDistanceTo(start)) {
                return new Pair(hitResult, portals);
             } else {
-               IERayTraceContext betterContext = (IERayTraceContext)context;
+               IERayTraceContext betterContext = (IERayTraceContext)(Object)context;
                betterContext.ip_setStart(portal.transformPoint(intersection)).ip_setEnd(portal.transformPoint(end));
                portals.add(portal);
                World destWorld = portal.getDestinationWorld();

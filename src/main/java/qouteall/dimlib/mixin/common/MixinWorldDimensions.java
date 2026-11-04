@@ -15,7 +15,7 @@ import qouteall.dimlib.DimensionImpl;
 public class MixinWorldDimensions {
    @Inject(
       method = {"isVanilla"},
-      at = {@At("RETURN")},
+      at = @At("RETURN"),
       cancellable = true
    )
    private static void onIsVanillaLike(RegistryKey<DimensionOptions> resourceKey, DimensionOptions levelStem, CallbackInfoReturnable<Boolean> cir) {
@@ -27,11 +27,11 @@ public class MixinWorldDimensions {
 
    @Redirect(
       method = {"toConfig"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lcom/mojang/serialization/Lifecycle;experimental()Lcom/mojang/serialization/Lifecycle;",
          remap = false
-      )}
+      )
    )
    private Lifecycle redirectLifecycle() {
       return Lifecycle.stable();

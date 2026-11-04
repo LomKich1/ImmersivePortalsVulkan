@@ -57,7 +57,7 @@ public class EnvironmentStripMixinPlugin implements IMixinConfigPlugin {
             }
 
             Method isDedicatedServer = dist.getClass().getMethod("isDedicatedServer");
-            return isDedicatedServer.invoke(dist) ? "SERVER" : "CLIENT";
+            return (Boolean)isDedicatedServer.invoke(dist) ? "SERVER" : "CLIENT";
          } catch (Throwable var9) {
          }
       }
@@ -100,12 +100,12 @@ public class EnvironmentStripMixinPlugin implements IMixinConfigPlugin {
             }
          }
 
-         it = node.methods.iterator();
+         Iterator<MethodNode> methodIt = node.methods.iterator();
 
-         while (it.hasNext()) {
-            MethodNode method = (MethodNode)it.next();
+         while (methodIt.hasNext()) {
+            MethodNode method = methodIt.next();
             if (isForOtherSide(method.visibleAnnotations, envType) || isForOtherSide(method.invisibleAnnotations, envType)) {
-               it.remove();
+               methodIt.remove();
             }
          }
 

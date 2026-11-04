@@ -119,7 +119,7 @@ public class NormalSkylandGenerator extends NoiseChunkGenerator {
          noiseParametersHolderGetter,
          seed
       );
-      ((IEChunkGenerator_AlternateDim)result)
+      ((IEChunkGenerator_AlternateDim)(Object)result)
          .ip_setFeaturesPerStep(Suppliers.memoize(() -> PlacedFeatureIndexer.collectIndexedFeatures(List.copyOf(overworldBiomeSource.getBiomes()), holder -> {
             Biome biome = (Biome)holder.value();
             GenerationSettings bgs = biome.getGenerationSettings();
@@ -134,9 +134,9 @@ public class NormalSkylandGenerator extends NoiseChunkGenerator {
    }
 
    public CompletableFuture<Chunk> populateNoise(Blender blender, NoiseConfig noiseConfig, StructureAccessor structureAccessor, Chunk chunk) {
-      ((IEChunkAccess_AlternateDim)chunk).ip_setNoiseChunk(null);
+      ((IEChunkAccess_AlternateDim)(Object)chunk).ip_setNoiseChunk(null);
       return this.delegate.populateNoise(blender, this.delegatedRandomState, structureAccessor, chunk).thenApply(c -> {
-         ((IEChunkAccess_AlternateDim)c).ip_setNoiseChunk(null);
+         ((IEChunkAccess_AlternateDim)(Object)c).ip_setNoiseChunk(null);
          return (Chunk)c;
       });
    }

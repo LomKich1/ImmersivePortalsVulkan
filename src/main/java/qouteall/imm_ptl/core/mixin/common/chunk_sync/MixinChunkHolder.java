@@ -28,22 +28,22 @@ public class MixinChunkHolder implements IEChunkHolder {
 
    @ModifyVariable(
       method = {"sendPacketToPlayers"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       argsOnly = true
    )
    private Packet<?> modifyPacket(Packet<?> packet) {
-      ServerWorld serverWorld = (ServerWorld)this.world;
+      ServerWorld serverWorld = (ServerWorld)(Object)this.world;
       return PacketRedirection.createRedirectedMessage(serverWorld.getServer(), serverWorld.getRegistryKey(), (Packet<ClientPlayPacketListener>)packet);
    }
 
    @Redirect(
       method = {"flushUpdates"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/server/world/ChunkHolder$PlayersWatchingChunkProvider;getPlayersWatchingChunk(Lnet/minecraft/util/math/ChunkPos;Z)Ljava/util/List;"
-      )}
+      )
    )
    private List<ServerPlayerEntity> redirectGetPlayers(PlayersWatchingChunkProvider playerProvider, ChunkPos chunkPos, boolean boundaryOnly) {
-      return ImmPtlChunkTracking.getPlayersViewingChunk(((World)this.world).getRegistryKey(), chunkPos.x, chunkPos.z, boundaryOnly);
+      return ImmPtlChunkTracking.getPlayersViewingChunk(((World)(Object)this.world).getRegistryKey(), chunkPos.x, chunkPos.z, boundaryOnly);
    }
 }

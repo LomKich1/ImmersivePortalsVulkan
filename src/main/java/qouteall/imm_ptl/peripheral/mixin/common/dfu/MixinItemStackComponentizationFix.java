@@ -20,7 +20,7 @@ public class MixinItemStackComponentizationFix {
 
    @Inject(
       method = {"fixStack"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private static void onFixItemStack(StackData itemStackData, Dynamic<?> tag, CallbackInfo ci) {
       if (itemStackData.itemEquals("immersive_portals:command_stick")) {

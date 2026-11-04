@@ -11,10 +11,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinLivingEntity {
    @Inject(
       method = {"Lnet/minecraft/entity/LivingEntity;tick()V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onTickEnded(CallbackInfo ci) {
-      LivingEntity this_ = (LivingEntity)this;
+      LivingEntity this_ = (LivingEntity)(Object)this;
       if (this_.getAttacker() != null && this_.getAttacker().getEntityWorld() != this_.getEntityWorld()) {
          this_.setAttacker(null);
       }

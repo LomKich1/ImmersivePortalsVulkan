@@ -44,11 +44,11 @@ public class MixinServerPlayerGameMode {
 
    @Redirect(
       method = {"continueMining", "processBlockBreakingAction", "finishMining", "tryBreakBlock"},
-      at = {@At(
+      at = @At(
          value = "FIELD",
          opcode = 180,
          target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;world:Lnet/minecraft/server/world/ServerWorld;"
-      )}
+      )
    )
    private ServerWorld redirectGetLevel(ServerPlayerInteractionManager serverPlayerGameMode) {
       return this.ip_getActualWorld();
@@ -56,10 +56,10 @@ public class MixinServerPlayerGameMode {
 
    @Redirect(
       method = {"continueMining", "processBlockBreakingAction"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/server/network/ServerPlayerEntity;getEntityWorld()Lnet/minecraft/server/world/ServerWorld;"
-      )}
+      )
    )
    private ServerWorld redirectGetLevel(ServerPlayerEntity instance) {
       return this.ip_getActualWorld();
@@ -67,10 +67,10 @@ public class MixinServerPlayerGameMode {
 
    @Redirect(
       method = {"interactBlock"},
-      at = {@At(
+      at = @At(
          value = "NEW",
          target = "(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/item/ItemUsageContext;"
-      )}
+      )
    )
    private ItemUsageContext redirectNewUseOnContext(PlayerEntity player, Hand interactionHand, BlockHitResult blockHitResult) {
       return new ItemUsageContext(this.ip_getActualWorld(), player, interactionHand, player.getStackInHand(interactionHand), blockHitResult);
@@ -78,10 +78,10 @@ public class MixinServerPlayerGameMode {
 
    @WrapOperation(
       method = {"processBlockBreakingAction"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/server/network/ServerPlayerEntity;canInteractWithBlockAt(Lnet/minecraft/util/math/BlockPos;D)Z"
-      )}
+      )
    )
    private boolean wrapDistanceInHandleBlockBreakAction(ServerPlayerEntity instance, BlockPos blockPos, double v, Operation<Boolean> original) {
       BlockManipulationServer.Context redirect = BlockManipulationServer.REDIRECT_CONTEXT.get();
@@ -90,11 +90,11 @@ public class MixinServerPlayerGameMode {
 
    @Inject(
       method = {"processBlockBreakingAction"},
-      at = {@At(
+      at = @At(
          value = "FIELD",
          opcode = 181,
          target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;miningPos:Lnet/minecraft/util/math/BlockPos;"
-      )}
+      )
    )
    private void onSetDestroyPos(BlockPos pos, Action action, Direction face, int maxBuildHeight, int sequence, CallbackInfo ci) {
       this.ip_destroyPosLevel = this.ip_getActualWorld();
@@ -102,11 +102,11 @@ public class MixinServerPlayerGameMode {
 
    @Inject(
       method = {"processBlockBreakingAction"},
-      at = {@At(
+      at = @At(
          value = "FIELD",
          opcode = 181,
          target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;failedMiningPos:Lnet/minecraft/util/math/BlockPos;"
-      )}
+      )
    )
    private void onSetDelayedDestroyPos(BlockPos pos, Action action, Direction face, int maxBuildHeight, int sequence, CallbackInfo ci) {
       this.ip_destroyPosLevel = this.ip_getActualWorld();
@@ -114,11 +114,11 @@ public class MixinServerPlayerGameMode {
 
    @Redirect(
       method = {"update"},
-      at = {@At(
+      at = @At(
          value = "FIELD",
          opcode = 180,
          target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;world:Lnet/minecraft/server/world/ServerWorld;"
-      )}
+      )
    )
    private ServerWorld redirectLevelOnTicking(ServerPlayerInteractionManager instance) {
       return this.ip_destroyPosLevel != null ? this.ip_destroyPosLevel : this.world;
@@ -126,7 +126,7 @@ public class MixinServerPlayerGameMode {
 
    @Inject(
       method = {"update"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onTickingEnd(CallbackInfo ci) {
       if (!this.failedToMine && !this.mining) {

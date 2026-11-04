@@ -1,5 +1,6 @@
 package qouteall.imm_ptl.core;
 
+import qouteall.imm_ptl.core.compat.RenderBackendCompat;
 import com.google.gson.Gson;
 import java.util.function.Consumer;
 import me.shedaniel.autoconfig.ConfigHolder;
@@ -35,7 +36,7 @@ public class IPGlobal {
    public static boolean looseMovementCheck = false;
    public static boolean pureMirror = false;
    public static int portalRenderLimit = 200;
-   public static boolean cacheGlBuffer = true;
+   public static boolean cacheGlBuffer = RenderBackendCompat.isRawGlAvailable();
    public static boolean reducedPortalRendering = false;
    public static boolean useSecondaryEntityVertexConsumer = true;
    public static boolean cullSectionsBehind = true;

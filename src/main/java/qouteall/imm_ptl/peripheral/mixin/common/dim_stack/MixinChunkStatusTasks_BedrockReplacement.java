@@ -17,7 +17,7 @@ import qouteall.imm_ptl.peripheral.dim_stack.DimStackManagement;
 public class MixinChunkStatusTasks_BedrockReplacement {
    @Inject(
       method = {"generateEntities"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private static void onGenerateSpawn(
       ChunkGenerationContext worldGenContext,

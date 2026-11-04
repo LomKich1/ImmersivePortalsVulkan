@@ -1,5 +1,6 @@
 package qouteall.imm_ptl.core.render;
 
+import qouteall.imm_ptl.core.compat.RenderBackendCompat;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.buffers.Std140Builder;
@@ -108,6 +109,10 @@ public class MyRenderHelper {
    }
 
    public static void bindRenderTargetFbo(Framebuffer target) {
+      if (!RenderBackendCompat.isRawGlAvailable()) {
+         return;
+      }
+
       GlStateManager._glBindFramebuffer(36160, getFbo(target));
    }
 
@@ -332,7 +337,7 @@ public class MyRenderHelper {
    }
 
    public static void drawFramebufferInGui(DrawContext guiGraphics, Framebuffer framebuffer, int x0, int y0, int x1, int y1) {
-      GuiRenderState guiRenderState = ((IEGuiGraphics)guiGraphics).ip_getGuiRenderState();
+      GuiRenderState guiRenderState = ((IEGuiGraphics)(Object)guiGraphics).ip_getGuiRenderState();
       guiRenderState.addSimpleElement(
          new TexturedQuadGuiElementRenderState(
             RenderPipelines.GUI_TEXTURED,
@@ -376,10 +381,18 @@ public class MyRenderHelper {
    }
 
    public static void applyMirrorFaceCulling() {
+      if (!RenderBackendCompat.isRawGlAvailable()) {
+         return;
+      }
+
       GL11.glCullFace(1028);
    }
 
    public static void recoverFaceCulling() {
+      if (!RenderBackendCompat.isRawGlAvailable()) {
+         return;
+      }
+
       GL11.glCullFace(1029);
    }
 
@@ -408,7 +421,7 @@ public class MyRenderHelper {
    }
 
    public static void debugFramebufferDepth() {
-      if (debugEnabled) {
+      if (debugEnabled && RenderBackendCompat.isRawGlAvailable()) {
          debugEnabled = false;
          int width = client.getFramebuffer().textureWidth;
          int height = client.getFramebuffer().textureHeight;

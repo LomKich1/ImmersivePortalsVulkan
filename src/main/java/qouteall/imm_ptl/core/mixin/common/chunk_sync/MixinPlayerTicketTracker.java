@@ -12,7 +12,7 @@ import qouteall.imm_ptl.core.platform_specific.IPConfig;
 public class MixinPlayerTicketTracker {
    @Inject(
       method = {"Lnet/minecraft/server/world/ChunkLevelManager$NearbyChunkTicketUpdater;onDistanceChange(JII)V", "setWatchDistance", "Lnet/minecraft/server/world/ChunkLevelManager$NearbyChunkTicketUpdater;updateTicket(JIZZ)V", "updateLevels"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onInject(CallbackInfo ci) {

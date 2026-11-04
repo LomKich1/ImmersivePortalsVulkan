@@ -18,7 +18,7 @@ import qouteall.imm_ptl.core.teleportation.ClientTeleportationManager;
 public class MixinScreenEffectRenderer {
    @Inject(
       method = {"Lnet/minecraft/client/gui/hud/InGameOverlayRenderer;renderInWallOverlay(Lnet/minecraft/client/texture/Sprite;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private static void onRenderInWallOverlay(Sprite sprite, MatrixStack matrices, VertexConsumerProvider bufferSource, CallbackInfo ci) {
@@ -27,7 +27,7 @@ public class MixinScreenEffectRenderer {
       }
 
       ClientPlayerEntity player = MinecraftClient.getInstance().player;
-      if (player != null && ((IEEntity)player).ip_getCollidingPortal() != null) {
+      if (player != null && ((IEEntity)(Object)player).ip_getCollidingPortal() != null) {
          ci.cancel();
       }
 

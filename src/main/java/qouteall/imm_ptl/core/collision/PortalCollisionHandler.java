@@ -229,7 +229,7 @@ public class PortalCollisionHandler {
    }
 
    public static void updateCollidingPortalAfterTeleportation(Entity entity, Vec3d newEyePos, Vec3d newLastTickEyePos, float partialTicks) {
-      ((IEEntity)entity).ip_clearCollidingPortal();
+      ((IEEntity)(Object)entity).ip_clearCollidingPortal();
       McHelper.findEntitiesByBox(
             Portal.class, entity.getEntityWorld(), CollisionHelper.getStretchedBoundingBox(entity), IPGlobal.maxNormalPortalRadius, p -> true
          )

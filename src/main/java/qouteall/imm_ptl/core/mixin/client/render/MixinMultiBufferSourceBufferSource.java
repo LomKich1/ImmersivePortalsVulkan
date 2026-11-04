@@ -14,7 +14,7 @@ import qouteall.imm_ptl.core.render.context_management.RenderStates;
 public class MixinMultiBufferSourceBufferSource {
    @Inject(
       method = {"draw(Lnet/minecraft/client/render/RenderLayer;)V"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onBeginDraw(RenderLayer layer, CallbackInfo ci) {
       if (PortalRendering.isRenderingOddNumberOfMirrors()) {
@@ -25,7 +25,7 @@ public class MixinMultiBufferSourceBufferSource {
 
    @Inject(
       method = {"draw(Lnet/minecraft/client/render/RenderLayer;)V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onEndDraw(RenderLayer layer, CallbackInfo ci) {
       if (RenderStates.shouldForceDisableCull) {

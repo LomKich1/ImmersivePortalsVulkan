@@ -1,5 +1,6 @@
 package qouteall.imm_ptl.core.render.renderer;
 
+import qouteall.imm_ptl.core.compat.RenderBackendCompat;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Comparator;
@@ -250,7 +251,7 @@ public abstract class PortalRenderer {
          IPModInfoChecking.checkShaderpack();
          switch (IPGlobal.renderMode) {
             case normal:
-               switchRenderer(IPCGlobal.rendererUsingStencil);
+               switchRenderer(RenderBackendCompat.supportsStencil() ? IPCGlobal.rendererUsingStencil : IPCGlobal.rendererUsingFrameBuffer);
                break;
             case compatibility:
                switchRenderer(IPCGlobal.rendererUsingFrameBuffer);

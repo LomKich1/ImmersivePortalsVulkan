@@ -61,7 +61,7 @@ public class ImmPtlChunkTracking {
    public static void removePlayerFromChunkTrackersAndEntityTrackers(ServerPlayerEntity oldPlayer) {
       for (ServerWorld world : oldPlayer.server.getWorlds()) {
          ServerChunkManager chunkManager = world.getChunkManager();
-         IEChunkMap storage = (IEChunkMap)chunkManager.chunkLoadingManager;
+         IEChunkMap storage = (IEChunkMap)(Object)chunkManager.chunkLoadingManager;
          storage.ip_onPlayerUnload(oldPlayer);
       }
 
@@ -70,7 +70,7 @@ public class ImmPtlChunkTracking {
 
    public static void onDimensionRemove(ServerWorld world) {
       ServerChunkManager chunkManager = world.getChunkManager();
-      IEChunkMap storage = (IEChunkMap)chunkManager.chunkLoadingManager;
+      IEChunkMap storage = (IEChunkMap)(Object)chunkManager.chunkLoadingManager;
       storage.ip_onDimensionRemove();
       forceRemoveDimension(world);
    }
@@ -83,7 +83,7 @@ public class ImmPtlChunkTracking {
 
    public static PlayerChunkLoading getPlayerInfo(ServerPlayerEntity player) {
       return (PlayerChunkLoading)playerInfoMap.computeIfAbsent(
-         player, p -> new PlayerChunkLoading(((IEServerCommonPacketListenerImpl)p.networkHandler).ip_getConnection().isLocal())
+         player, p -> new PlayerChunkLoading(((IEServerCommonPacketListenerImpl)((ServerPlayerEntity)p).networkHandler).ip_getConnection().isLocal())
       );
    }
 
@@ -558,7 +558,7 @@ public class ImmPtlChunkTracking {
          getPlayerInfo(player).doChunkSending(player);
       }
 
-      IEChunkMap chunkMap = (IEChunkMap)world.getChunkManager().chunkLoadingManager;
+      IEChunkMap chunkMap = (IEChunkMap)(Object)world.getChunkManager().chunkLoadingManager;
 
       for (int x = lowPos.x; x <= highPos.x; x++) {
          for (int zx = lowPos.z; zx <= highPos.z; zx++) {

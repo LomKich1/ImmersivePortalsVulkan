@@ -1,5 +1,6 @@
 package qouteall.imm_ptl.core;
 
+import qouteall.imm_ptl.core.compat.RenderBackendCompat;
 import com.mojang.logging.LogUtils;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,7 +47,7 @@ public class CHelper {
 
    @Nullable
    public static List<Portal> getClientGlobalPortal(World world) {
-      return world instanceof ClientWorld ? ((IEClientWorld)world).ip_getGlobalPortals() : null;
+      return world instanceof ClientWorld ? ((IEClientWorld)(Object)world).ip_getGlobalPortals() : null;
    }
 
    public static Stream<Portal> getClientNearbyPortals(double range) {
@@ -62,6 +63,10 @@ public class CHelper {
    }
 
    public static void doCheckGlError() {
+      if (!RenderBackendCompat.isRawGlAvailable()) {
+         return;
+      }
+
       int errorCode = GL11.glGetError();
       if (errorCode != 0) {
          Helper.err("OpenGL Error" + errorCode);

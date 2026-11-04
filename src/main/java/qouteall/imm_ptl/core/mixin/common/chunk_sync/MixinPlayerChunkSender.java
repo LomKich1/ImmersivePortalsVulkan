@@ -43,7 +43,7 @@ public class MixinPlayerChunkSender implements IEPlayerChunkSender {
 
    @Inject(
       method = {"sendChunkBatches"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    public void sendNextChunks(ServerPlayerEntity serverPlayer, CallbackInfo ci) {

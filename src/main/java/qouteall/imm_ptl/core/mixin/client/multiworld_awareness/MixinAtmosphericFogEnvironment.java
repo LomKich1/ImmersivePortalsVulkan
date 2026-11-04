@@ -23,21 +23,21 @@ public class MixinAtmosphericFogEnvironment {
 
    @Inject(
       method = {"<init>"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onInit(CallbackInfo ci) {
-      ip_instance = (AtmosphericFogModifier)this;
+      ip_instance = (AtmosphericFogModifier)(Object)this;
    }
 
    static {
       FogRendererContext.copyContextFromObject = context -> {
          if (ip_instance != null) {
-            ((MixinAtmosphericFogEnvironment)ip_instance).fogMultiplier = context.rainFogMultiplier;
+            ((MixinAtmosphericFogEnvironment)(Object)ip_instance).fogMultiplier = context.rainFogMultiplier;
          }
       };
       FogRendererContext.copyContextToObject = context -> {
          if (ip_instance != null) {
-            context.rainFogMultiplier = ((MixinAtmosphericFogEnvironment)ip_instance).fogMultiplier;
+            context.rainFogMultiplier = ((MixinAtmosphericFogEnvironment)(Object)ip_instance).fogMultiplier;
          }
       };
       FogRendererContext.init();

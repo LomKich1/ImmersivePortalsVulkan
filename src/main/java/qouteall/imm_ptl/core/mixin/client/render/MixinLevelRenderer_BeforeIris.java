@@ -16,10 +16,10 @@ import qouteall.imm_ptl.core.IPCGlobal;
 public class MixinLevelRenderer_BeforeIris {
    @Inject(
       method = {"lambda$addMainPass$1", "method_62214"},
-      at = {@At(
+      at = @At(
          value = "CONSTANT",
          args = {"stringValue=translucent"}
-      )},
+      ),
       require = 1
    )
    private void iris$beginTranslucents(CallbackInfo ci, @Local(argsOnly = true) Matrix4f modelView) {

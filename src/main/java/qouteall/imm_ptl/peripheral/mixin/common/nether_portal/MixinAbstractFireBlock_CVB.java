@@ -19,10 +19,10 @@ import qouteall.imm_ptl.peripheral.portal_generation.IntrinsicPortalGeneration;
 public class MixinAbstractFireBlock_CVB {
    @Redirect(
       method = {"Lnet/minecraft/block/AbstractFireBlock;onBlockAdded(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Z)V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/world/dimension/NetherPortal;getNewPortal(Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction$Axis;)Ljava/util/Optional;"
-      )}
+      )
    )
    Optional<NetherPortal> redirectCreateAreaHelper(WorldAccess worldAccess, BlockPos blockPos, Axis axis) {
       if (IPGlobal.netherPortalMode == IPGlobal.NetherPortalMode.disabled) {
@@ -50,10 +50,10 @@ public class MixinAbstractFireBlock_CVB {
 
    @Redirect(
       method = {"Lnet/minecraft/block/AbstractFireBlock;shouldLightPortalAt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Ljava/util/Optional;isPresent()Z"
-      )}
+      )
    )
    private static boolean redirectIsPresent(Optional optional) {
       return IPGlobal.netherPortalMode != IPGlobal.NetherPortalMode.vanilla ? true : optional.isPresent();

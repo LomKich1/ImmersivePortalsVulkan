@@ -97,7 +97,7 @@ public class McHelper {
 
    @Deprecated
    public static IEChunkMap getIEChunkMap(RegistryKey<World> dimension) {
-      return (IEChunkMap)getServerWorld(dimension).getChunkManager().chunkLoadingManager;
+      return (IEChunkMap)(Object)getServerWorld(dimension).getChunkManager().chunkLoadingManager;
    }
 
    @Deprecated
@@ -205,7 +205,7 @@ public class McHelper {
    }
 
    public static void setPosAndLastTickPosWithoutTriggeringCallback(Entity entity, Vec3d pos, Vec3d lastTickPos) {
-      ((IEEntity)entity).ip_setPositionWithoutTriggeringCallback(pos);
+      ((IEEntity)(Object)entity).ip_setPositionWithoutTriggeringCallback(pos);
       entity.lastRenderX = lastTickPos.x;
       entity.lastRenderY = lastTickPos.y;
       entity.lastRenderZ = lastTickPos.z;
@@ -253,7 +253,7 @@ public class McHelper {
    }
 
    public static WorldChunk getServerChunkIfPresent(ServerWorld world, int x, int z) {
-      ChunkHolder chunkHolder_ = ((IEChunkMap)world.getChunkManager().chunkLoadingManager).ip_getChunkHolder(ChunkPos.toLong(x, z));
+      ChunkHolder chunkHolder_ = ((IEChunkMap)(Object)world.getChunkManager().chunkLoadingManager).ip_getChunkHolder(ChunkPos.toLong(x, z));
       return chunkHolder_ == null ? null : chunkHolder_.getWorldChunk();
    }
 
@@ -401,8 +401,8 @@ public class McHelper {
       Validate.isTrue(chunkXEnd - chunkXStart < 1000, "range too big", new Object[0]);
       Validate.isTrue(chunkZEnd - chunkZStart < 1000, "range too big", new Object[0]);
       TypeFilter<Entity, T> typeFilter = TypeFilter.instanceOf(entityClass);
-      SectionedEntityCache<Entity> cache = (SectionedEntityCache<Entity>)((IELevelEntityGetterAdapter)entityLookup).getCache();
-      return ((IESectionedEntityCache)cache)
+      SectionedEntityCache<Entity> cache = (SectionedEntityCache<Entity>)((IELevelEntityGetterAdapter)(Object)entityLookup).getCache();
+      return (R)((IESectionedEntityCache)(Object)cache)
          .ip_traverseSectionInBox(
             chunkXStart,
             chunkXEnd,
@@ -410,7 +410,7 @@ public class McHelper {
             chunkYEnd,
             chunkZStart,
             chunkZEnd,
-            entityTrackingSection -> ((IEEntityTrackingSection)entityTrackingSection).ip_traverse((TypeFilter<T, T>)typeFilter, function)
+            entityTrackingSection -> ((IEEntityTrackingSection)(Object)entityTrackingSection).ip_traverse((TypeFilter<T, T>)typeFilter, function)
          );
    }
 
@@ -449,7 +449,7 @@ public class McHelper {
       ChunkSectionPos sectionPos = ChunkSectionPos.from(center);
       return findEntities(
          entityClass,
-         ((IEWorld)world).portal_getEntityLookup(),
+         ((IEWorld)(Object)world).portal_getEntityLookup(),
          sectionPos.getSectionX() - radiusChunks,
          sectionPos.getSectionX() + radiusChunks,
          sectionPos.getSectionY() - radiusChunks,
@@ -485,7 +485,7 @@ public class McHelper {
       int xMax = (int)Math.ceil(box.maxX + maxEntityRadius);
       int yMax = (int)Math.ceil(box.maxY + maxEntityRadius);
       int zMax = (int)Math.ceil(box.maxZ + maxEntityRadius);
-      foreachEntities(entityClass, ((IEWorld)world).portal_getEntityLookup(), xMin >> 4, xMax >> 4, yMin >> 4, yMax >> 4, zMin >> 4, zMax >> 4, consumer);
+      foreachEntities(entityClass, ((IEWorld)(Object)world).portal_getEntityLookup(), xMin >> 4, xMax >> 4, yMin >> 4, yMax >> 4, zMin >> 4, zMax >> 4, consumer);
    }
 
    public static <E extends Entity, R> R traverseEntitiesByApproximateRegion(
@@ -498,7 +498,7 @@ public class McHelper {
       int yMax = (int)Math.ceil(box.maxY + maxEntityRadius);
       int zMax = (int)Math.ceil(box.maxZ + maxEntityRadius);
       return traverseEntities(
-         entityClass, ((IEWorld)world).portal_getEntityLookup(), xMin >> 4, xMax >> 4, yMin >> 4, yMax >> 4, zMin >> 4, zMax >> 4, function
+         entityClass, ((IEWorld)(Object)world).portal_getEntityLookup(), xMin >> 4, xMax >> 4, yMin >> 4, yMax >> 4, zMin >> 4, zMax >> 4, function
       );
    }
 
@@ -522,7 +522,7 @@ public class McHelper {
 
       traverseEntities(
          entityClass,
-         ((IEWorld)world).portal_getEntityLookup(),
+         ((IEWorld)(Object)world).portal_getEntityLookup(),
          sectionPos.getSectionX() - roughRadiusChunks,
          sectionPos.getSectionX() + roughRadiusChunks,
          sectionPos.getSectionY() - roughRadiusChunks,
@@ -674,7 +674,7 @@ public class McHelper {
 
    @Nullable
    public static Entity getEntityByUUID(World world, UUID portalId) {
-      return (Entity)((IEWorld)world).portal_getEntityLookup().get(portalId);
+      return (Entity)((IEWorld)(Object)world).portal_getEntityLookup().get(portalId);
    }
 
    public static Text getDimensionName(RegistryKey<World> dimension) {

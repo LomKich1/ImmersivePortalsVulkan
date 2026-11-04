@@ -43,16 +43,16 @@ public abstract class MixinCamera implements IECamera {
 
    @Inject(
       method = {"Lnet/minecraft/client/render/Camera;update(Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;ZZF)V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onUpdateFinished(World area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float partialTick, CallbackInfo ci) {
-      Camera this_ = (Camera)this;
+      Camera this_ = (Camera)(Object)this;
       WorldRenderInfo.adjustCameraPos(this_);
    }
 
    @Inject(
       method = {"Lnet/minecraft/client/render/Camera;getSubmersionType()Lnet/minecraft/block/enums/CameraSubmersionType;"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void getSubmergedFluidState(CallbackInfoReturnable<CameraSubmersionType> cir) {
@@ -64,7 +64,7 @@ public abstract class MixinCamera implements IECamera {
 
    @Inject(
       method = {"Lnet/minecraft/client/render/Camera;isThirdPerson()Z"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onIsThirdPerson(CallbackInfoReturnable<Boolean> cir) {

@@ -14,10 +14,10 @@ import qouteall.imm_ptl.core.render.context_management.RenderStates;
 public class MixinQuadParticleGroup {
    @WrapOperation(
       method = {"render"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/Frustum;intersectPoint(DDD)Z"
-      )}
+      )
    )
    private boolean wrapParticleFrustumCheck(Frustum frustum, double x, double y, double z, Operation<Boolean> original, @Local BillboardParticle particle) {
       return !RenderStates.shouldRenderParticle(particle) ? false : (Boolean)original.call(new Object[]{frustum, x, y, z});

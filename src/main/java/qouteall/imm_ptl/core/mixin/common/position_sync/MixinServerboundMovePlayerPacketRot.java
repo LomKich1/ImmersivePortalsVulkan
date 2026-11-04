@@ -15,11 +15,11 @@ import qouteall.imm_ptl.core.ducks.IEPlayerMoveC2SPacket;
 public class MixinServerboundMovePlayerPacketRot {
    @Inject(
       method = {"Lnet/minecraft/network/packet/c2s/play/PlayerMoveC2SPacket$LookAndOnGround;read(Lnet/minecraft/network/PacketByteBuf;)Lnet/minecraft/network/packet/c2s/play/PlayerMoveC2SPacket$LookAndOnGround;"},
-      at = {@At("RETURN")},
+      at = @At("RETURN"),
       cancellable = true
    )
    private static void onRead(PacketByteBuf buf, CallbackInfoReturnable<LookAndOnGround> cir) {
       RegistryKey<World> playerDim = buf.readRegistryKey(RegistryKeys.WORLD);
-      ((IEPlayerMoveC2SPacket)cir.getReturnValue()).ip_setPlayerDimension(playerDim);
+      ((IEPlayerMoveC2SPacket)(Object)cir.getReturnValue()).ip_setPlayerDimension(playerDim);
    }
 }

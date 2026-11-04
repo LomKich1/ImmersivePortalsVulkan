@@ -70,15 +70,15 @@ public class PortalAPI {
    }
 
    public static <T extends Portal> T createReversePortal(T portal) {
-      return PortalManipulation.createReversePortal(portal, portal.getType());
+      return (T)PortalManipulation.createReversePortal(portal, (EntityType<Portal>)(EntityType<?>)portal.getType());
    }
 
    public static <T extends Portal> T createFlippedPortal(T portal) {
-      return PortalManipulation.createFlippedPortal(portal, portal.getType());
+      return (T)PortalManipulation.createFlippedPortal(portal, (EntityType<Portal>)(EntityType<?>)portal.getType());
    }
 
    public static <T extends Portal> T copyPortal(Portal portal, EntityType<T> entityType) {
-      return (T)PortalManipulation.copyPortal(portal, entityType);
+      return (T)PortalManipulation.copyPortal(portal, (EntityType<Portal>)(EntityType<?>)entityType);
    }
 
    public static void addGlobalPortal(ServerWorld world, Portal portal) {

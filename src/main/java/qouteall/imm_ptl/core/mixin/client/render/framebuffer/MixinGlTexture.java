@@ -11,9 +11,9 @@ import qouteall.imm_ptl.core.render.StencilDepthTextures;
 public class MixinGlTexture {
    @Inject(
       method = {"free"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onDestroyImmediately(CallbackInfo ci) {
-      StencilDepthTextures.unregister(((GlTexture)this).getGlId());
+      StencilDepthTextures.unregister(((GlTexture)(Object)this).getGlId());
    }
 }

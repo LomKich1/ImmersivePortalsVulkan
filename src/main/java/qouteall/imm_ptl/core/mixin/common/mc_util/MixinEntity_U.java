@@ -12,24 +12,24 @@ import qouteall.imm_ptl.core.mc_utils.IPEntityEventListenableEntity;
 public class MixinEntity_U {
    @Inject(
       method = {"Lnet/minecraft/entity/Entity;setPos(DDD)V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/world/entity/EntityChangeListener;updateEntityPosition()V"
-      )}
+      )
    )
    private void onUpdateEntityPosition(double x, double y, double z, CallbackInfo ci) {
       if (this instanceof IPEntityEventListenableEntity) {
-         ((IPEntityEventListenableEntity)this).ip_onEntityPositionUpdated();
+         ((IPEntityEventListenableEntity)(Object)this).ip_onEntityPositionUpdated();
       }
    }
 
    @Inject(
       method = {"Lnet/minecraft/entity/Entity;setRemoved(Lnet/minecraft/entity/Entity$RemovalReason;)V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onSetRemoved(RemovalReason reason, CallbackInfo ci) {
       if (this instanceof IPEntityEventListenableEntity) {
-         ((IPEntityEventListenableEntity)this).ip_onRemoved(reason);
+         ((IPEntityEventListenableEntity)(Object)this).ip_onRemoved(reason);
       }
    }
 }

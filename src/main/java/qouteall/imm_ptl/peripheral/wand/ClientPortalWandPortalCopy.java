@@ -153,7 +153,7 @@ public class ClientPortalWandPortalCopy {
             Portal portal = WandUtil.getClientPortalByUUID(statusSelectPortal.selectedPortalId);
             if (portal != null) {
                status = new ClientPortalWandPortalCopy.Status_PlacingPortal(
-                  new ClientPortalWandPortalCopy.PlacementRequirement(portal.getWidth(), portal.getHeight()), true
+                  new ClientPortalWandPortalCopy.PlacementRequirement(portal.getPortalWidth(), portal.getPortalHeight()), true
                );
                McRemoteProcedureCall.tellServerToInvoke(
                   "qouteall.imm_ptl.peripheral.wand.PortalWandInteraction.RemoteCallables.copyCutPortal", statusSelectPortal.selectedPortalId, true
@@ -172,7 +172,7 @@ public class ClientPortalWandPortalCopy {
             Portal portal = WandUtil.getClientPortalByUUID(statusSelectPortal.selectedPortalId);
             if (portal != null) {
                status = new ClientPortalWandPortalCopy.Status_PlacingPortal(
-                  new ClientPortalWandPortalCopy.PlacementRequirement(portal.getWidth(), portal.getHeight()), false
+                  new ClientPortalWandPortalCopy.PlacementRequirement(portal.getPortalWidth(), portal.getPortalHeight()), false
                );
                McRemoteProcedureCall.tellServerToInvoke(
                   "qouteall.imm_ptl.peripheral.wand.PortalWandInteraction.RemoteCallables.copyCutPortal", statusSelectPortal.selectedPortalId, false

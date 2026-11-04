@@ -61,7 +61,7 @@ public class ImplRemoteProcedureCall {
    private static final CountDownInt ERROR_MESSAGE_LIMIT = new CountDownInt(10);
    public static final Gson gson = MiscHelper.gson;
    private static final ConcurrentHashMap<String, Method> methodCache = new ConcurrentHashMap<>();
-   private static final ImmutableMap<Class, BiConsumer<RegistryByteBuf, Object>> serializerMap = ImmutableMap.builder()
+   private static final ImmutableMap<Class, BiConsumer<RegistryByteBuf, Object>> serializerMap = ImmutableMap.<Class, BiConsumer<RegistryByteBuf, Object>>builder()
       .put(Identifier.class, (BiConsumer<RegistryByteBuf, Object>)(buf, o) -> buf.writeIdentifier((Identifier)o))
       .put(RegistryKey.class, (BiConsumer<RegistryByteBuf, Object>)(buf, o) -> buf.writeIdentifier(((RegistryKey)o).getValue()))
       .put(BlockPos.class, (BiConsumer<RegistryByteBuf, Object>)(buf, o) -> buf.writeBlockPos((BlockPos)o))
@@ -87,8 +87,8 @@ public class ImplRemoteProcedureCall {
       })
       .put(byte[].class, (BiConsumer<RegistryByteBuf, Object>)(buf, o) -> buf.writeByteArray((byte[])o))
       .build();
-   private static final ImmutableMap<Type, Function<RegistryByteBuf, Object>> deserializerMap = ImmutableMap.builder()
-      .put(Identifier.class, PacketByteBuf::readIdentifier)
+   private static final ImmutableMap<java.lang.reflect.Type, Function<RegistryByteBuf, Object>> deserializerMap = ImmutableMap.<java.lang.reflect.Type, Function<RegistryByteBuf, Object>>builder()
+      .put(Identifier.class, (Function<RegistryByteBuf, Object>)buf -> buf.readIdentifier())
       .put((new TypeToken<RegistryKey<World>>() {}).getType(), (Function<RegistryByteBuf, Object>)buf -> RegistryKey.of(RegistryKeys.WORLD, buf.readIdentifier()))
       .put((new TypeToken<RegistryKey<Biome>>() {}).getType(), (Function<RegistryByteBuf, Object>)buf -> RegistryKey.of(RegistryKeys.BIOME, buf.readIdentifier()))
       .put(BlockPos.class, (Function<RegistryByteBuf, Object>)buf -> buf.readBlockPos())
@@ -121,7 +121,7 @@ public class ImplRemoteProcedureCall {
       return codec.parse(JsonOps.INSTANCE, jsonElement).getOrThrow();
    }
 
-   private static Object deserializeArgument(RegistryByteBuf buf, Type type) {
+   private static Object deserializeArgument(RegistryByteBuf buf, java.lang.reflect.Type type) {
       Function<RegistryByteBuf, Object> deserializer = (Function<RegistryByteBuf, Object>)deserializerMap.get(type);
       if (deserializer == null) {
          String json = buf.readString();
@@ -235,11 +235,11 @@ public class ImplRemoteProcedureCall {
          try {
             methodPath = buf.readString();
             Method method = ImplRemoteProcedureCall.getMethodByPath(methodPath);
-            Type[] genericParameterTypes = method.getGenericParameterTypes();
+            java.lang.reflect.Type[] genericParameterTypes = method.getGenericParameterTypes();
             List<Object> args = new ArrayList<>();
 
             for (int i = 1; i < genericParameterTypes.length; i++) {
-               Type parameterType = genericParameterTypes[i];
+               java.lang.reflect.Type parameterType = genericParameterTypes[i];
                Object obj = ImplRemoteProcedureCall.deserializeArgument(buf, parameterType);
                args.add(obj);
             }
@@ -310,10 +310,10 @@ public class ImplRemoteProcedureCall {
          try {
             methodPath = buf.readString();
             Method method = ImplRemoteProcedureCall.getMethodByPath(methodPath);
-            Type[] genericParameterTypes = method.getGenericParameterTypes();
+            java.lang.reflect.Type[] genericParameterTypes = method.getGenericParameterTypes();
             List<Object> args = new ArrayList<>();
 
-            for (Type parameterType : genericParameterTypes) {
+            for (java.lang.reflect.Type parameterType : genericParameterTypes) {
                Object obj = ImplRemoteProcedureCall.deserializeArgument(buf, parameterType);
                args.add(obj);
             }

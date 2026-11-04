@@ -28,7 +28,7 @@ public class MixinLevelRenderer_Optional {
 
    @Inject(
       method = {"translucencySort"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true,
       require = 0
    )
@@ -40,10 +40,10 @@ public class MixinLevelRenderer_Optional {
 
    @Redirect(
       method = {"updateCamera"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/chunk/ChunkBuilder;setCameraPosition(Lnet/minecraft/util/math/Vec3d;)V"
-      )},
+      ),
       require = 0
    )
    private void onSetChunkBuilderCameraPosition(ChunkBuilder chunkBuilder, Vec3d cameraPosition) {

@@ -65,13 +65,13 @@ public class CrossPortalEntityRenderer {
    private static void onClientTick() {
       collidedEntities.entrySet().removeIf(entry -> {
          Entity entity = entry.getKey();
-         return entity.isRemoved() || !((IEEntity)entity).ip_isCollidingWithPortal();
+         return entity.isRemoved() || !((IEEntity)(Object)entity).ip_isCollidingWithPortal();
       });
    }
 
    public static void onEntityTickClient(Entity entity) {
       if (!(entity instanceof Portal)) {
-         if (((IEEntity)entity).ip_isCollidingWithPortal()) {
+         if (((IEEntity)(Object)entity).ip_isCollidingWithPortal()) {
             collidedEntities.put(entity, null);
          }
       }
@@ -110,7 +110,7 @@ public class CrossPortalEntityRenderer {
       } else if (!collidedEntities.containsKey(entity)) {
          return false;
       } else {
-         PortalCollisionHandler collisionHandler = ((IEEntity)entity).ip_getPortalCollisionHandler();
+         PortalCollisionHandler collisionHandler = ((IEEntity)(Object)entity).ip_getPortalCollisionHandler();
          return collisionHandler != null && !collisionHandler.portalCollisions.isEmpty();
       }
    }
@@ -142,7 +142,7 @@ public class CrossPortalEntityRenderer {
    public static void beforeRenderingEntity(Entity entity, MatrixStack matrixStack) {
       if (isCrossPortalRenderingEnabled()) {
          if (!PortalRendering.isRendering() && collidedEntities.containsKey(entity)) {
-            PortalCollisionHandler collisionHandler = ((IEEntity)entity).ip_getPortalCollisionHandler();
+            PortalCollisionHandler collisionHandler = ((IEEntity)(Object)entity).ip_getPortalCollisionHandler();
             if (collisionHandler != null) {
                for (PortalCollisionEntry e : collisionHandler.portalCollisions) {
                   Portal collidingPortal = e.portal;
@@ -174,7 +174,7 @@ public class CrossPortalEntityRenderer {
       float partialTick = client.getRenderTickCounter().getTickProgress(!client.world.getTickManager().shouldSkipTick(entity));
       Vec3d cameraPos = client.gameRenderer.getCamera().getCameraPos();
       Immediate consumers = client.getBufferBuilders().getEntityVertexConsumers();
-      ((IEWorldRenderer)client.worldRenderer).ip_renderSingleEntity(entity, cameraPos.x, cameraPos.y, cameraPos.z, partialTick, matrixStack, consumers);
+      ((IEWorldRenderer)(Object)client.worldRenderer).ip_renderSingleEntity(entity, cameraPos.x, cameraPos.y, cameraPos.z, partialTick, matrixStack, consumers);
    }
 
    private static void renderEntityProjections(MatrixStack matrixStack) {
@@ -182,7 +182,7 @@ public class CrossPortalEntityRenderer {
          RegistryKey<World> clientDim = client.world.getRegistryKey();
 
          for (Entity entity : collidedEntities.keySet()) {
-            PortalCollisionHandler collisionHandler = ((IEEntity)entity).ip_getPortalCollisionHandler();
+            PortalCollisionHandler collisionHandler = ((IEEntity)(Object)entity).ip_getPortalCollisionHandler();
             if (collisionHandler != null) {
                for (PortalCollisionEntry e : collisionHandler.portalCollisions) {
                   Portal collidingPortal = e.portal;
@@ -280,7 +280,7 @@ public class CrossPortalEntityRenderer {
          Vec3d newCameraPos = entityInstantPos.subtract(newEntityInstantPos).add(cameraPos);
          setupEntityProjectionRenderingTransformation(transformingPortal, matrixStack, entityPos, entityLastTickPos, newCameraPos);
          Immediate consumers = client.getBufferBuilders().getEntityVertexConsumers();
-         ((IEWorldRenderer)client.worldRenderer)
+         ((IEWorldRenderer)(Object)client.worldRenderer)
             .ip_renderSingleEntity(entity, newCameraPos.x, newCameraPos.y, newCameraPos.z, RenderStates.getPartialTick(), matrixStack, consumers);
          consumers.draw();
       } finally {
@@ -335,7 +335,7 @@ public class CrossPortalEntityRenderer {
          return true;
       } else if (PortalRendering.isRendering()) {
          Portal renderingPortal = PortalRendering.getRenderingPortal();
-         Portal collidingPortal = ((IEEntity)entity).ip_getCollidingPortal();
+         Portal collidingPortal = ((IEEntity)(Object)entity).ip_getCollidingPortal();
          if (entity instanceof PlayerEntity && !renderingPortal.getDoRenderPlayer()) {
             return false;
          } else {

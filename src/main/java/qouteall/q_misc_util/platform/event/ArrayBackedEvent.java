@@ -24,7 +24,7 @@ class ArrayBackedEvent<T> extends Event<T> {
    }
 
    void update() {
-      this.invoker = this.invokerFactory.apply((T)this.handlers);
+      this.invoker = this.invokerFactory.apply(this.handlers);
    }
 
    @Override

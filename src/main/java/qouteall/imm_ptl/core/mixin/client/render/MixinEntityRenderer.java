@@ -12,10 +12,10 @@ import qouteall.imm_ptl.core.render.context_management.WorldRenderInfo;
 public class MixinEntityRenderer {
    @Redirect(
       method = {"updateRenderState"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/MinecraftClient;hasOutline(Lnet/minecraft/entity/Entity;)Z"
-      )}
+      )
    )
    private boolean redirectGlowing(MinecraftClient client, Entity entity) {
       return WorldRenderInfo.isRendering() ? false : client.hasOutline(entity);

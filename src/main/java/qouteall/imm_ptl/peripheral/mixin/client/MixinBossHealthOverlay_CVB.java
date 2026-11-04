@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinBossHealthOverlay_CVB {
    @Inject(
       method = {"Lnet/minecraft/client/gui/hud/BossBarHud;shouldThickenFog()Z"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onShouldThickenFog(CallbackInfoReturnable<Boolean> cir) {

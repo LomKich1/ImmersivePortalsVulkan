@@ -19,10 +19,10 @@ public class MixinMinecraft_PortalWand {
 
    @Inject(
       method = {"doAttack"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/network/ClientPlayerEntity;getStackInHand(Lnet/minecraft/util/Hand;)Lnet/minecraft/item/ItemStack;"
-      )},
+      ),
       cancellable = true
    )
    private void onStartingAttack(CallbackInfoReturnable<Boolean> cir) {

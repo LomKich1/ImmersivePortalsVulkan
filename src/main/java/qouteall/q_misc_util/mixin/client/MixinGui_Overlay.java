@@ -20,7 +20,7 @@ public class MixinGui_Overlay {
 
    @Inject(
       method = {"render"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onRender(DrawContext guiGraphics, RenderTickCounter deltaTracker, CallbackInfo ci) {
       if (!this.client.options.hudHidden) {

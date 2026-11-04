@@ -36,7 +36,7 @@ public class PortalShapeSerialization {
          LOGGER.warn("unknown portal shape class {}", portalShape.getClass());
          return new NbtCompound();
       } else {
-         NbtCompound tag = serializer.serializer().apply(portalShape);
+         NbtCompound tag = ((PortalShapeSerialization.Serializer<PortalShape>)serializer).serializer().apply(portalShape);
          tag.putString("type", serializer.typeName());
          return tag;
       }

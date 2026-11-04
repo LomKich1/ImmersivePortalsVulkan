@@ -15,7 +15,7 @@ import qouteall.q_misc_util.Helper;
 public interface MixinBlockGetter {
    @ModifyVariable(
       method = {"raycast(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;Ljava/lang/Object;Ljava/util/function/BiFunction;Ljava/util/function/Function;)Ljava/lang/Object;"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       argsOnly = true,
       index = 1
    )

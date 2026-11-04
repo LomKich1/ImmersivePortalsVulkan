@@ -38,7 +38,7 @@ public abstract class MixinLevel implements IEWorld {
 
    @Inject(
       method = {"Lnet/minecraft/world/World;initWeatherGradients()V"},
-      at = {@At("TAIL")}
+      at = @At("TAIL")
    )
    private void onInitWeatherGradients(CallbackInfo ci) {
       if (this.getRegistryKey() == World.NETHER) {

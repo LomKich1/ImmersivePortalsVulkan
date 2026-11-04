@@ -1,5 +1,6 @@
 package qouteall.imm_ptl.core.render;
 
+import qouteall.imm_ptl.core.compat.RenderBackendCompat;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import java.util.WeakHashMap;
 import net.minecraft.client.MinecraftClient;
@@ -119,7 +120,7 @@ public class FrontClipping {
    }
 
    public static void onProgramBound(ShaderProgram program) {
-      if (IPGlobal.enableClippingMechanism) {
+      if (IPGlobal.enableClippingMechanism && RenderBackendCompat.isRawGlAvailable()) {
          int location = uniformLocationCache.computeIfAbsent(program, p -> GlStateManager._glGetUniformLocation(p.getGlRef(), "iportal_ClippingEquation"));
          if (location != -1) {
             if (isClippingEnabled && shouldApplyClippingToCurrentDraw() && activeClipPlaneEquationBeforeModelView != null) {

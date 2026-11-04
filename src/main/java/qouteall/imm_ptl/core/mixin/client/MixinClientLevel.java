@@ -86,7 +86,7 @@ public abstract class MixinClientLevel implements IEClientWorld {
 
    @Inject(
       method = {"<init>"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    void onConstructed(
       ClientPlayNetworkHandler clientPacketListener,
@@ -101,19 +101,19 @@ public abstract class MixinClientLevel implements IEClientWorld {
       int seaLevel,
       CallbackInfo ci
    ) {
-      ClientWorld clientWorld = (ClientWorld)this;
+      ClientWorld clientWorld = (ClientWorld)(Object)this;
       ClientChunkManager myClientChunkManager = O_O.createMyClientChunkManager(clientWorld, loadDistance);
       this.chunkManager = myClientChunkManager;
    }
 
    @Inject(
       method = {"addEntity"},
-      at = {@At("TAIL")}
+      at = @At("TAIL")
    )
    private void onOnEntityAdded(Entity entityIn, CallbackInfo ci) {
       if (ClientWorldLoader.getIsInitialized()) {
          for (ClientWorld world : ClientWorldLoader.getClientWorlds()) {
-            if (world != this) {
+            if (world != (Object)this) {
                world.removeEntity(entityIn.getId(), RemovalReason.DISCARDED);
             }
          }
@@ -122,7 +122,7 @@ public abstract class MixinClientLevel implements IEClientWorld {
 
    @Inject(
       method = {"Lnet/minecraft/client/world/ClientWorld;isChunkLoaded(II)Z"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onHasChunk(int chunkX, int chunkZ, CallbackInfoReturnable<Boolean> cir) {
@@ -136,20 +136,20 @@ public abstract class MixinClientLevel implements IEClientWorld {
 
    @Inject(
       method = {"Lnet/minecraft/client/world/ClientWorld;toString()Ljava/lang/String;"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onToString(CallbackInfoReturnable<String> cir) {
-      ClientWorld this_ = (ClientWorld)this;
+      ClientWorld this_ = (ClientWorld)(Object)this;
       cir.setReturnValue("ClientWorld " + this_.getRegistryKey().getValue());
    }
 
    @Inject(
       method = {"tickEntity"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onTickNonPassenger(Entity entity, CallbackInfo ci) {
-      ((IEEntity)entity).ip_tickCollidingPortal();
+      ((IEEntity)(Object)entity).ip_tickCollidingPortal();
    }
 
    @Override

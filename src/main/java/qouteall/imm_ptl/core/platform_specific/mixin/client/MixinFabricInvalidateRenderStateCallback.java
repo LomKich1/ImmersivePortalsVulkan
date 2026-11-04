@@ -16,7 +16,7 @@ import qouteall.imm_ptl.core.ClientWorldLoader;
 public interface MixinFabricInvalidateRenderStateCallback {
    @Inject(
       method = {"lambda$static$0"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private static void onInvokeEvent(InvalidateRenderStateCallback[] event, CallbackInfo ci) {

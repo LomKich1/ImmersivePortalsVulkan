@@ -16,7 +16,7 @@ public final class EventFactory {
          if (listeners.length == 0) {
             return emptyInvoker;
          } else {
-            return listeners.length == 1 ? listeners[0] : invokerFactory.apply((T)listeners);
+            return listeners.length == 1 ? listeners[0] : invokerFactory.apply(listeners);
          }
       });
    }

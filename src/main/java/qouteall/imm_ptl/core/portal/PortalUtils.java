@@ -41,7 +41,7 @@ public class PortalUtils {
          portalStream = Streams.concat(new Stream[]{portalStream, globalPortals.stream()});
       }
 
-      return portalStream.<Pair<Portal, RayTraceResult>>map(portal -> new Pair(portal, portal.generalRayTrace(from, to, leniency)))
+      return portalStream.<Pair<Portal, RayTraceResult>>map(portal -> new Pair<>(portal, portal.generalRayTrace(from, to, leniency)))
          .filter(portalAndHitPos -> portalAndHitPos.getSecond() != null && predicate.test((Portal)portalAndHitPos.getFirst()))
          .min(Comparator.comparingDouble(portalAndHitPos -> ((RayTraceResult)portalAndHitPos.getSecond()).hitPos().squaredDistanceTo(from)));
    }

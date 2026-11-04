@@ -23,7 +23,7 @@ public class MixinConnection_Debug {
 
    @Inject(
       method = {"exceptionCaught"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onExceptionCaught(ChannelHandlerContext channelHandlerContext, Throwable throwable, CallbackInfo ci) {
       if (immPtlExceptionLogNum < immPtlExceptionLogLimit) {

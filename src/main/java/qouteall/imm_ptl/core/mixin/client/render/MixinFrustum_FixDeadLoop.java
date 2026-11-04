@@ -31,7 +31,7 @@ public abstract class MixinFrustum_FixDeadLoop {
    @IPVanillaCopy
    public Frustum coverBoxAroundSetPosition(int gridSize) {
       if (TransformationManager.isIsometricView) {
-         return (Frustum)this;
+         return (Frustum)(Object)this;
       } else {
          double minX = Math.floor(this.x / gridSize) * gridSize;
          double minY = Math.floor(this.y / gridSize) * gridSize;
@@ -65,7 +65,7 @@ public abstract class MixinFrustum_FixDeadLoop {
             }
          }
 
-         return (Frustum)this;
+         return (Frustum)(Object)this;
       }
    }
 }

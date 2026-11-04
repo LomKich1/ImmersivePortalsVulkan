@@ -23,7 +23,7 @@ public class MixinServerGamePacketListenerImpl_Redirect {
 
    @ModifyVariable(
       method = {"send(Lnet/minecraft/network/packet/Packet;Lio/netty/channel/ChannelFutureListener;)V"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       argsOnly = true
    )
    private Packet modifyPacket(Packet originalPacket) {
@@ -34,16 +34,16 @@ public class MixinServerGamePacketListenerImpl_Redirect {
 
    @Inject(
       method = {"send(Lnet/minecraft/network/packet/Packet;Lio/netty/channel/ChannelFutureListener;)V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/network/ClientConnection;send(Lnet/minecraft/network/packet/Packet;Lio/netty/channel/ChannelFutureListener;Z)V"
-      )},
+      ),
       cancellable = true
    )
    private void onSend(Packet<?> packet, @Nullable ChannelFutureListener packetSendListener, CallbackInfo ci) {
       PacketRedirection.ForceBundleCallback forceBundleCallback = PacketRedirection.getForceBundleCallback();
       if (forceBundleCallback != null) {
-         forceBundleCallback.accept((ServerCommonNetworkHandler)this, (Packet<ClientPlayPacketListener>)packet);
+         forceBundleCallback.accept((ServerCommonNetworkHandler)(Object)this, (Packet<ClientPlayPacketListener>)packet);
          ci.cancel();
       }
    }

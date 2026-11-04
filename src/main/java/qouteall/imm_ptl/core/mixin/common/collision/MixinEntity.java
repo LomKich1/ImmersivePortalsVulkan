@@ -81,10 +81,10 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
 
    @Redirect(
       method = {"Lnet/minecraft/entity/Entity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/entity/Entity;adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;"
-      )}
+      )
    )
    private Vec3d redirectHandleCollisions(Entity entity, Vec3d attemptedMove) {
       if (IPGlobal.enableServerCollision || entity.getEntityWorld().isClient()) {
@@ -98,7 +98,7 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
 
             return Vec3d.ZERO;
          } else if (IPGlobal.crossPortalCollision && this.ip_portalCollisionHandler != null && this.ip_portalCollisionHandler.hasCollisionEntry()) {
-            Vec3d result = this.ip_portalCollisionHandler.handleCollision((Entity)this, attemptedMove);
+            Vec3d result = this.ip_portalCollisionHandler.handleCollision((Entity)(Object)this, attemptedMove);
             if (result.lengthSquared() > 400.0) {
                if (IMM_PTL_LOG_COUNTER.tryDecrement()) {
                   LOGGER.error("[ImmPtl] cross portal collision result too large {} {} {}", new Object[]{this, attemptedMove, result});
@@ -118,7 +118,7 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
 
    @Inject(
       method = {"Lnet/minecraft/entity/Entity;isFireImmune()Z"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onIsFireImmune(CallbackInfoReturnable<Boolean> cir) {
@@ -133,10 +133,10 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
 
    @WrapOperation(
       method = {"checkBlockCollision(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/entity/EntityCollisionHandler$Impl;Lit/unimi/dsi/fastutil/longs/LongSet;I)I"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/entity/Entity;calculateDefaultBoundingBox(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Box;"
-      )}
+      )
    )
    private Box redirectBoundingBoxInCheckingBlockCollision(Entity entity, Vec3d pos, Operation<Box> original) {
       return this.ip_getActiveCollisionBox((Box)original.call(new Object[]{entity, pos}));
@@ -144,7 +144,7 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
 
    @Inject(
       method = {"checkBlockCollision(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/entity/EntityCollisionHandler$Impl;Lit/unimi/dsi/fastutil/longs/LongSet;I)I"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onCheckInsideBlocks(Vec3d from, Vec3d to, Impl collector, LongSet visited, int steps, CallbackInfoReturnable<Integer> cir) {
@@ -155,7 +155,7 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
 
    @Inject(
       method = {"Lnet/minecraft/entity/Entity;isInsideWall()Z"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onIsInsideWall(CallbackInfoReturnable<Boolean> cir) {
@@ -166,10 +166,10 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
 
    @Inject(
       method = {"Lnet/minecraft/entity/Entity;setPos(DDD)V"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onSetPos(double nx, double ny, double nz, CallbackInfo ci) {
-      Entity this_ = (Entity)this;
+      Entity this_ = (Entity)(Object)this;
       if (this_ instanceof PlayerEntity
          && IPGlobal.teleportationDebugEnabled
          && (Math.abs(this.getX() - nx) > 10.0 || Math.abs(this.getY() - ny) > 10.0 || Math.abs(this.getZ() - nz) > 10.0)) {
@@ -192,12 +192,12 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
 
    @Inject(
       method = {"getBlockStateAtPos"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onGetInBlockState(CallbackInfoReturnable<BlockState> cir) {
       Portal collidingPortal = this.ip_getCollidingPortal();
-      Entity this_ = (Entity)this;
+      Entity this_ = (Entity)(Object)this;
       if (collidingPortal != null && collidingPortal.getNormal().y > 0.0) {
          BlockPos remoteLandingPos = BlockPos.ofFloored(collidingPortal.transformPoint(this_.getEntityPos()));
          World destinationWorld = collidingPortal.getDestinationWorld();
@@ -222,7 +222,7 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
 
    @Override
    public void ip_tickCollidingPortal() {
-      Entity this_ = (Entity)this;
+      Entity this_ = (Entity)(Object)this;
       if (this.ip_portalCollisionHandler != null) {
          this.ip_portalCollisionHandler.update(this_);
       }
@@ -234,7 +234,7 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
 
    @Override
    public void ip_notifyCollidingWithPortal(Entity portal) {
-      Entity this_ = (Entity)this;
+      Entity this_ = (Entity)(Object)this;
       if (this.ip_portalCollisionHandler == null) {
          this.ip_portalCollisionHandler = new PortalCollisionHandler();
       }
@@ -249,7 +249,7 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
 
    @Override
    public boolean ip_isRecentlyCollidingWithPortal() {
-      return this.ip_portalCollisionHandler == null ? false : this.ip_portalCollisionHandler.isRecentlyCollidingWithPortal((Entity)this);
+      return this.ip_portalCollisionHandler == null ? false : this.ip_portalCollisionHandler.isRecentlyCollidingWithPortal((Entity)(Object)this);
    }
 
    @Override
@@ -286,7 +286,7 @@ public abstract class MixinEntity implements IEEntity, ImmPtlEntityExtension {
    @Nullable
    @Override
    public Box ip_getActiveCollisionBox(Box originalBox) {
-      Entity this_ = (Entity)this;
+      Entity this_ = (Entity)(Object)this;
       return this.ip_portalCollisionHandler == null ? originalBox : this.ip_portalCollisionHandler.getActiveCollisionBox(this_, originalBox);
    }
 

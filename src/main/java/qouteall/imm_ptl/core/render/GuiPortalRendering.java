@@ -37,13 +37,13 @@ public class GuiPortalRendering {
    private static void renderWorldIntoFrameBuffer(WorldRenderInfo worldRenderInfo, Framebuffer framebuffer) {
       RenderStates.basicProjectionMatrix = null;
       CHelper.checkGlError();
-      ((IECamera)RenderStates.originalCamera).ip_resetState(worldRenderInfo.cameraPos, worldRenderInfo.world);
+      ((IECamera)(Object)RenderStates.originalCamera).ip_resetState(worldRenderInfo.cameraPos, worldRenderInfo.world);
       Validate.isTrue(renderingFrameBuffer == null);
       renderingFrameBuffer = framebuffer;
       MyRenderHelper.restoreViewPort();
       Framebuffer mcFb = MyGameRenderer.client.getFramebuffer();
       Validate.isTrue(mcFb != framebuffer);
-      ((IEMinecraftClient)MyGameRenderer.client).ip_setFrameBuffer(framebuffer);
+      ((IEMinecraftClient)(Object)MyGameRenderer.client).ip_setFrameBuffer(framebuffer);
       if (!worldRenderInfo.doRenderSky) {
          RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(framebuffer.getColorAttachment(), 0, framebuffer.getDepthAttachment(), 1.0);
       }
@@ -51,7 +51,7 @@ public class GuiPortalRendering {
       IPCGlobal.renderer.prepareRendering();
       IPCGlobal.renderer.invokeWorldRendering(worldRenderInfo);
       IPCGlobal.renderer.finishRendering();
-      ((IEMinecraftClient)MyGameRenderer.client).ip_setFrameBuffer(mcFb);
+      ((IEMinecraftClient)(Object)MyGameRenderer.client).ip_setFrameBuffer(mcFb);
       renderingFrameBuffer = null;
       MyRenderHelper.restoreViewPort();
       CHelper.checkGlError();

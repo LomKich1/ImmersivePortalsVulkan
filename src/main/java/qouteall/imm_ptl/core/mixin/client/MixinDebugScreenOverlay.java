@@ -15,10 +15,10 @@ import qouteall.imm_ptl.core.render.context_management.RenderStates;
 public class MixinDebugScreenOverlay {
    @WrapOperation(
       method = {"render"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/gui/hud/DebugHud;drawText(Lnet/minecraft/client/gui/DrawContext;Ljava/util/List;Z)V"
-      )}
+      )
    )
    private void onRenderLines(DebugHud instance, DrawContext guiGraphics, List<String> lines, boolean leftAlign, Operation<Void> original) {
       if (!leftAlign && MinecraftClient.getInstance().debugHudEntryList.isF3Enabled()) {

@@ -1,7 +1,5 @@
 package qouteall.imm_ptl.core.compat;
 
-import gravity_changer.api.GravityChangerAPI;
-import gravity_changer.util.RotationUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -82,77 +80,4 @@ public class GravityChangerInterface {
       }
    }
 
-   public static class OnGravityChangerPresent extends GravityChangerInterface.Invoker {
-      @Override
-      public boolean isGravityChangerPresent() {
-         return true;
-      }
-
-      @Override
-      public Vec3d getEyeOffset(Entity entity) {
-         return GravityChangerAPI.getEyeOffset(entity);
-      }
-
-      @Override
-      public Direction getGravityDirection(Entity entity) {
-         return GravityChangerAPI.getGravityDirection(entity);
-      }
-
-      @Override
-      public Direction getBaseGravityDirection(Entity entity) {
-         return GravityChangerAPI.getBaseGravityDirection(entity);
-      }
-
-      @Override
-      public void setBaseGravityDirectionServer(Entity entity, Direction direction) {
-         GravityChangerAPI.setBaseGravityDirection(entity, direction);
-      }
-
-      @Override
-      public void setClientPlayerGravityDirection(PlayerEntity player, Direction direction) {
-         this.setClientPlayerGravityDirectionClientOnly(player, direction);
-      }
-
-      @Environment(EnvType.CLIENT)
-      private void setClientPlayerGravityDirectionClientOnly(PlayerEntity player, Direction direction) {
-         Validate.isTrue(MinecraftClient.getInstance().isOnThread());
-         GravityChangerAPI.instantlySetClientBaseGravityDirection(player, direction);
-      }
-
-      @Nullable
-      @Override
-      public DQuaternion getExtraCameraRotation(Direction gravityDirection) {
-         return gravityDirection == Direction.DOWN ? null : DQuaternion.fromMcQuaternion(RotationUtil.getWorldRotationQuaternion(gravityDirection));
-      }
-
-      @Override
-      public Vec3d getWorldVelocity(Entity entity) {
-         return GravityChangerAPI.getWorldVelocity(entity);
-      }
-
-      @Override
-      public void setWorldVelocity(Entity entity, Vec3d newVelocity) {
-         GravityChangerAPI.setWorldVelocity(entity, newVelocity);
-      }
-
-      @Override
-      public Vec3d transformPlayerToWorld(Direction gravity, Vec3d vec3d) {
-         return RotationUtil.vecPlayerToWorld(vec3d, gravity);
-      }
-
-      @Override
-      public Vec3d transformWorldToPlayer(Direction gravity, Vec3d vec3d) {
-         return RotationUtil.vecWorldToPlayer(vec3d, gravity);
-      }
-
-      @Override
-      public Direction transformDirPlayerToWorld(Direction gravity, Direction direction) {
-         return RotationUtil.dirPlayerToWorld(direction, gravity);
-      }
-
-      @Override
-      public Direction transformDirWorldToPlayer(Direction gravity, Direction direction) {
-         return RotationUtil.dirWorldToPlayer(direction, gravity);
-      }
-   }
 }

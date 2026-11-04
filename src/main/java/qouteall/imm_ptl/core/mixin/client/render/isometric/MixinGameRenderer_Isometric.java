@@ -12,7 +12,7 @@ import qouteall.imm_ptl.core.render.TransformationManager;
 public class MixinGameRenderer_Isometric {
    @Inject(
       method = {"getBasicProjectionMatrix"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    private void onGetBasicProjectionMatrix(float fov, CallbackInfoReturnable<Matrix4f> cir) {

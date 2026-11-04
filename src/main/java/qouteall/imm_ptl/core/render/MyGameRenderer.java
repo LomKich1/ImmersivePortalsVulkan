@@ -159,8 +159,8 @@ public class MyGameRenderer {
       RegistryKey<World> newDimension = newWorld.getRegistryKey();
       WorldRenderer worldRenderer = ClientWorldLoader.getWorldRenderer(newDimension);
       CHelper.checkGlError();
-      IEGameRenderer ieGameRenderer = (IEGameRenderer)client.gameRenderer;
-      IEWorldRenderer ieWorldRenderer = (IEWorldRenderer)worldRenderer;
+      IEGameRenderer ieGameRenderer = (IEGameRenderer)(Object)client.gameRenderer;
+      IEWorldRenderer ieWorldRenderer = (IEWorldRenderer)(Object)worldRenderer;
       DimensionRenderHelper helper = ClientWorldLoader.getDimensionRenderHelper(newDimension);
       Camera newCamera = new Camera();
       ClientWorld oldWorld = client.world;
@@ -168,12 +168,12 @@ public class MyGameRenderer {
       LightmapTextureManager oldLightmap = client.gameRenderer.getLightmapTextureManager();
       boolean oldNoClip = client.player.noClip;
       boolean oldDoRenderHand = ieGameRenderer.ip_getDoRenderHand();
-      ObjectArrayList<BuiltChunk> oldChunkInfoList = ((IEWorldRenderer)oldWorldRenderer).portal_getChunkInfoList();
+      ObjectArrayList<BuiltChunk> oldChunkInfoList = ((IEWorldRenderer)(Object)oldWorldRenderer).portal_getChunkInfoList();
       HitResult oldCrosshairTarget = client.crosshairTarget;
       Camera oldCamera = client.gameRenderer.getCamera();
       BufferBuilderStorage oldRenderBuffers = ieWorldRenderer.ip_getRenderBuffers();
       BufferBuilderStorage oldClientRenderBuffers = client.getBufferBuilders();
-      BlockBufferAllocatorStorage oldSectionRenderDispatcherFixedBuffers = ((IESectionRenderDispatcher)worldRenderer.getChunkBuilder()).ip_getFixedBuffers();
+      BlockBufferAllocatorStorage oldSectionRenderDispatcherFixedBuffers = ((IESectionRenderDispatcher)(Object)worldRenderer.getChunkBuilder()).ip_getFixedBuffers();
       Matrix4f oldProjectionMatrix = RenderStates.projectionMatrix == null ? null : new Matrix4f(RenderStates.projectionMatrix);
       ProjectionType oldProjectionType = RenderSystem.getProjectionType();
       Matrix4fStack oldModelViewStack = IERenderSystem.ip_getModelViewStack();
@@ -197,15 +197,15 @@ public class MyGameRenderer {
       GpuBufferSlice oldShaderLights = RenderSystem.getShaderLights();
       Vec3d oldFogColor = RenderStates.currentFogColor;
       ObjectArrayList<BuiltChunk> newChunkInfoList = VisibleSectionDiscovery.takeList();
-      ((IEWorldRenderer)oldWorldRenderer).portal_setChunkInfoList(newChunkInfoList);
+      ((IEWorldRenderer)(Object)oldWorldRenderer).portal_setChunkInfoList(newChunkInfoList);
       Object irisPipeline = IrisInterface.invoker.getPipeline(worldRenderer);
-      ((IEMinecraftClient)client).ip_setWorldRenderer(worldRenderer);
+      ((IEMinecraftClient)(Object)client).ip_setWorldRenderer(worldRenderer);
       client.world = newWorld;
       ieGameRenderer.ip_setLightmapTextureManager(helper.lightmapTexture);
       client.player.noClip = true;
       ieGameRenderer.ip_setDoRenderHand(doRenderHand);
       FogRendererContext.swappingManager.pushSwapping(newDimension);
-      ((IEParticleManager)client.particleManager).ip_setWorld(newWorld);
+      ((IEParticleManager)(Object)client.particleManager).ip_setWorld(newWorld);
       if (BlockManipulationClient.remotePointedDim == newDimension) {
          client.crosshairTarget = BlockManipulationClient.remoteHitResult;
       }
@@ -229,8 +229,8 @@ public class MyGameRenderer {
          newRenderBuffers = context.renderBuffers;
          if (newRenderBuffers != null) {
             ieWorldRenderer.ip_setRenderBuffers(newRenderBuffers);
-            ((IEMinecraftClient)client).ip_setRenderBuffers(newRenderBuffers);
-            ((IESectionRenderDispatcher)worldRenderer.getChunkBuilder()).ip_setFixedBuffers(newRenderBuffers.getBlockBufferBuilders());
+            ((IEMinecraftClient)(Object)client).ip_setRenderBuffers(newRenderBuffers);
+            ((IESectionRenderDispatcher)(Object)worldRenderer.getChunkBuilder()).ip_setFixedBuffers(newRenderBuffers.getBlockBufferBuilders());
          } else {
             client.getBufferBuilders().getEntityVertexConsumers().draw();
          }
@@ -248,30 +248,28 @@ public class MyGameRenderer {
 
       client.gameRenderer.getDiffuseLighting().updateLevelBuffer(newWorld.getDimension().cardinalLightType());
       Object nestedRenderToken = ClientPlatform.get().beforeNestedWorldRender(oldWorldRenderer);
-      Object[] dhRenderState = DhRenderStateGuard.snapshot();
       invokeWrapper.accept(() -> {
          Profilers.get().push("render_portal_content");
          client.gameRenderer.renderWorld(client.getRenderTickCounter());
          Profilers.get().pop();
       });
-      DhRenderStateGuard.restore(dhRenderState);
       ClientPlatform.get().afterNestedWorldRender(oldWorldRenderer, nestedRenderToken);
       SodiumInterface.invoker.switchContextWithCurrentWorldRenderer(newSodiumContext);
-      ((IEMinecraftClient)client).ip_setWorldRenderer(oldWorldRenderer);
+      ((IEMinecraftClient)(Object)client).ip_setWorldRenderer(oldWorldRenderer);
       client.world = oldWorld;
       ieGameRenderer.ip_setLightmapTextureManager(oldLightmap);
       client.player.noClip = oldNoClip;
       ieGameRenderer.ip_setDoRenderHand(oldDoRenderHand);
-      ((IEParticleManager)client.particleManager).ip_setWorld(oldWorld);
+      ((IEParticleManager)(Object)client.particleManager).ip_setWorld(oldWorld);
       client.crosshairTarget = oldCrosshairTarget;
       ieGameRenderer.ip_setCamera(oldCamera);
       updateGlobalSettingsUniform(oldCamera);
       FogRendererContext.swappingManager.popSwapping();
-      ((IEWorldRenderer)oldWorldRenderer).portal_setChunkInfoList(oldChunkInfoList);
+      ((IEWorldRenderer)(Object)oldWorldRenderer).portal_setChunkInfoList(oldChunkInfoList);
       VisibleSectionDiscovery.returnList(newChunkInfoList);
       ieWorldRenderer.ip_setRenderBuffers(oldRenderBuffers);
-      ((IEMinecraftClient)client).ip_setRenderBuffers(oldClientRenderBuffers);
-      ((IESectionRenderDispatcher)worldRenderer.getChunkBuilder()).ip_setFixedBuffers(oldSectionRenderDispatcherFixedBuffers);
+      ((IEMinecraftClient)(Object)client).ip_setRenderBuffers(oldClientRenderBuffers);
+      ((IESectionRenderDispatcher)(Object)worldRenderer.getChunkBuilder()).ip_setFixedBuffers(oldSectionRenderDispatcherFixedBuffers);
       ieGameRenderer.ip_setLevelRenderState(oldGameLevelRenderState);
       ieGameRenderer.ip_setSubmitNodeStorage(oldGameSubmitNodeStorage);
       ieGameRenderer.ip_setFeatureRenderDispatcher(oldGameFeatureRenderDispatcher);
@@ -322,7 +320,7 @@ public class MyGameRenderer {
 
    @IPVanillaCopy
    public static void resetFogState() {
-      FogRenderer fogRenderer = ((IEGameRenderer)client.gameRenderer).ip_getFogRenderer();
+      FogRenderer fogRenderer = ((IEGameRenderer)(Object)client.gameRenderer).ip_getFogRenderer();
       RenderSystem.setShaderFog(fogRenderer.getFogBuffer(FogType.WORLD));
    }
 

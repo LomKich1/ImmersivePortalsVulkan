@@ -15,10 +15,10 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class MixinProjectile extends MixinEntity {
    @WrapOperation(
       method = {"getOwner"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/entity/LazyEntityReference;getEntity(Lnet/minecraft/entity/LazyEntityReference;Lnet/minecraft/world/World;)Lnet/minecraft/entity/Entity;"
-      )}
+      )
    )
    private Entity wrapGetOwnerEntity(LazyEntityReference<Entity> owner, World level, Operation<Entity> original) {
       Entity entity = (Entity)original.call(new Object[]{owner, level});

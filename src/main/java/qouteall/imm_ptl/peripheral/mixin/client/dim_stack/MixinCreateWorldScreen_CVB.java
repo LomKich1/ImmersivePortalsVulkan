@@ -53,7 +53,7 @@ public abstract class MixinCreateWorldScreen_CVB extends Screen implements IECre
 
    @Inject(
       method = {"<init>"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onInitEnd(
       MinecraftClient minecraft,
@@ -73,7 +73,7 @@ public abstract class MixinCreateWorldScreen_CVB extends Screen implements IECre
    @Override
    public void ip_openDimStackScreen() {
       if (this.ip_dimStackController == null) {
-         CreateWorldScreen this_ = (CreateWorldScreen)this;
+         CreateWorldScreen this_ = (CreateWorldScreen)(Object)this;
          this.ip_dimStackController = new DimStackGuiController(this_, () -> this.portal_getDimensionList(), info -> {
             DimStackManagement.dimStackToApply = info;
             MinecraftClient.getInstance().setScreen(this_);

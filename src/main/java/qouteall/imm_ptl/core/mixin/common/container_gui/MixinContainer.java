@@ -16,10 +16,10 @@ import qouteall.imm_ptl.core.block_manipulation.BlockManipulationServer;
 public interface MixinContainer {
    @WrapOperation(
       method = {"canPlayerUse(Lnet/minecraft/block/entity/BlockEntity;Lnet/minecraft/entity/player/PlayerEntity;F)Z"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/entity/player/PlayerEntity;canInteractWithBlockAt(Lnet/minecraft/util/math/BlockPos;D)Z"
-      )}
+      )
    )
    private static boolean wrapCanInteractWithBlock(
       PlayerEntity player, BlockPos blockPos, double distance, Operation<Boolean> operation, @Local BlockEntity blockEntity

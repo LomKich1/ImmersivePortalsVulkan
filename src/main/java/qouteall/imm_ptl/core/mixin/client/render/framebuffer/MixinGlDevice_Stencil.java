@@ -18,23 +18,23 @@ import qouteall.imm_ptl.core.render.StencilDepthTextures;
 public class MixinGlDevice_Stencil {
    @ModifyArgs(
       method = {"createTexture(Ljava/lang/String;ILcom/mojang/blaze3d/textures/TextureFormat;IIII)Lcom/mojang/blaze3d/textures/GpuTexture;", "createTexture(Ljava/lang/String;ILcom/mojang/blaze3d/textures/TextureFormat;IIIIZ)Lcom/mojang/blaze3d/textures/GpuTexture;"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lcom/mojang/blaze3d/opengl/GlStateManager;_texImage2D(IIIIIIIILjava/nio/ByteBuffer;)V"
-      )},
+      ),
       require = 1
    )
    private void modifyTexImage2D(Args args) {
       if (StencilDepthTextures.creatingStencilDepth && (Integer)args.get(2) == GlConst.toGlInternalId(TextureFormat.DEPTH32)) {
-         args.set(2, IPCGlobal.useSeparatedStencilFormat ? '貭' : '裰');
+         args.set(2, IPCGlobal.useSeparatedStencilFormat ? 36013 : 35056);
          args.set(6, 34041);
-         args.set(7, IPCGlobal.useSeparatedStencilFormat ? '趭' : '蓺');
+         args.set(7, IPCGlobal.useSeparatedStencilFormat ? 36269 : 34042);
       }
    }
 
    @Inject(
       method = {"createTexture(Ljava/lang/String;ILcom/mojang/blaze3d/textures/TextureFormat;IIII)Lcom/mojang/blaze3d/textures/GpuTexture;"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onCreatedTexture(
       String label, int usage, TextureFormat format, int width, int height, int depthOrLayers, int mipLevels, CallbackInfoReturnable<GpuTexture> cir

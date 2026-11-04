@@ -19,11 +19,11 @@ import qouteall.imm_ptl.core.network.ImmPtlNetworkConfig;
 public class MixinServerBoundMovePlayerPacketPosRot {
    @Inject(
       method = {"Lnet/minecraft/network/packet/c2s/play/PlayerMoveC2SPacket$Full;write(Lnet/minecraft/network/PacketByteBuf;)V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onWrite(PacketByteBuf buf, CallbackInfo ci) {
       if (ImmPtlNetworkConfig.doesServerHaveImmPtl()) {
-         RegistryKey<World> playerDimension = ((IEPlayerMoveC2SPacket)this).ip_getPlayerDimension();
+         RegistryKey<World> playerDimension = ((IEPlayerMoveC2SPacket)(Object)this).ip_getPlayerDimension();
          Validate.notNull(playerDimension, "player dimension is null", new Object[0]);
          buf.writeRegistryKey(playerDimension);
       }

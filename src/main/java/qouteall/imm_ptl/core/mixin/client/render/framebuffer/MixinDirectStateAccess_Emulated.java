@@ -12,11 +12,11 @@ import qouteall.imm_ptl.core.render.StencilDepthTextures;
 public class MixinDirectStateAccess_Emulated {
    @WrapOperation(
       method = {"setupFramebuffer"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lcom/mojang/blaze3d/opengl/GlStateManager;_glFramebufferTexture2D(IIIII)V",
          ordinal = 1
-      )}
+      )
    )
    private void wrapAttachDepthTexture(int target, int attachment, int textureTarget, int texture, int level, Operation<Void> original) {
       if (StencilDepthTextures.isStencilTexture(texture)) {

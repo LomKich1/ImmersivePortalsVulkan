@@ -14,10 +14,10 @@ import qouteall.imm_ptl.peripheral.alternate_dimension.AlternateDimensions;
 public class MixinFogRenderer_A_CVB {
    @Redirect(
       method = {"getFogColor"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/client/render/Camera;getCameraPos()Lnet/minecraft/util/math/Vec3d;"
-      )}
+      )
    )
    private Vec3d redirectCameraGetPos(Camera camera) {
       ClientWorld world = MinecraftClient.getInstance().world;

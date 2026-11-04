@@ -12,7 +12,7 @@ public class MixinGlDebug {
 
    @Inject(
       method = {"Lnet/minecraft/client/gl/GlDebug;onDebugMessage(IIIIIJJ)V"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onLogging(int source, int type, int id, int severity, int messageLength, long message, long l, CallbackInfo ci) {
       if (loggedNum < 100) {

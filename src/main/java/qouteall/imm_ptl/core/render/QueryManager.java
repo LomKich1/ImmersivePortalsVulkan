@@ -1,5 +1,6 @@
 package qouteall.imm_ptl.core.render;
 
+import qouteall.imm_ptl.core.compat.RenderBackendCompat;
 import net.minecraft.util.Util;
 import net.minecraft.util.Util.OperatingSystem;
 import org.lwjgl.opengl.GL15;
@@ -11,6 +12,10 @@ public class QueryManager {
    private static int idQueryObject = -1;
 
    public static boolean renderAndGetDoesAnySamplePass(Runnable renderingFunc) {
+      if (!RenderBackendCompat.supportsOcclusionQuery()) {
+         return true;
+      }
+
       if (idQueryObject == -1) {
          idQueryObject = GL15.glGenQueries();
          CHelper.checkGlError();
@@ -33,6 +38,10 @@ public class QueryManager {
    }
 
    public static int renderAndGetSampleCountPassed(Runnable renderingFunc) {
+      if (!RenderBackendCompat.supportsOcclusionQuery()) {
+         return 1;
+      }
+
       assert !isQuerying;
 
       if (idQueryObject == -1) {

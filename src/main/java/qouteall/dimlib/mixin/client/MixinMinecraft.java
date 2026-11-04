@@ -12,7 +12,7 @@ import qouteall.dimlib.ClientDimensionInfo;
 public class MixinMinecraft {
    @Inject(
       method = {"setWorld(Lnet/minecraft/client/world/ClientWorld;Z)V"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onClientReset(ClientWorld level, boolean stopSound, CallbackInfo ci) {
       if (level == null) {

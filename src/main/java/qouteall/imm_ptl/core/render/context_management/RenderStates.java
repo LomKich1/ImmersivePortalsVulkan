@@ -149,7 +149,7 @@ public class RenderStates {
 
    public static void onTotalRenderEnd() {
       MinecraftClient client = MinecraftClient.getInstance();
-      IEGameRenderer gameRenderer = (IEGameRenderer)MinecraftClient.getInstance().gameRenderer;
+      IEGameRenderer gameRenderer = (IEGameRenderer)(Object)MinecraftClient.getInstance().gameRenderer;
       gameRenderer.ip_setLightmapTextureManager(ClientWorldLoader.getDimensionRenderHelper(client.world.getRegistryKey()).lightmapTexture);
       Vec3d currCameraPos = client.gameRenderer.getCamera().getCameraPos();
       cameraPosDelta = currCameraPos.subtract(lastCameraPos);
@@ -169,7 +169,7 @@ public class RenderStates {
    }
 
    public static boolean shouldRenderParticle(Particle particle) {
-      if (((IEParticle)particle).portal_getWorld() != MinecraftClient.getInstance().world) {
+      if (((IEParticle)(Object)particle).portal_getWorld() != MinecraftClient.getInstance().world) {
          return false;
       } else if (PortalRendering.isRendering()) {
          Portal renderingPortal = PortalRendering.getRenderingPortal();
@@ -193,7 +193,7 @@ public class RenderStates {
       result.add("Rendered Portals: " + lastPortalRenderInfos.size());
       ClientPlayerEntity player = MinecraftClient.getInstance().player;
       if (player != null) {
-         Portal collidingPortal = ((IEEntity)player).ip_getCollidingPortal();
+         Portal collidingPortal = ((IEEntity)(Object)player).ip_getCollidingPortal();
          if (collidingPortal != null) {
             String text = "Colliding " + collidingPortal.toString();
             result.addAll(Helper.splitStringByLen(text, 50));

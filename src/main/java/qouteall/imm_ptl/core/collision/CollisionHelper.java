@@ -245,7 +245,7 @@ public class CollisionHelper {
    }
 
    public static boolean isCollidingWithAnyPortal(Entity entity) {
-      return ((IEEntity)entity).ip_getCollidingPortal() != null;
+      return ((IEEntity)(Object)entity).ip_getCollidingPortal() != null;
    }
 
    public static void updateCollidingPortalForWorld(World world, float partialTick) {
@@ -261,7 +261,7 @@ public class CollisionHelper {
             for (Portal globalPortal : globalPortals) {
                Box globalPortalBoundingBox = globalPortal.getBoundingBox();
                if (entityBoundingBoxStretched.intersects(globalPortalBoundingBox) && canCollideWithPortal(entity, globalPortal, partialTick)) {
-                  ((IEEntity)entity).ip_notifyCollidingWithPortal(globalPortal);
+                  ((IEEntity)(Object)entity).ip_notifyCollidingWithPortal(globalPortal);
                }
             }
          }
@@ -307,7 +307,7 @@ public class CollisionHelper {
                if (entityBoxStretched.intersects(portalBoundingBox)) {
                   boolean canCollideWithPortal = canCollideWithPortal(entity, portal, partialTick);
                   if (canCollideWithPortal) {
-                     ((IEEntity)entity).ip_notifyCollidingWithPortal(portal);
+                     ((IEEntity)(Object)entity).ip_notifyCollidingWithPortal(portal);
                   }
                }
             }

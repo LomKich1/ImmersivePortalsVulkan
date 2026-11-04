@@ -25,7 +25,7 @@ public class MixinClientLevel_Sound {
 
    @Inject(
       method = {"playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZJ)V"},
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       cancellable = true
    )
    @IPVanillaCopy
@@ -42,7 +42,7 @@ public class MixinClientLevel_Sound {
       CallbackInfo ci
    ) {
       if (IPGlobal.enableCrossPortalSound) {
-         ClientWorld this_ = (ClientWorld)this;
+         ClientWorld this_ = (ClientWorld)(Object)this;
          Vec3d soundPos = new Vec3d(x, y, z);
          if (!this.portal_isPosNearPlayer(soundPos)) {
             PositionedSoundInstance crossPortalSound = CrossPortalSound.createCrossPortalSound(this_, soundEvent, soundSource, soundPos, volume, pitch, seed);
@@ -67,7 +67,7 @@ public class MixinClientLevel_Sound {
    }
 
    private boolean portal_isPosNearPlayer(Vec3d pos) {
-      ClientWorld this_ = (ClientWorld)this;
+      ClientWorld this_ = (ClientWorld)(Object)this;
       ClientPlayerEntity player = this.client.player;
       if (player == null) {
          return false;

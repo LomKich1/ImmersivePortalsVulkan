@@ -55,21 +55,18 @@ public class IPModEntryClient implements ClientModInitializer {
       boolean isSodiumPresent = FabricLoader.getInstance().isModLoaded("sodium");
       if (isSodiumPresent) {
          Helper.log("Sodium is present");
-         SodiumInterface.invoker = new SodiumInterface.OnSodiumPresent();
       } else {
          Helper.log("Sodium is not present");
       }
 
       if (FabricLoader.getInstance().isModLoaded("voxy")) {
          Helper.log("Voxy is present");
-         VoxyInterface.invoker = new VoxyInterface.OnVoxyPresent();
       } else {
          Helper.log("Voxy is not present");
       }
 
       if (FabricLoader.getInstance().isModLoaded("iris")) {
          Helper.log("Iris is present");
-         IrisInterface.invoker = new IrisInterface.OnIrisPresent();
          IPGlobal.CLIENT_TASK_LIST.addTask(MyTaskList.oneShotTask(() -> {
             if (IPConfig.getConfig().shouldDisplayWarning("iris")) {
                CHelper.printChat(Text.translatable("imm_ptl.iris_warning").append(IPMcHelper.getDisableWarningText("iris")));

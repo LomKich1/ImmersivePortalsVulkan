@@ -115,7 +115,7 @@ public class FabricPlatformNetworking implements PlatformNetworking {
    private record FabricServerConfigurationContext(ServerConfigurationNetworkHandler networkHandler) implements PlatformNetworking.ServerConfigurationContext {
       @Override
       public GameProfile gameProfile() {
-         return ((IEServerConfigurationPacketListenerImpl)this.networkHandler).ip_getGameProfile();
+         return ((IEServerConfigurationPacketListenerImpl)(Object)this.networkHandler).ip_getGameProfile();
       }
 
       @Override
@@ -147,7 +147,7 @@ public class FabricPlatformNetworking implements PlatformNetworking {
 
       @Override
       public GameProfile gameProfile() {
-         return ((IEServerConfigurationPacketListenerImpl)this.handler).ip_getGameProfile();
+         return ((IEServerConfigurationPacketListenerImpl)(Object)this.handler).ip_getGameProfile();
       }
    }
 }

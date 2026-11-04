@@ -42,7 +42,7 @@ public class PortalWandItem extends Item {
       new Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, McHelper.newResourceLocation("immersive_portals:portal_wand")))
    );
    public static final Codec<PortalWandItem.Mode> MODE_CODEC = Codec.STRING.xmap(PortalWandItem.Mode::fromStr, PortalWandItem.Mode::toStr);
-   public static final ComponentType<PortalWandItem.Mode> COMPONENT_TYPE = ComponentType.builder().codec(MODE_CODEC).build();
+   public static final ComponentType<PortalWandItem.Mode> COMPONENT_TYPE = ComponentType.<PortalWandItem.Mode>builder().codec(MODE_CODEC).build();
    private static boolean instructionInformed = false;
 
    public static void init() {

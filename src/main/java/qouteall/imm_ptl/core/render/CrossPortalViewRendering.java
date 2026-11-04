@@ -30,9 +30,9 @@ public class CrossPortalViewRendering {
       } else {
          Entity cameraEntity = client.getCameraEntity();
          Camera camera1 = new Camera();
-         float cameraY = ((IECamera)RenderStates.originalCamera).ip_getCameraY();
-         float lastCameraY = ((IECamera)RenderStates.originalCamera).ip_getLastCameraY();
-         ((IECamera)camera1).ip_setCameraY(cameraY, lastCameraY);
+         float cameraY = ((IECamera)(Object)RenderStates.originalCamera).ip_getCameraY();
+         float lastCameraY = ((IECamera)(Object)RenderStates.originalCamera).ip_getLastCameraY();
+         ((IECamera)(Object)camera1).ip_setCameraY(cameraY, lastCameraY);
          camera1.update(client.world, cameraEntity, isThirdPerson(), isFrontView(), RenderStates.getPartialTick());
          Vec3d realCameraPos = camera1.getCameraPos();
          Vec3d isometricAdjustedOriginalCameraPos = TransformationManager.getIsometricAdjustedCameraPos(camera1);
@@ -56,7 +56,7 @@ public class CrossPortalViewRendering {
                   renderingCameraPos = portal.transformPoint(realCameraPos);
                }
 
-               ((IECamera)RenderStates.originalCamera).portal_setPos(renderingCameraPos);
+               ((IECamera)(Object)RenderStates.originalCamera).portal_setPos(renderingCameraPos);
                WorldRenderInfo worldRenderInfo = new WorldRenderInfo.Builder()
                   .setWorld(ClientWorldLoader.getWorld(portal.getDestDim()))
                   .setCameraPos(renderingCameraPos)

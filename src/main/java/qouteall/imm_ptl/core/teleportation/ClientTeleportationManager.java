@@ -337,21 +337,21 @@ public class ClientTeleportationManager {
       player.detach();
       RegistryKey<World> toDimension = toWorld.getRegistryKey();
       RegistryKey<World> fromDimension = fromWorld.getRegistryKey();
-      ((IEClientPlayNetworkHandler)client.getNetworkHandler()).ip_setWorld(toWorld);
+      ((IEClientPlayNetworkHandler)(Object)client.getNetworkHandler()).ip_setWorld(toWorld);
       fromWorld.removeEntity(player.getId(), RemovalReason.CHANGED_DIMENSION);
-      ((IEEntity)player).ip_setWorld(toWorld);
+      ((IEEntity)(Object)player).ip_setWorld(toWorld);
       McHelper.setEyePos(player, newEyePos, newEyePos);
       McHelper.updateBoundingBox(player);
-      ((IEEntity)player).ip_unsetRemoved();
+      ((IEEntity)(Object)player).ip_unsetRemoved();
       toWorld.addEntity(player);
-      IEGameRenderer gameRenderer = (IEGameRenderer)MinecraftClient.getInstance().gameRenderer;
+      IEGameRenderer gameRenderer = (IEGameRenderer)(Object)MinecraftClient.getInstance().gameRenderer;
       gameRenderer.ip_setLightmapTextureManager(ClientWorldLoader.getDimensionRenderHelper(toDimension).lightmapTexture);
       client.world = toWorld;
-      ((IEMinecraftClient)client).ip_setWorldRenderer(ClientWorldLoader.getWorldRenderer(toDimension));
+      ((IEMinecraftClient)(Object)client).ip_setWorldRenderer(ClientWorldLoader.getWorldRenderer(toDimension));
       VoxyInterface.invoker
          .onPlayerDimensionChangePromoted(ClientWorldLoader.getWorldRenderer(toDimension), toWorld, ClientWorldLoader.getWorldRenderer(fromDimension));
       if (client.particleManager != null) {
-         ((IEParticleManager)client.particleManager).ip_setWorld(toWorld);
+         ((IEParticleManager)(Object)client.particleManager).ip_setWorld(toWorld);
       }
 
       if (vehicle != null) {
@@ -373,7 +373,7 @@ public class ClientTeleportationManager {
 
    private static void changePlayerMotionIfCollidingWithPortal() {
       ClientPlayerEntity player = client.player;
-      Portal portal = ((IEEntity)player).ip_getCollidingPortal();
+      Portal portal = ((IEEntity)(Object)player).ip_getCollidingPortal();
       if (portal != null) {
          if (PortalExtension.get(portal).motionAffinity > 0.0) {
             changeMotion(player, portal);
@@ -391,9 +391,9 @@ public class ClientTeleportationManager {
    public static void moveClientEntityAcrossDimension(Entity entity, ClientWorld newWorld, Vec3d newPos) {
       ClientWorld oldWorld = (ClientWorld)entity.getEntityWorld();
       oldWorld.removeEntity(entity.getId(), RemovalReason.CHANGED_DIMENSION);
-      ((IEEntity)entity).ip_setWorld(newWorld);
+      ((IEEntity)(Object)entity).ip_setWorld(newWorld);
       entity.setPosition(newPos.x, newPos.y, newPos.z);
-      ((IEEntity)entity).ip_unsetRemoved();
+      ((IEEntity)(Object)entity).ip_unsetRemoved();
       newWorld.addEntity(entity);
       Validate.isTrue(!entity.isRemoved());
    }
@@ -406,7 +406,7 @@ public class ClientTeleportationManager {
       if (!player.isSpectator()) {
          if (player.getVehicle() == null) {
             Box playerBoundingBox = player.getBoundingBox();
-            PortalCollisionHandler portalCollisionHandler = ((IEEntity)player).ip_getPortalCollisionHandler();
+            PortalCollisionHandler portalCollisionHandler = ((IEEntity)(Object)player).ip_getPortalCollisionHandler();
             List<Portal> collidingPortals = portalCollisionHandler == null ? Collections.emptyList() : portalCollisionHandler.getCollidingPortals();
             Direction gravityDir = GravityChangerInterface.invoker.getGravityDirection(player);
             Direction levitationDir = gravityDir.getOpposite();
@@ -464,7 +464,7 @@ public class ClientTeleportationManager {
                                  Vec3d newPos = Helper.putCoordinate(
                                     player.getEntityPos(), levitationDir.getAxis(), Helper.getCoordinate(expectedPos, levitationDir.getAxis())
                                  );
-                                 Portal currentCollidingPortal = ((IEEntity)player).ip_getCollidingPortal();
+                                 Portal currentCollidingPortal = ((IEEntity)(Object)player).ip_getCollidingPortal();
                                  if (currentCollidingPortal != null) {
                                     Vec3d eyePos = McHelper.getEyePos(player);
                                     Vec3d newEyePos = newPos.add(McHelper.getEyeOffset(player));

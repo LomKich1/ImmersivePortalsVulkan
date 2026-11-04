@@ -15,10 +15,10 @@ import qouteall.q_misc_util.platform.PlatformNetworking;
 public class MixinPlayerList {
    @Inject(
       method = {"onPlayerConnect"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/network/packet/s2c/play/DifficultyS2CPacket;<init>(Lnet/minecraft/world/Difficulty;Z)V"
-      )}
+      )
    )
    private void onConnectionEstablished(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData commonListenerCookie, CallbackInfo ci) {
       player.networkHandler.sendPacket(PlatformNetworking.get().createS2CPacket(DimLibNetworking.DimSyncPacket.createPacket(player.server)));

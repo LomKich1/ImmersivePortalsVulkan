@@ -21,10 +21,10 @@ import qouteall.imm_ptl.core.portal.PortalUtils;
 public class MixinBucketItem {
    @Redirect(
       method = {"use"},
-      at = {@At(
+      at = @At(
          value = "INVOKE",
          target = "Lnet/minecraft/item/BucketItem;raycast(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/world/RaycastContext$FluidHandling;)Lnet/minecraft/util/hit/BlockHitResult;"
-      )}
+      )
    )
    private BlockHitResult redirectRayTrace(World level, PlayerEntity player, FluidHandling fluid, @Local(argsOnly = true) LocalRef<World> worldRef) {
       double distance = 5.0;

@@ -1,5 +1,6 @@
 package qouteall.imm_ptl.core.portal;
 
+import qouteall.imm_ptl.core.compat.RenderBackendCompat;
 import com.mojang.logging.LogUtils;
 import java.lang.ref.Cleaner;
 import java.util.HashMap;
@@ -138,6 +139,10 @@ public class PortalRenderInfo implements AutoCloseable {
    }
 
    public static boolean renderAndDecideVisibility(Portal portal, Runnable queryRendering) {
+      if (!RenderBackendCompat.supportsOcclusionQuery()) {
+         return true;
+      }
+
       Profiler profiler = Profilers.get();
       boolean decision;
       if (IPGlobal.offsetOcclusionQuery) {

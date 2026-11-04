@@ -54,7 +54,7 @@ public abstract class MixinClipContext implements IERayTraceContext {
    }
 
    @Inject(
-      at = {@At("HEAD")},
+      at = @At("HEAD"),
       method = {"Lnet/minecraft/world/RaycastContext;getBlockShape(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/shape/VoxelShape;"},
       cancellable = true
    )

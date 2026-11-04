@@ -13,15 +13,15 @@ import qouteall.imm_ptl.core.render.StencilDepthTextures;
 public abstract class MixinMainTarget {
    @Inject(
       method = {"createDepthAttachment"},
-      at = {@At("HEAD")}
+      at = @At("HEAD")
    )
    private void onBeginAllocateDepthAttachment(CallbackInfoReturnable<GpuTexture> cir) {
-      StencilDepthTextures.creatingStencilDepth = ((IEFrameBuffer)this).ip_getIsStencilBufferEnabled();
+      StencilDepthTextures.creatingStencilDepth = ((IEFrameBuffer)(Object)this).ip_getIsStencilBufferEnabled();
    }
 
    @Inject(
       method = {"createDepthAttachment"},
-      at = {@At("RETURN")}
+      at = @At("RETURN")
    )
    private void onEndAllocateDepthAttachment(CallbackInfoReturnable<GpuTexture> cir) {
       StencilDepthTextures.creatingStencilDepth = false;
