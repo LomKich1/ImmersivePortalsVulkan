@@ -15,12 +15,12 @@ import net.minecraft.registry.SimpleRegistry;
 import qouteall.imm_ptl.core.McHelper;
 
 public abstract class PortalGenTrigger {
-   public static final Codec<PortalGenTrigger> triggerCodec = PortalGenTrigger.codecRegistry
-      .getCodec()
-      .dispatchStable(PortalGenTrigger::getCodec, Function.identity());
    public static final Registry<MapCodec<? extends PortalGenTrigger>> codecRegistry = new SimpleRegistry(
       RegistryKey.ofRegistry(McHelper.newResourceLocation("imm_ptl:custom_portal_gen_trigger")), Lifecycle.stable()
    );
+   public static final Codec<PortalGenTrigger> triggerCodec = PortalGenTrigger.codecRegistry
+      .getCodec()
+      .dispatchStable(PortalGenTrigger::getCodec, Function.identity());
    public static final MapCodec<PortalGenTrigger.UseItemTrigger> useItemTriggerCodec = RecordCodecBuilder.mapCodec(
       instance -> instance.group(
             Registries.ITEM.getCodec().fieldOf("item").forGetter(o -> o.item), Codec.BOOL.optionalFieldOf("consume", false).forGetter(o -> o.consume)
