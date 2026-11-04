@@ -1,6 +1,9 @@
 package qouteall.imm_ptl.core.compat;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.World;
+import qouteall.imm_ptl.core.compat.vulkanmod_compatibility.VulkanChunkStatusRouter;
 
 /**
  * Tells the rest of the mod which graphics backend Minecraft is running on.
@@ -37,5 +40,29 @@ public class RenderBackendCompat {
 
    public static String getBackendName() {
       return IS_NON_GL_RENDERER ? "Vulkan (VulkanMod)" : "OpenGL";
+   }
+
+   /**
+    * VulkanMod learns that a chunk's block data arrived from a mixin inside the vanilla
+    * ClientChunkManager.loadChunkFromPacket. ImmPtlClientChunkMap overrides that method without
+    * calling super, so the notification never happens and no section of the chunk is ever built
+    * (and entities in it are culled, because VulkanMod answers isSectionCompiledAndVisible from the
+    * built sections). Reported here for the world the chunk belongs to.
+    */
+   public static void notifyVulkanChunkDataReady(RegistryKey<World> dimension, int chunkX, int chunkZ) {
+      if (!IS_NON_GL_RENDERER) {
+         return;
+      }
+      VulkanChunkStatusRouter.withDimension(dimension, () ->
+         VulkanChunkStatusRouter.forwardSet(chunkX, chunkZ, VulkanChunkStatusRouter.FLAG_DATA_READY));
+   }
+
+   /** Counterpart of {@link #notifyVulkanChunkDataReady} for chunk unloading. */
+   public static void notifyVulkanChunkUnloaded(RegistryKey<World> dimension, int chunkX, int chunkZ) {
+      if (!IS_NON_GL_RENDERER) {
+         return;
+      }
+      VulkanChunkStatusRouter.withDimension(dimension, () ->
+         VulkanChunkStatusRouter.forwardReset(chunkX, chunkZ, VulkanChunkStatusRouter.FLAG_DATA_READY));
    }
 }

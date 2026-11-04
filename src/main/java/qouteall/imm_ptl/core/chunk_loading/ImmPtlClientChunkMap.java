@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import qouteall.imm_ptl.core.CHelper;
 import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.McHelper;
+import qouteall.imm_ptl.core.compat.RenderBackendCompat;
 import qouteall.imm_ptl.core.compat.sodium_compatibility.SodiumInterface;
 import qouteall.imm_ptl.core.ducks.IEMinecraftClient;
 import qouteall.imm_ptl.core.miscellaneous.IPVanillaCopy;
@@ -50,6 +51,7 @@ public class ImmPtlClientChunkMap extends ClientChunkManager {
 
    public void unload(ChunkPos pos) {
       Validate.isTrue(Thread.currentThread() == this.mainThread);
+      RenderBackendCompat.notifyVulkanChunkUnloaded(this.world.getRegistryKey(), pos.x, pos.z);
       WorldChunk chunk = (WorldChunk)this.chunkMapForMainThread.get(pos.toLong());
       if (chunk != null) {
          this.modifyChunkMap(chunkMap -> chunkMap.remove(pos.toLong()));
@@ -124,6 +126,7 @@ public class ImmPtlClientChunkMap extends ClientChunkManager {
       }
 
       this.world.resetChunkColor(new ChunkPos(x, z));
+      RenderBackendCompat.notifyVulkanChunkDataReady(this.world.getRegistryKey(), x, z);
       O_O.postClientChunkLoadEvent(worldChunk);
       SodiumInterface.invoker.onClientChunkLoaded(this.world, x, z);
       clientChunkLoadSignal.emit(worldChunk);

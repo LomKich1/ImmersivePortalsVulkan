@@ -7,7 +7,7 @@
     "immersive_portals_core",
     "dimlib"
   ],
-  "version": "6.0.7-vulkan.2",
+  "version": "6.0.7-vulkan.3",
   "name": "Immersive Portals (VulkanMod Port)",
   "description": "See through portals and travel between dimensions seamlessly. Ported from Immersive Portals by qouteall.",
   "authors": [
@@ -52,6 +52,7 @@
     "imm_ptl_peripheral.mixins.json",
     "imm_ptl.mixins.json",
     "imm_ptl_fabric.mixins.json",
+    "imm_ptl_compat.mixins.json",
     "q_misc_util.mixins.json"
   ],
   "depends": {

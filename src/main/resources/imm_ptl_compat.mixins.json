@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "qouteall.imm_ptl.core.compat.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "qouteall.imm_ptl.core.compat.IPCompatMixinPlugin",
+  "mixins": [
+    "vulkanmod.MixinVulkanModChunkStatusMap",
+    "vulkanmod.MixinVulkanModClientPacketListener"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
