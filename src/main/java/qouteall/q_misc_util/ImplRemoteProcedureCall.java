@@ -88,7 +88,7 @@ public class ImplRemoteProcedureCall {
       .put(byte[].class, (BiConsumer<RegistryByteBuf, Object>)(buf, o) -> buf.writeByteArray((byte[])o))
       .build();
    private static final ImmutableMap<java.lang.reflect.Type, Function<RegistryByteBuf, Object>> deserializerMap = ImmutableMap.<Class, BiConsumer<RegistryByteBuf, Object>>builder()
-      .put(Identifier.class, PacketByteBuf::readIdentifier)
+      .put(Identifier.class, (Function<RegistryByteBuf, Object>)buf -> buf.readIdentifier())
       .put((new TypeToken<RegistryKey<World>>() {}).getType(), (Function<RegistryByteBuf, Object>)buf -> RegistryKey.of(RegistryKeys.WORLD, buf.readIdentifier()))
       .put((new TypeToken<RegistryKey<Biome>>() {}).getType(), (Function<RegistryByteBuf, Object>)buf -> RegistryKey.of(RegistryKeys.BIOME, buf.readIdentifier()))
       .put(BlockPos.class, (Function<RegistryByteBuf, Object>)buf -> buf.readBlockPos())

@@ -185,7 +185,7 @@ public class PacketRedirection {
       public void write(RegistryByteBuf buf) {
          Validate.notNull(this.packet, "packet is null", new Object[0]);
          buf.writeVarInt(this.dimensionIntId);
-         PacketRedirection.PLACEHOLDER_PROTOCOL_INFO.codec().encode(buf, this.packet);
+         PacketRedirection.PLACEHOLDER_PROTOCOL_INFO.codec().encode(buf, (Packet<ClientPlayPacketListener>)(Packet<?>)this.packet);
       }
 
       public static PacketRedirection.Payload read(PacketByteBuf buf) {
@@ -196,7 +196,7 @@ public class PacketRedirection {
 
       @Environment(EnvType.CLIENT)
       public void handle(ClientPlayPacketListener listener) {
-         PacketRedirectionClient.handleRedirectedPacket(this.dimensionIntId, this.packet, listener);
+         PacketRedirectionClient.handleRedirectedPacket(this.dimensionIntId, (Packet<ClientPlayPacketListener>)(Packet<?>)this.packet, listener);
       }
 
       @NotNull

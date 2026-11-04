@@ -113,7 +113,7 @@ public abstract class MixinClientLevel implements IEClientWorld {
    private void onOnEntityAdded(Entity entityIn, CallbackInfo ci) {
       if (ClientWorldLoader.getIsInitialized()) {
          for (ClientWorld world : ClientWorldLoader.getClientWorlds()) {
-            if (world != this) {
+            if (world != (Object)this) {
                world.removeEntity(entityIn.getId(), RemovalReason.DISCARDED);
             }
          }

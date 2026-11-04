@@ -81,7 +81,7 @@ public class ClientDebugCommand {
          .then(
             LiteralArgumentBuilder.<S>literal("set_max_portal_layer")
                .then(
-                  RequiredArgumentBuilder.argument("argMaxPortalLayer", IntegerArgumentType.integer())
+                  RequiredArgumentBuilder.<S, Integer>argument("argMaxPortalLayer", IntegerArgumentType.integer())
                      .executes(context -> setMaxPortalLayer(IntegerArgumentType.getInteger(context, "argMaxPortalLayer")))
                )
          );
@@ -92,8 +92,8 @@ public class ClientDebugCommand {
       builder = (LiteralArgumentBuilder<S>)builder.then(
          LiteralArgumentBuilder.<S>literal("is_client_chunk_loaded")
             .then(
-               RequiredArgumentBuilder.argument("chunkX", IntegerArgumentType.integer())
-                  .then(RequiredArgumentBuilder.argument("chunkZ", IntegerArgumentType.integer()).executes(ClientDebugCommand::isClientChunkLoaded))
+               RequiredArgumentBuilder.<S, Integer>argument("chunkX", IntegerArgumentType.integer())
+                  .then(RequiredArgumentBuilder.<S, Integer>argument("chunkZ", IntegerArgumentType.integer()).executes(ClientDebugCommand::isClientChunkLoaded))
             )
       );
       builder = (LiteralArgumentBuilder<S>)builder.then(LiteralArgumentBuilder.<S>literal("report_player_status").executes(context -> {
@@ -304,7 +304,7 @@ public class ClientDebugCommand {
       }));
       builder.then(
          LiteralArgumentBuilder.<S>literal("disable_warning_for")
-            .then(RequiredArgumentBuilder.argument("warningKey", StringArgumentType.string()).executes(context -> {
+            .then(RequiredArgumentBuilder.<S, String>argument("warningKey", StringArgumentType.string()).executes(context -> {
                disableWarningFor(StringArgumentType.getString(context, "warningKey"));
                support.sendFeedback((S)context.getSource(), Text.translatable("imm_ptl.warning_disabled"));
                return 0;
@@ -334,12 +334,12 @@ public class ClientDebugCommand {
          builder.then(
             LiteralArgumentBuilder.<S>literal("tp_on_client_side")
                .then(
-                  RequiredArgumentBuilder.argument("dim_id", StringArgumentType.string())
+                  RequiredArgumentBuilder.<S, String>argument("dim_id", StringArgumentType.string())
                      .then(
-                        RequiredArgumentBuilder.argument("x", DoubleArgumentType.doubleArg())
+                        RequiredArgumentBuilder.<S, Double>argument("x", DoubleArgumentType.doubleArg())
                            .then(
-                              RequiredArgumentBuilder.argument("y", DoubleArgumentType.doubleArg())
-                                 .then(RequiredArgumentBuilder.argument("z", DoubleArgumentType.doubleArg()).executes(context -> {
+                              RequiredArgumentBuilder.<S, Double>argument("y", DoubleArgumentType.doubleArg())
+                                 .then(RequiredArgumentBuilder.<S, Double>argument("z", DoubleArgumentType.doubleArg()).executes(context -> {
                                     String dimId = StringArgumentType.getString(context, "dim_id");
                                     double x = DoubleArgumentType.getDouble(context, "x");
                                     double y = DoubleArgumentType.getDouble(context, "y");
@@ -363,7 +363,7 @@ public class ClientDebugCommand {
       }));
       builder.then(
          LiteralArgumentBuilder.<S>literal("force_main_thread_chunk_rebuild")
-            .then(RequiredArgumentBuilder.argument("frameCount", IntegerArgumentType.integer(0, 10000)).executes(context -> {
+            .then(RequiredArgumentBuilder.<S, Integer>argument("frameCount", IntegerArgumentType.integer(0, 10000)).executes(context -> {
                int frameCount = IntegerArgumentType.getInteger(context, "frameCount");
                ForceMainThreadRebuild.forceMainThreadRebuildFor(frameCount);
                return 0;
@@ -416,7 +416,7 @@ public class ClientDebugCommand {
    private static <S> void registerPortalWandCommands(LiteralArgumentBuilder<S> builder, ClientPlatform.ClientCommandSupport<S> support) {
       builder.then(
          LiteralArgumentBuilder.<S>literal("set_cursor_alignment")
-            .then(RequiredArgumentBuilder.argument("alignment", IntegerArgumentType.integer(0)).executes(context -> {
+            .then(RequiredArgumentBuilder.<S, Integer>argument("alignment", IntegerArgumentType.integer(0)).executes(context -> {
                int alignment = IntegerArgumentType.getInteger(context, "alignment");
                IPConfig config = IPConfig.getConfig();
                config.portalWandCursorAlignment = alignment;
