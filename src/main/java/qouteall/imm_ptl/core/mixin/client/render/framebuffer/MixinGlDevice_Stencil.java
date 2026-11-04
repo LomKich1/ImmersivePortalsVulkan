@@ -26,9 +26,9 @@ public class MixinGlDevice_Stencil {
    )
    private void modifyTexImage2D(Args args) {
       if (StencilDepthTextures.creatingStencilDepth && (Integer)args.get(2) == GlConst.toGlInternalId(TextureFormat.DEPTH32)) {
-         args.set(2, IPCGlobal.useSeparatedStencilFormat ? '貭' : '裰');
+         args.set(2, IPCGlobal.useSeparatedStencilFormat ? 36013 : 35056);
          args.set(6, 34041);
-         args.set(7, IPCGlobal.useSeparatedStencilFormat ? '趭' : '蓺');
+         args.set(7, IPCGlobal.useSeparatedStencilFormat ? 36269 : 34042);
       }
    }
 
