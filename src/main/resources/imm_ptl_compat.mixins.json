@@ -6,7 +6,9 @@
   "plugin": "qouteall.imm_ptl.core.compat.IPCompatMixinPlugin",
   "mixins": [
     "vulkanmod.MixinVulkanModChunkStatusMap",
-    "vulkanmod.MixinVulkanModClientPacketListener"
+    "vulkanmod.MixinVulkanModClientPacketListener",
+    "vulkanmod.MixinVulkanModCommandEncoder",
+    "vulkanmod.MixinVulkanModDefaultMainPass"
   ],
   "injectors": {
     "defaultRequire": 1

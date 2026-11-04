@@ -161,6 +161,7 @@ public abstract class MixinMinecraft implements IEMinecraftClient {
 
    @Override
    public void ip_setFrameBuffer(Framebuffer buffer) {
+      qouteall.imm_ptl.core.compat.RenderBackendCompat.noteMainTargetSwap(this.framebuffer);
       this.framebuffer = buffer;
    }
 

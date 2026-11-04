@@ -1,6 +1,8 @@
 package qouteall.imm_ptl.core.compat;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import qouteall.imm_ptl.core.compat.vulkanmod_compatibility.VulkanChunkStatusRouter;
@@ -64,5 +66,25 @@ public class RenderBackendCompat {
       }
       VulkanChunkStatusRouter.withDimension(dimension, () ->
          VulkanChunkStatusRouter.forwardReset(chunkX, chunkZ, VulkanChunkStatusRouter.FLAG_DATA_READY));
+   }
+
+   // ---- the window's own render target ----
+
+   private static Framebuffer realMainTarget = null;
+
+   /**
+    * Called by MixinMinecraft.ip_setFrameBuffer before the reference is replaced. The first swap
+    * always starts from the window's real target (later swaps restore it), so that is what is kept.
+    */
+   public static void noteMainTargetSwap(Framebuffer current) {
+      if (realMainTarget == null) {
+         realMainTarget = current;
+      }
+   }
+
+   /** The window's own render target, whatever Immersive Portals currently put in its place. */
+   public static Framebuffer getRealMainTarget() {
+      Framebuffer result = realMainTarget;
+      return result != null ? result : MinecraftClient.getInstance().getFramebuffer();
    }
 }
