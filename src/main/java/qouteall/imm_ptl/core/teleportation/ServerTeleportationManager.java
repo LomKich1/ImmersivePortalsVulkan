@@ -362,10 +362,11 @@ public class ServerTeleportationManager {
                TeleportationUtil.transformEntityVelocity(portal, entity, TeleportationUtil.PortalPointVelocity.ZERO, oldPos);
                if (portal.getDestDim() != entity.getEntityWorld().getRegistryKey()) {
                   entity = this.changeEntityDimension(entity, portal.getDestDim(), newEyePos, true);
+                  Entity newVehicle = entity;
                   passengerList.stream()
                      .map(e -> this.changeEntityDimension(e, portal.getDestDim(), newEyePos, true))
                      .collect(Collectors.toList())
-                     .forEach(e -> e.startRiding(entity, true, false));
+                     .forEach(e -> e.startRiding(newVehicle, true, false));
                }
 
                McHelper.setEyePos(entity, newEyePos, newEyePos);
