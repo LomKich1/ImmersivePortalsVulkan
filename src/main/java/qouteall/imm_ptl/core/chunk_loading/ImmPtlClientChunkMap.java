@@ -115,9 +115,10 @@ public class ImmPtlClientChunkMap extends ClientChunkManager {
       long chunkPosLong = ChunkPos.toLong(x, z);
       WorldChunk worldChunk = (WorldChunk)this.chunkMapForMainThread.get(chunkPosLong);
       if (worldChunk == null) {
-         worldChunk = new WorldChunk(this.world, new ChunkPos(x, z));
-         this.loadChunkDataFromPacket(buf, heightmaps, worldChunk, consumer);
-         this.modifyChunkMap(chunkMap -> chunkMap.put(chunkPosLong, worldChunk));
+         WorldChunk newChunk = new WorldChunk(this.world, new ChunkPos(x, z));
+         worldChunk = newChunk;
+         this.loadChunkDataFromPacket(buf, heightmaps, newChunk, consumer);
+         this.modifyChunkMap(chunkMap -> chunkMap.put(chunkPosLong, newChunk));
       } else {
          this.loadChunkDataFromPacket(buf, heightmaps, worldChunk, consumer);
       }
