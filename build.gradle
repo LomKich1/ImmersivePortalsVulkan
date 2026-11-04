@@ -47,7 +47,3 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
     options.compilerArgs << "-Xmaxerrs" << "1000"
 }
-
-jar {
-    from("src/main/resources/LICENSE_immersive-portals")
-}
