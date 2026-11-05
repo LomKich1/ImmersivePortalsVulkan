@@ -7,7 +7,7 @@
     "immersive_portals_core",
     "dimlib"
   ],
-  "version": "6.0.7-vulkan.5",
+  "version": "6.0.7-vulkan.6",
   "name": "Immersive Portals (VulkanMod Port)",
   "description": "See through portals and travel between dimensions seamlessly. Ported from Immersive Portals by qouteall.",
   "authors": [

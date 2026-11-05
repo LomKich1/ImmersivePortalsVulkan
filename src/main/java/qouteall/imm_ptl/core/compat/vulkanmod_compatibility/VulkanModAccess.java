@@ -34,6 +34,7 @@ public class VulkanModAccess {
    private static Field worldRendererGraphNeedsUpdateField;
    private static Method sectionGridGetRenderSectionsAt;
    private static Method renderSectionSetDirty;
+   private static Method worldRendererSetLevel;
 
    private static String lastReportedFailure = null;
 
@@ -72,6 +73,8 @@ public class VulkanModAccess {
          worldRendererSectionGridField.setAccessible(true);
          worldRendererGraphNeedsUpdateField = worldRenderer.getDeclaredField("graphNeedsUpdate");
          worldRendererGraphNeedsUpdateField.setAccessible(true);
+
+         worldRendererSetLevel = worldRenderer.getDeclaredMethod("setLevel", ClientWorld.class);
 
          Class<?> sectionGrid = Class.forName("net.vulkanmod.render.chunk.SectionGrid");
          sectionGridGetRenderSectionsAt = sectionGrid.getDeclaredMethod("getRenderSectionsAt", int.class, int.class);
@@ -174,6 +177,18 @@ public class VulkanModAccess {
          return level instanceof ClientWorld ? (ClientWorld) level : null;
       } catch (Throwable e) {
          return null;
+      }
+   }
+
+   /** Calls VulkanMod's own WorldRenderer.setLevel (rebuilds its section grid for that world). */
+   public static void bindWorldRendererLevel(Object worldRenderer, ClientWorld level) {
+      if (!isAvailable() || worldRenderer == null) {
+         return;
+      }
+      try {
+         worldRendererSetLevel.invoke(worldRenderer, level);
+      } catch (Throwable e) {
+         reportOnce("bind terrain level", e);
       }
    }
 
