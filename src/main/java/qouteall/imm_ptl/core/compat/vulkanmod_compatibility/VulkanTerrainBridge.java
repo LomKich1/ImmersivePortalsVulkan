@@ -1,8 +1,13 @@
 package qouteall.imm_ptl.core.compat.vulkanmod_compatibility;
 
+import java.lang.reflect.Field;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.Frustum;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import qouteall.imm_ptl.core.ClientWorldLoader;
+import qouteall.imm_ptl.core.compat.RenderBackendCompat;
 import qouteall.q_misc_util.Helper;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -120,5 +125,113 @@ public class VulkanTerrainBridge {
       }
       VulkanModAccess.bindWorldRendererLevel(worldRenderer, world);
       return VulkanModAccess.getWorldRendererLevel(worldRenderer) == world;
+   }
+
+   // ---- nested (portal) passes on the same terrain renderer ----
+   //
+   // A portal pass into the same dimension uses the same LevelRenderer and the same VulkanMod
+   // WorldRenderer as the pass that contains it. VulkanMod keeps the camera, the matrices (in the
+   // LevelRenderer) and the set of visible sections (in the WorldRenderer) between the terrain
+   // setup and the later terrain layers, so after the portal pass the translucent layer (water,
+   // glass) would be drawn with the portal's camera and sections. The state is saved before a
+   // nested pass and restored after it.
+
+   private static long setupCount = 0;
+   private static Camera lastSetupCamera = null;
+   private static Frustum lastSetupFrustum = null;
+   private static boolean lastSetupSpectator = false;
+
+   private static boolean fieldsResolved = false;
+   private static Field fCamX, fCamY, fCamZ, fModelView, fProjection;
+
+   /** Called by the WorldRenderer.setupRenderer hook each time the setup actually runs. */
+   public static void onSetupRenderer(Camera camera, Frustum frustum, boolean spectator) {
+      setupCount++;
+      lastSetupCamera = camera;
+      lastSetupFrustum = frustum;
+      lastSetupSpectator = spectator;
+   }
+
+   private static final class NestedState {
+      WorldRenderer levelRenderer;
+      double camX, camY, camZ;
+      Object modelView, projection;
+      long setupCountAtBegin;
+      Camera camera;
+      Frustum frustum;
+      boolean spectator;
+   }
+
+   private static void resolveFields(WorldRenderer levelRenderer) {
+      if (fieldsResolved) {
+         return;
+      }
+      fieldsResolved = true;
+      try {
+         Class<?> c = levelRenderer.getClass();
+         fCamX = field(c, "camX");
+         fCamY = field(c, "camY");
+         fCamZ = field(c, "camZ");
+         fModelView = field(c, "modelView");
+         fProjection = field(c, "projection");
+      } catch (Throwable e) {
+         fCamX = null;
+         Helper.err("[Immersive Portals] cannot read VulkanMod's per frame view state: " + e);
+      }
+   }
+
+   private static Field field(Class<?> c, String name) throws NoSuchFieldException {
+      Field f = c.getDeclaredField(name);
+      f.setAccessible(true);
+      return f;
+   }
+
+   /** Call before a nested world render starts, with the LevelRenderer of the enclosing pass. */
+   public static Object beginNestedRender(WorldRenderer outerLevelRenderer) {
+      if (!RenderBackendCompat.IS_NON_GL_RENDERER || outerLevelRenderer == null || !VulkanModAccess.isAvailable()) {
+         return null;
+      }
+      resolveFields(outerLevelRenderer);
+      if (fCamX == null) {
+         return null;
+      }
+      try {
+         NestedState state = new NestedState();
+         state.levelRenderer = outerLevelRenderer;
+         state.camX = fCamX.getDouble(outerLevelRenderer);
+         state.camY = fCamY.getDouble(outerLevelRenderer);
+         state.camZ = fCamZ.getDouble(outerLevelRenderer);
+         state.modelView = fModelView.get(outerLevelRenderer);
+         state.projection = fProjection.get(outerLevelRenderer);
+         state.setupCountAtBegin = setupCount;
+         state.camera = lastSetupCamera;
+         state.frustum = lastSetupFrustum;
+         state.spectator = lastSetupSpectator;
+         return state;
+      } catch (Throwable e) {
+         return null;
+      }
+   }
+
+   /** Call after the nested render, once the enclosing world and camera are back in place. */
+   public static void endNestedRender(Object token) {
+      if (!(token instanceof NestedState)) {
+         return;
+      }
+      NestedState state = (NestedState) token;
+      try {
+         fCamX.setDouble(state.levelRenderer, state.camX);
+         fCamY.setDouble(state.levelRenderer, state.camY);
+         fCamZ.setDouble(state.levelRenderer, state.camZ);
+         fModelView.set(state.levelRenderer, state.modelView);
+         fProjection.set(state.levelRenderer, state.projection);
+      } catch (Throwable e) {
+         Helper.err("[Immersive Portals] restoring VulkanMod view state failed: " + e);
+         return;
+      }
+      // the nested pass ran the terrain setup on this renderer: redo it for the enclosing camera
+      if (setupCount != state.setupCountAtBegin && state.camera != null && state.frustum != null) {
+         VulkanModAccess.runSetupRenderer(VulkanModAccess.getWorldRenderer(), state.camera, state.frustum, state.spectator);
+      }
    }
 }

@@ -4,6 +4,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.Frustum;
 import net.minecraft.client.world.ClientWorld;
 import qouteall.imm_ptl.core.compat.RenderBackendCompat;
 import qouteall.q_misc_util.Helper;
@@ -35,6 +37,7 @@ public class VulkanModAccess {
    private static Method sectionGridGetRenderSectionsAt;
    private static Method renderSectionSetDirty;
    private static Method worldRendererSetLevel;
+   private static Method worldRendererSetupRenderer;
 
    private static String lastReportedFailure = null;
 
@@ -75,6 +78,8 @@ public class VulkanModAccess {
          worldRendererGraphNeedsUpdateField.setAccessible(true);
 
          worldRendererSetLevel = worldRenderer.getDeclaredMethod("setLevel", ClientWorld.class);
+         worldRendererSetupRenderer = worldRenderer.getDeclaredMethod(
+            "setupRenderer", Camera.class, Frustum.class, boolean.class, boolean.class);
 
          Class<?> sectionGrid = Class.forName("net.vulkanmod.render.chunk.SectionGrid");
          sectionGridGetRenderSectionsAt = sectionGrid.getDeclaredMethod("getRenderSectionsAt", int.class, int.class);
@@ -189,6 +194,18 @@ public class VulkanModAccess {
          worldRendererSetLevel.invoke(worldRenderer, level);
       } catch (Throwable e) {
          reportOnce("bind terrain level", e);
+      }
+   }
+
+   /** Runs VulkanMod's per frame terrain setup (culling and section scheduling) for a camera. */
+   public static void runSetupRenderer(Object worldRenderer, Camera camera, Frustum frustum, boolean spectator) {
+      if (!isAvailable() || worldRenderer == null) {
+         return;
+      }
+      try {
+         worldRendererSetupRenderer.invoke(worldRenderer, camera, frustum, false, spectator);
+      } catch (Throwable e) {
+         reportOnce("run terrain setup", e);
       }
    }
 

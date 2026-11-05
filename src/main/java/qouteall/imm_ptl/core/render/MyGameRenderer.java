@@ -165,6 +165,7 @@ public class MyGameRenderer {
       Camera newCamera = new Camera();
       ClientWorld oldWorld = client.world;
       WorldRenderer oldWorldRenderer = client.worldRenderer;
+      Object vkNestedState = qouteall.imm_ptl.core.compat.vulkanmod_compatibility.VulkanTerrainBridge.beginNestedRender(oldWorldRenderer);
       LightmapTextureManager oldLightmap = client.gameRenderer.getLightmapTextureManager();
       boolean oldNoClip = client.player.noClip;
       boolean oldDoRenderHand = ieGameRenderer.ip_getDoRenderHand();
@@ -264,6 +265,7 @@ public class MyGameRenderer {
       client.crosshairTarget = oldCrosshairTarget;
       ieGameRenderer.ip_setCamera(oldCamera);
       updateGlobalSettingsUniform(oldCamera);
+      qouteall.imm_ptl.core.compat.vulkanmod_compatibility.VulkanTerrainBridge.endNestedRender(vkNestedState);
       FogRendererContext.swappingManager.popSwapping();
       ((IEWorldRenderer)(Object)oldWorldRenderer).portal_setChunkInfoList(oldChunkInfoList);
       VisibleSectionDiscovery.returnList(newChunkInfoList);

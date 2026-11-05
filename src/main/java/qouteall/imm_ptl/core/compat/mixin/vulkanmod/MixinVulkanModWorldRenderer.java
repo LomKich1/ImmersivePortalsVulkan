@@ -1,5 +1,7 @@
 package qouteall.imm_ptl.core.compat.mixin.vulkanmod;
 
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.Frustum;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,10 +41,12 @@ public class MixinVulkanModWorldRenderer {
    }
 
    @Inject(method = "setupRenderer", at = @At("HEAD"), cancellable = true, require = 0)
-   private void ip_bindOrSkipSetup(CallbackInfo ci) {
+   private void ip_bindOrSkipSetup(Camera camera, Frustum frustum, boolean isCapturedFrustum, boolean spectator, CallbackInfo ci) {
       if (!VulkanTerrainBridge.prepareForFrame(this)) {
          ci.cancel();
+         return;
       }
+      VulkanTerrainBridge.onSetupRenderer(camera, frustum, spectator);
    }
 
    @Inject(method = "renderSectionLayer", at = @At("HEAD"), cancellable = true, require = 0)
