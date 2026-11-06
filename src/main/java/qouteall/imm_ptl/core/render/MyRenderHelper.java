@@ -382,6 +382,7 @@ public class MyRenderHelper {
 
    public static void applyMirrorFaceCulling() {
       if (!RenderBackendCompat.isRawGlAvailable()) {
+         qouteall.imm_ptl.core.compat.vulkanmod_compatibility.VulkanTerrainBridge.setMirrorFrontFace(true);
          return;
       }
 
@@ -390,6 +391,7 @@ public class MyRenderHelper {
 
    public static void recoverFaceCulling() {
       if (!RenderBackendCompat.isRawGlAvailable()) {
+         qouteall.imm_ptl.core.compat.vulkanmod_compatibility.VulkanTerrainBridge.setMirrorFrontFace(false);
          return;
       }
 

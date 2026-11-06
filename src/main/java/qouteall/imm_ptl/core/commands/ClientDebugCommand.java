@@ -373,6 +373,8 @@ public class ClientDebugCommand {
       registerPortalWandCommands(wandBuilder, support);
       builder.then(wandBuilder);
       registerSwitchCommand(builder, "front_clipping", cond -> IPCGlobal.useFrontClipping = cond);
+      registerSwitchCommand(builder, "vk_mirror_culling", cond -> qouteall.imm_ptl.core.compat.vulkanmod_compatibility.VulkanTerrainBridge.mirrorCullingEnabled = cond);
+      registerSwitchCommand(builder, "vk_oblique_clipping", cond -> qouteall.imm_ptl.core.compat.vulkanmod_compatibility.VulkanTerrainBridge.obliqueClippingEnabled = cond);
       registerSwitchCommand(builder, "gl_check_error", cond -> IPGlobal.doCheckGlError = cond);
       registerSwitchCommand(builder, "early_light_update", cond -> IPCGlobal.lateClientLightUpdate = cond);
       registerSwitchCommand(builder, "early_remote_upload", cond -> IPCGlobal.earlyRemoteUpload = cond);

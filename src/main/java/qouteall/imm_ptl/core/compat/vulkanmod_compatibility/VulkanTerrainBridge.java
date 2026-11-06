@@ -1,13 +1,17 @@
 package qouteall.imm_ptl.core.compat.vulkanmod_compatibility;
 
 import java.lang.reflect.Field;
+import java.util.ArrayDeque;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
+import org.joml.Matrix4f;
 import qouteall.imm_ptl.core.ClientWorldLoader;
 import qouteall.imm_ptl.core.compat.RenderBackendCompat;
+import qouteall.imm_ptl.core.render.FrontClipping;
+import qouteall.imm_ptl.core.render.context_management.PortalRendering;
 import qouteall.q_misc_util.Helper;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -219,6 +223,7 @@ public class VulkanTerrainBridge {
          return;
       }
       NestedState state = (NestedState) token;
+      setMirrorFrontFace(false);
       try {
          fCamX.setDouble(state.levelRenderer, state.camX);
          fCamY.setDouble(state.levelRenderer, state.camY);
@@ -233,5 +238,113 @@ public class VulkanTerrainBridge {
       if (setupCount != state.setupCountAtBegin && state.camera != null && state.frustum != null) {
          VulkanModAccess.runSetupRenderer(VulkanModAccess.getWorldRenderer(), state.camera, state.frustum, state.spectator);
       }
+   }
+
+   // ---- mirrors and front clipping inside portal passes ----
+   //
+   // Both are done in the GL path with state VulkanMod does not have: glCullFace(GL_FRONT) for a
+   // view through an odd number of mirrors, and a clip distance written by patched vanilla shaders
+   // (VulkanMod's terrain shader is its own). The first becomes a flip of VulkanMod's front face;
+   // the second becomes an oblique near plane in the projection used for the terrain layer.
+   // Both can be switched off in game with the client debug commands (see ClientDebugCommand).
+
+   public static boolean mirrorCullingEnabled = true;
+   public static boolean obliqueClippingEnabled = true;
+
+   private static final ArrayDeque<Object[]> clipBackups = new ArrayDeque<>();
+   private static boolean loggedMirror = false;
+   private static boolean loggedOblique = false;
+   private static boolean loggedObliqueRejected = false;
+
+   public static void setMirrorFrontFace(boolean mirrored) {
+      if (!RenderBackendCompat.IS_NON_GL_RENDERER || !VulkanModAccess.isAvailable()) {
+         return;
+      }
+      boolean apply = mirrored && mirrorCullingEnabled;
+      if (VulkanModAccess.setFrontFaceClockwise(apply) && apply && !loggedMirror) {
+         loggedMirror = true;
+         Helper.log("[IP-VK] mirror pass: VulkanMod front face flipped");
+      }
+   }
+
+   /** Before a terrain layer inside a portal pass: puts the portal's clip plane into the projection. */
+   public static void beginClippedLayer(WorldRenderer levelRenderer) {
+      Matrix4f backup = null;
+      try {
+         if (obliqueClippingEnabled && RenderBackendCompat.IS_NON_GL_RENDERER && VulkanModAccess.isAvailable()
+            && PortalRendering.isRendering() && FrontClipping.isClippingEnabled) {
+            double[] equation = FrontClipping.getActiveClipPlaneEquationAfterModelView();
+            resolveFields(levelRenderer);
+            if (equation != null && fProjection != null) {
+               Object current = fProjection.get(levelRenderer);
+               if (current instanceof Matrix4f) {
+                  Matrix4f projection = (Matrix4f) current;
+                  Matrix4f copy = new Matrix4f(projection);
+                  if (applyObliqueNearPlane(projection, equation)) {
+                     backup = copy;
+                  }
+               }
+            }
+         }
+      } catch (Throwable e) {
+         backup = null;
+      }
+      clipBackups.push(new Object[]{levelRenderer, backup});
+   }
+
+   /** After the terrain layer: puts the original projection back. */
+   public static void endClippedLayer() {
+      Object[] entry = clipBackups.poll();
+      if (entry == null || entry[1] == null) {
+         return;
+      }
+      try {
+         Object current = fProjection.get(entry[0]);
+         if (current instanceof Matrix4f) {
+            ((Matrix4f) current).set((Matrix4f) entry[1]);
+         }
+      } catch (Throwable e) {
+         Helper.err("[Immersive Portals] restoring the projection after clipping failed: " + e);
+      }
+   }
+
+   /**
+    * Lengyel's oblique near plane. The plane is in eye space, kept side where dot(plane, p) >= 0, as
+    * IP's GL clip distance uses it. Only a standard perspective matrix is touched, and only when the
+    * camera is on the clipped side; anything else leaves the matrix alone.
+    */
+   private static boolean applyObliqueNearPlane(Matrix4f m, double[] eq) {
+      float a = (float) eq[0];
+      float b = (float) eq[1];
+      float c = (float) eq[2];
+      float d = (float) eq[3];
+      boolean perspective = Math.abs(m.m23() + 1.0F) < 1.0E-3F && Math.abs(m.m33()) < 1.0E-6F
+         && Math.abs(m.m00()) > 1.0E-6F && Math.abs(m.m11()) > 1.0E-6F && Math.abs(m.m32()) > 1.0E-9F;
+      if (!perspective || !(d < 0.0F) || Float.isNaN(a + b + c + d)) {
+         if (!loggedObliqueRejected) {
+            loggedObliqueRejected = true;
+            Helper.log("[IP-VK] oblique clipping skipped: perspective=" + perspective + " plane=(" + a + "," + b + "," + c + "," + d + ")");
+         }
+         return false;
+      }
+      float qx = (Math.signum(a) + m.m20()) / m.m00();
+      float qy = (Math.signum(b) + m.m21()) / m.m11();
+      float qz = -1.0F;
+      float qw = (1.0F + m.m22()) / m.m32();
+      float dot = a * qx + b * qy + c * qz + d * qw;
+      if (Float.isNaN(dot) || Math.abs(dot) < 1.0E-6F) {
+         return false;
+      }
+      float scale = 2.0F / dot;
+      m.m02(a * scale);
+      m.m12(b * scale);
+      m.m22(c * scale + 1.0F);
+      m.m32(d * scale);
+      if (!loggedOblique) {
+         loggedOblique = true;
+         Helper.log("[IP-VK] oblique front clipping applied to the terrain of a portal pass, plane=("
+            + a + "," + b + "," + c + "," + d + ")");
+      }
+      return true;
    }
 }

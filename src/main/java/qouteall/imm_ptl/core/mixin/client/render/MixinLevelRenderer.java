@@ -271,6 +271,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
    private void onBeforeRenderingLayer(Matrix4f modelView) {
       if (PortalRendering.isRendering()) {
          FrontClipping.setupInnerClipping(PortalRendering.getActiveClippingPlane(), modelView, -0.01);
+         qouteall.imm_ptl.core.compat.vulkanmod_compatibility.VulkanTerrainBridge.beginClippedLayer((WorldRenderer)(Object)this);
          if (PortalRendering.isRenderingOddNumberOfMirrors()) {
             MyRenderHelper.applyMirrorFaceCulling();
          }
@@ -283,6 +284,7 @@ public abstract class MixinLevelRenderer implements IEWorldRenderer {
 
    private void onAfterRenderingLayer() {
       if (PortalRendering.isRendering()) {
+         qouteall.imm_ptl.core.compat.vulkanmod_compatibility.VulkanTerrainBridge.endClippedLayer();
          FrontClipping.disableClipping();
          MyRenderHelper.recoverFaceCulling();
          if (IPGlobal.enableDepthClampForPortalRendering) {

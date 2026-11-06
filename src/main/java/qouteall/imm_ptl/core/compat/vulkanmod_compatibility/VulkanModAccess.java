@@ -39,6 +39,9 @@ public class VulkanModAccess {
    private static Method worldRendererSetLevel;
    private static Method worldRendererSetupRenderer;
 
+   private static boolean frontFaceResolved = false;
+   private static Field frontFaceField;
+
    private static String lastReportedFailure = null;
 
    private VulkanModAccess() {
@@ -91,6 +94,37 @@ public class VulkanModAccess {
       } catch (Throwable e) {
          available = false;
          Helper.err("[Immersive Portals] cannot drive VulkanMod chunk status map: " + e);
+      }
+   }
+
+   // ---- face winding ----
+
+   /**
+    * Sets VulkanMod's global front face (it is encoded into the pipeline state at every draw).
+    * Clockwise is what GL's glCullFace(GL_FRONT) amounts to with back face culling on, which is
+    * what a view through an odd number of mirrors needs. Returns false when it cannot be done.
+    */
+   public static boolean setFrontFaceClockwise(boolean clockwise) {
+      if (!frontFaceResolved) {
+         frontFaceResolved = true;
+         try {
+            frontFaceField = Class.forName("net.vulkanmod.vulkan.VRenderSystem").getDeclaredField("frontFace");
+            frontFaceField.setAccessible(true);
+         } catch (Throwable e) {
+            frontFaceField = null;
+            Helper.err("[Immersive Portals] cannot switch VulkanMod's face winding for mirrors: " + e);
+         }
+      }
+      if (frontFaceField == null) {
+         return false;
+      }
+      try {
+         // VK_FRONT_FACE_COUNTER_CLOCKWISE = 0, VK_FRONT_FACE_CLOCKWISE = 1
+         frontFaceField.setInt(null, clockwise ? 1 : 0);
+         return true;
+      } catch (Throwable e) {
+         frontFaceField = null;
+         return false;
       }
    }
 
